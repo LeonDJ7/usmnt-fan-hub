@@ -62,7 +62,7 @@
 		75A48B5E23B5AF2E001338C6 /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		75CF82FB2425690F00C11CCB /* TopicVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicVC.swift; sourceTree = "<group>"; };
 		75CFF95021ED543200C3F8E1 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
-		75D0077621E7F36800EBFB8D /* USA Soccer Calendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "USA Soccer Calendar.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		75D0077621E7F36800EBFB8D /* USMNT Fan App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "USMNT Fan App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		75D0077921E7F36800EBFB8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		75D0077B21E7F36800EBFB8D /* CalendarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarVC.swift; sourceTree = "<group>"; };
 		75D0078021E7F36A00EBFB8D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -134,7 +134,7 @@
 		75D0077721E7F36800EBFB8D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				75D0077621E7F36800EBFB8D /* USA Soccer Calendar.app */,
+				75D0077621E7F36800EBFB8D /* USMNT Fan App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -225,9 +225,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		75D0077521E7F36800EBFB8D /* USA Soccer Calendar */ = {
+		75D0077521E7F36800EBFB8D /* USMNT Fan App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 75D0078821E7F36A00EBFB8D /* Build configuration list for PBXNativeTarget "USA Soccer Calendar" */;
+			buildConfigurationList = 75D0078821E7F36A00EBFB8D /* Build configuration list for PBXNativeTarget "USMNT Fan App" */;
 			buildPhases = (
 				15F83A69C04697CE6AF8399F /* [CP] Check Pods Manifest.lock */,
 				75D0077221E7F36800EBFB8D /* Sources */,
@@ -240,9 +240,9 @@
 			);
 			dependencies = (
 			);
-			name = "USA Soccer Calendar";
+			name = "USMNT Fan App";
 			productName = "USA Soccer Calendar";
-			productReference = 75D0077621E7F36800EBFB8D /* USA Soccer Calendar.app */;
+			productReference = 75D0077621E7F36800EBFB8D /* USMNT Fan App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -260,7 +260,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 75D0077121E7F36800EBFB8D /* Build configuration list for PBXProject "USA Soccer Calendar" */;
+			buildConfigurationList = 75D0077121E7F36800EBFB8D /* Build configuration list for PBXProject "USMNT Fan App" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -273,7 +273,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				75D0077521E7F36800EBFB8D /* USA Soccer Calendar */,
+				75D0077521E7F36800EBFB8D /* USMNT Fan App */,
 			);
 		};
 /* End PBXProject section */
@@ -583,7 +583,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		75D0077121E7F36800EBFB8D /* Build configuration list for PBXProject "USA Soccer Calendar" */ = {
+		75D0077121E7F36800EBFB8D /* Build configuration list for PBXProject "USMNT Fan App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				75D0078621E7F36A00EBFB8D /* Debug */,
@@ -592,7 +592,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		75D0078821E7F36A00EBFB8D /* Build configuration list for PBXNativeTarget "USA Soccer Calendar" */ = {
+		75D0078821E7F36A00EBFB8D /* Build configuration list for PBXNativeTarget "USMNT Fan App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				75D0078921E7F36A00EBFB8D /* Debug */,
