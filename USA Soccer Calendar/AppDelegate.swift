@@ -7,16 +7,95 @@
 //
 
 import UIKit
+import Firebase
+import GoogleMobileAds
+import GoogleSignIn
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
 
     var window: UIWindow?
-
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        FirebaseApp.configure()
+        GADMobileAds.configure(withApplicationID: "ca-app-pub-2790005755690511~2126004075")
+        
+        GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
+        GIDSignIn.sharedInstance().delegate = self
+        
+        let homeVC = HomeVC()
+        let calendarVC = CalendarVC()
+        let forumHomeVC = ForumHomeVC()
+        let rosterVC = RosterVC()
+        let pollsVC = PollsVC()
+        
+        // rosterVC attributes
+        rosterVC.tabBarItem.title = "Roster"
+        rosterVC.navigationController?.navigationBar.isHidden = true
+        rosterVC.tabBarItem.image = UIImage(named: "RosterIcon")
+        
+        // create polls navController
+        let pollsNavController = UINavigationController(rootViewController: pollsVC)
+        pollsNavController.navigationBar.isHidden = true
+        pollsNavController.tabBarItem.title = "Polls"
+        pollsNavController.tabBarItem.image = UIImage(named: "PollsIcon")
+        
+        // create home navController
+        let homeNavController = UINavigationController(rootViewController: homeVC)
+        homeNavController.navigationBar.isHidden = true
+        homeNavController.tabBarItem.title = "Home"
+        homeNavController.tabBarItem.image = UIImage(named: "HomeIcon")
+        
+        // create calendar navController
+        let calendarNavController = UINavigationController(rootViewController: calendarVC)
+        calendarNavController.navigationBar.isHidden = true
+        calendarNavController.tabBarItem.title = "Calendar"
+        calendarNavController.tabBarItem.image = UIImage(named: "CalendarIcon")
+        
+        // create forum navController
+        let forumNavController = UINavigationController(rootViewController: forumHomeVC)
+        forumNavController.navigationBar.isHidden = true
+        forumNavController.tabBarItem.title = "Forum"
+        forumNavController.tabBarItem.image = UIImage(named: "ForumIcon")
+        
+        // create tabBarController
+        let tabBarController = UITabBarController()
+        tabBarController.tabBar.tintColor = #colorLiteral(red: 1, green: 0.6931049824, blue: 0.6924019456, alpha: 1)
+        tabBarController.viewControllers = [homeNavController, calendarNavController, forumNavController, rosterVC, pollsNavController]
+        
+        // set tabController as root
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.makeKeyAndVisible()
+        window?.rootViewController = tabBarController
+        
         return true
+    }
+    
+    @available(iOS 9.0, *)
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        return GIDSignIn.sharedInstance().handle(url,
+                                                 sourceApplication:options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+                                                 annotation: [:])
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
+        // ...
+        if let error = error {
+            print(error.localizedDescription)
+            return
+        }
+        
+        guard let authentication = user.authentication else { return }
+        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
+                                                       accessToken: authentication.accessToken)
+        // ...
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        // Perform any operations when the user disconnects from app here.
+        // ...
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

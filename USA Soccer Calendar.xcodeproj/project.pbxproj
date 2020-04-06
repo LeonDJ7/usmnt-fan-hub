@@ -7,21 +7,77 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		750F89C522E25687006EA794 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750F89C422E25687006EA794 /* Player.swift */; };
+		750F89C722F0D276006EA794 /* PollsTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750F89C622F0D276006EA794 /* PollsTVCell.swift */; };
+		7518755C22D3CC730098494F /* PollsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518755B22D3CC730098494F /* PollsVC.swift */; };
+		7518B81824396DDB00265EE4 /* ForumHomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81724396DDB00265EE4 /* ForumHomeVC.swift */; };
+		7518B81A24396E1E00265EE4 /* CreateForumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81924396E1E00265EE4 /* CreateForumVC.swift */; };
+		7518B81C24396E3B00265EE4 /* ForumTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81B24396E3B00265EE4 /* ForumTVCell.swift */; };
+		752A3A4621F0727A00566127 /* ArticlesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A3A4521F0727A00566127 /* ArticlesVC.swift */; };
+		752A7B962319D24F00C41CF1 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A7B952319D24F00C41CF1 /* AlertController.swift */; };
+		753241402317883400FA6B19 /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7532413F2317883400FA6B19 /* SignUpVC.swift */; };
+		754164F522F6097900EB230D /* CreatePollVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754164F422F6097900EB230D /* CreatePollVC.swift */; };
+		754164F722F74CCE00EB230D /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754164F622F74CCE00EB230D /* Poll.swift */; };
+		755A3DB621F154D90024DFBB /* ArticlesTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755A3DB521F154D90024DFBB /* ArticlesTVCell.swift */; };
+		7560441222DCE90000A73201 /* RosterTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560441122DCE90000A73201 /* RosterTVCell.swift */; };
+		7560441522DD163000A73201 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560441422DD163000A73201 /* HomeVC.swift */; };
+		7560441722DFB22400A73201 /* AgeGroupTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560441622DFB22400A73201 /* AgeGroupTVCell.swift */; };
+		759F14F1230F33FD00FCED07 /* UserTopicsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759F14F0230F33FD00FCED07 /* UserTopicsVC.swift */; };
+		75A48B5F23B5AF2E001338C6 /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A48B5E23B5AF2E001338C6 /* SettingsVC.swift */; };
+		75CF82FC2425690F00C11CCB /* TopicVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CF82FB2425690F00C11CCB /* TopicVC.swift */; };
+		75CFF95121ED543200C3F8E1 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CFF95021ED543200C3F8E1 /* Event.swift */; };
 		75D0077A21E7F36800EBFB8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D0077921E7F36800EBFB8D /* AppDelegate.swift */; };
-		75D0077C21E7F36800EBFB8D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D0077B21E7F36800EBFB8D /* ViewController.swift */; };
-		75D0077F21E7F36800EBFB8D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 75D0077D21E7F36800EBFB8D /* Main.storyboard */; };
+		75D0077C21E7F36800EBFB8D /* CalendarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D0077B21E7F36800EBFB8D /* CalendarVC.swift */; };
 		75D0078121E7F36A00EBFB8D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 75D0078021E7F36A00EBFB8D /* Assets.xcassets */; };
 		75D0078421E7F36A00EBFB8D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 75D0078221E7F36A00EBFB8D /* LaunchScreen.storyboard */; };
+		75D0078E21E7FDBB00EBFB8D /* CalendarTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D0078D21E7FDBB00EBFB8D /* CalendarTVCell.swift */; };
+		75D0079021E8010900EBFB8D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D0078F21E8010900EBFB8D /* Extensions.swift */; };
+		75D7E88922C42FBB009EBF75 /* RosterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D7E88822C42FBB009EBF75 /* RosterVC.swift */; };
+		75E0345622B0565A00B9A193 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 75E0345522B0565A00B9A193 /* GoogleService-Info.plist */; };
+		75E0345822B1831C00B9A193 /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75E0345722B1831C00B9A193 /* Topic.swift */; };
+		75EE8140241F12B100DC0F79 /* UserPollsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EE813F241F12B100DC0F79 /* UserPollsVC.swift */; };
+		75EE814224242CD700DC0F79 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EE814124242CD700DC0F79 /* PaddingLabel.swift */; };
+		75EEBA77230DEA2700F151BF /* SignInVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EEBA76230DEA2700F151BF /* SignInVC.swift */; };
+		92A9327ECA007F090B02450B /* Pods_USA_Soccer_Calendar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 06D3FC9537A0172AD7806552 /* Pods_USA_Soccer_Calendar.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		06D3FC9537A0172AD7806552 /* Pods_USA_Soccer_Calendar.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_USA_Soccer_Calendar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		750F89C422E25687006EA794 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		750F89C622F0D276006EA794 /* PollsTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollsTVCell.swift; sourceTree = "<group>"; };
+		7518755B22D3CC730098494F /* PollsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollsVC.swift; sourceTree = "<group>"; };
+		7518B81724396DDB00265EE4 /* ForumHomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumHomeVC.swift; sourceTree = "<group>"; };
+		7518B81924396E1E00265EE4 /* CreateForumVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateForumVC.swift; sourceTree = "<group>"; };
+		7518B81B24396E3B00265EE4 /* ForumTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumTVCell.swift; sourceTree = "<group>"; };
+		752A3A4521F0727A00566127 /* ArticlesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesVC.swift; sourceTree = "<group>"; };
+		752A7B952319D24F00C41CF1 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
+		7532413F2317883400FA6B19 /* SignUpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
+		754164F422F6097900EB230D /* CreatePollVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePollVC.swift; sourceTree = "<group>"; };
+		754164F622F74CCE00EB230D /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
+		755A3DB521F154D90024DFBB /* ArticlesTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesTVCell.swift; sourceTree = "<group>"; };
+		7560441122DCE90000A73201 /* RosterTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosterTVCell.swift; sourceTree = "<group>"; };
+		7560441422DD163000A73201 /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
+		7560441622DFB22400A73201 /* AgeGroupTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeGroupTVCell.swift; sourceTree = "<group>"; };
+		759F14F0230F33FD00FCED07 /* UserTopicsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UserTopicsVC.swift; path = "USA Soccer Calendar/Forum/UserTopicsVC.swift"; sourceTree = SOURCE_ROOT; };
+		75A48B5E23B5AF2E001338C6 /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
+		75CF82FB2425690F00C11CCB /* TopicVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicVC.swift; sourceTree = "<group>"; };
+		75CFF95021ED543200C3F8E1 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		75D0077621E7F36800EBFB8D /* USA Soccer Calendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "USA Soccer Calendar.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		75D0077921E7F36800EBFB8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		75D0077B21E7F36800EBFB8D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		75D0077E21E7F36800EBFB8D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		75D0077B21E7F36800EBFB8D /* CalendarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarVC.swift; sourceTree = "<group>"; };
 		75D0078021E7F36A00EBFB8D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		75D0078321E7F36A00EBFB8D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		75D0078521E7F36A00EBFB8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		75D0078D21E7FDBB00EBFB8D /* CalendarTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarTVCell.swift; sourceTree = "<group>"; };
+		75D0078F21E8010900EBFB8D /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		75D7E88822C42FBB009EBF75 /* RosterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosterVC.swift; sourceTree = "<group>"; };
+		75E0345522B0565A00B9A193 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		75E0345722B1831C00B9A193 /* Topic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Topic.swift; sourceTree = "<group>"; };
+		75EE813F241F12B100DC0F79 /* UserPollsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPollsVC.swift; sourceTree = "<group>"; };
+		75EE814124242CD700DC0F79 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		75EEBA76230DEA2700F151BF /* SignInVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInVC.swift; sourceTree = "<group>"; };
+		CCC9470D865BFA64F1401881 /* Pods-USA Soccer Calendar.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-USA Soccer Calendar.release.xcconfig"; path = "Pods/Target Support Files/Pods-USA Soccer Calendar/Pods-USA Soccer Calendar.release.xcconfig"; sourceTree = "<group>"; };
+		D65220BDAB6ADC0D77E4DF8D /* Pods-USA Soccer Calendar.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-USA Soccer Calendar.debug.xcconfig"; path = "Pods/Target Support Files/Pods-USA Soccer Calendar/Pods-USA Soccer Calendar.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,17 +85,49 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92A9327ECA007F090B02450B /* Pods_USA_Soccer_Calendar.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7518755A22D3CC520098494F /* Polls */ = {
+			isa = PBXGroup;
+			children = (
+				7518755B22D3CC730098494F /* PollsVC.swift */,
+				750F89C622F0D276006EA794 /* PollsTVCell.swift */,
+				754164F422F6097900EB230D /* CreatePollVC.swift */,
+				75EE813F241F12B100DC0F79 /* UserPollsVC.swift */,
+			);
+			path = Polls;
+			sourceTree = "<group>";
+		};
+		752A7B972319D33E00C41CF1 /* Authentification */ = {
+			isa = PBXGroup;
+			children = (
+				75EEBA76230DEA2700F151BF /* SignInVC.swift */,
+				7532413F2317883400FA6B19 /* SignUpVC.swift */,
+			);
+			path = Authentification;
+			sourceTree = "<group>";
+		};
+		7560441322DD160800A73201 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				7560441422DD163000A73201 /* HomeVC.swift */,
+				75A48B5E23B5AF2E001338C6 /* SettingsVC.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
 		75D0076D21E7F36800EBFB8D = {
 			isa = PBXGroup;
 			children = (
 				75D0077821E7F36800EBFB8D /* USA Soccer Calendar */,
 				75D0077721E7F36800EBFB8D /* Products */,
+				91401CFFA57D35A8D1721A2B /* Pods */,
+				832E90CE1C1DB713DDF824EA /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -54,14 +142,84 @@
 		75D0077821E7F36800EBFB8D /* USA Soccer Calendar */ = {
 			isa = PBXGroup;
 			children = (
+				7560441322DD160800A73201 /* Home */,
+				7518755A22D3CC520098494F /* Polls */,
+				75D7E88722C42F50009EBF75 /* Roster */,
+				75E0344A22AEFDC400B9A193 /* Forum */,
+				75E0344522AB200A00B9A193 /* Calendar */,
+				752A7B972319D33E00C41CF1 /* Authentification */,
+				75E0344422AB1F6700B9A193 /* Custom Classes */,
+				75D0078F21E8010900EBFB8D /* Extensions.swift */,
+				752A7B952319D24F00C41CF1 /* AlertController.swift */,
 				75D0077921E7F36800EBFB8D /* AppDelegate.swift */,
-				75D0077B21E7F36800EBFB8D /* ViewController.swift */,
-				75D0077D21E7F36800EBFB8D /* Main.storyboard */,
 				75D0078021E7F36A00EBFB8D /* Assets.xcassets */,
 				75D0078221E7F36A00EBFB8D /* LaunchScreen.storyboard */,
+				75E0345522B0565A00B9A193 /* GoogleService-Info.plist */,
 				75D0078521E7F36A00EBFB8D /* Info.plist */,
 			);
 			path = "USA Soccer Calendar";
+			sourceTree = "<group>";
+		};
+		75D7E88722C42F50009EBF75 /* Roster */ = {
+			isa = PBXGroup;
+			children = (
+				75D7E88822C42FBB009EBF75 /* RosterVC.swift */,
+				7560441122DCE90000A73201 /* RosterTVCell.swift */,
+				7560441622DFB22400A73201 /* AgeGroupTVCell.swift */,
+			);
+			path = Roster;
+			sourceTree = "<group>";
+		};
+		75E0344422AB1F6700B9A193 /* Custom Classes */ = {
+			isa = PBXGroup;
+			children = (
+				75CFF95021ED543200C3F8E1 /* Event.swift */,
+				75E0345722B1831C00B9A193 /* Topic.swift */,
+				750F89C422E25687006EA794 /* Player.swift */,
+				754164F622F74CCE00EB230D /* Poll.swift */,
+				75EE814124242CD700DC0F79 /* PaddingLabel.swift */,
+			);
+			path = "Custom Classes";
+			sourceTree = "<group>";
+		};
+		75E0344522AB200A00B9A193 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				75D0077B21E7F36800EBFB8D /* CalendarVC.swift */,
+				75D0078D21E7FDBB00EBFB8D /* CalendarTVCell.swift */,
+				752A3A4521F0727A00566127 /* ArticlesVC.swift */,
+				755A3DB521F154D90024DFBB /* ArticlesTVCell.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		75E0344A22AEFDC400B9A193 /* Forum */ = {
+			isa = PBXGroup;
+			children = (
+				7518B81724396DDB00265EE4 /* ForumHomeVC.swift */,
+				7518B81B24396E3B00265EE4 /* ForumTVCell.swift */,
+				7518B81924396E1E00265EE4 /* CreateForumVC.swift */,
+				759F14F0230F33FD00FCED07 /* UserTopicsVC.swift */,
+				75CF82FB2425690F00C11CCB /* TopicVC.swift */,
+			);
+			path = Forum;
+			sourceTree = "<group>";
+		};
+		832E90CE1C1DB713DDF824EA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				06D3FC9537A0172AD7806552 /* Pods_USA_Soccer_Calendar.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		91401CFFA57D35A8D1721A2B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D65220BDAB6ADC0D77E4DF8D /* Pods-USA Soccer Calendar.debug.xcconfig */,
+				CCC9470D865BFA64F1401881 /* Pods-USA Soccer Calendar.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,9 +229,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 75D0078821E7F36A00EBFB8D /* Build configuration list for PBXNativeTarget "USA Soccer Calendar" */;
 			buildPhases = (
+				15F83A69C04697CE6AF8399F /* [CP] Check Pods Manifest.lock */,
 				75D0077221E7F36800EBFB8D /* Sources */,
 				75D0077321E7F36800EBFB8D /* Frameworks */,
 				75D0077421E7F36800EBFB8D /* Resources */,
+				BF5B78FB841CFFF421DF57CF /* [CP] Embed Pods Frameworks */,
+				8E68A25D7C42483945B62848 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -124,33 +285,134 @@
 			files = (
 				75D0078421E7F36A00EBFB8D /* LaunchScreen.storyboard in Resources */,
 				75D0078121E7F36A00EBFB8D /* Assets.xcassets in Resources */,
-				75D0077F21E7F36800EBFB8D /* Main.storyboard in Resources */,
+				75E0345622B0565A00B9A193 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		15F83A69C04697CE6AF8399F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-USA Soccer Calendar-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8E68A25D7C42483945B62848 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-USA Soccer Calendar/Pods-USA Soccer Calendar-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseGoogleAuthUI.bundle",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseGoogleAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-USA Soccer Calendar/Pods-USA Soccer Calendar-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BF5B78FB841CFFF421DF57CF /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-USA Soccer Calendar/Pods-USA Soccer Calendar-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC/GRPCClient.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-ProtoRPC/ProtoRPC.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-RxLibrary/RxLibrary.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRPCClient.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProtoRPC.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxLibrary.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-USA Soccer Calendar/Pods-USA Soccer Calendar-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		75D0077221E7F36800EBFB8D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				75D0077C21E7F36800EBFB8D /* ViewController.swift in Sources */,
+				759F14F1230F33FD00FCED07 /* UserTopicsVC.swift in Sources */,
+				75D0078E21E7FDBB00EBFB8D /* CalendarTVCell.swift in Sources */,
+				75D0077C21E7F36800EBFB8D /* CalendarVC.swift in Sources */,
+				7518B81824396DDB00265EE4 /* ForumHomeVC.swift in Sources */,
+				752A7B962319D24F00C41CF1 /* AlertController.swift in Sources */,
+				75D0079021E8010900EBFB8D /* Extensions.swift in Sources */,
+				75D7E88922C42FBB009EBF75 /* RosterVC.swift in Sources */,
+				7560441522DD163000A73201 /* HomeVC.swift in Sources */,
+				75E0345822B1831C00B9A193 /* Topic.swift in Sources */,
+				75A48B5F23B5AF2E001338C6 /* SettingsVC.swift in Sources */,
+				75EEBA77230DEA2700F151BF /* SignInVC.swift in Sources */,
+				7560441722DFB22400A73201 /* AgeGroupTVCell.swift in Sources */,
 				75D0077A21E7F36800EBFB8D /* AppDelegate.swift in Sources */,
+				75CFF95121ED543200C3F8E1 /* Event.swift in Sources */,
+				75EE8140241F12B100DC0F79 /* UserPollsVC.swift in Sources */,
+				7518B81C24396E3B00265EE4 /* ForumTVCell.swift in Sources */,
+				7518755C22D3CC730098494F /* PollsVC.swift in Sources */,
+				754164F722F74CCE00EB230D /* Poll.swift in Sources */,
+				755A3DB621F154D90024DFBB /* ArticlesTVCell.swift in Sources */,
+				753241402317883400FA6B19 /* SignUpVC.swift in Sources */,
+				7560441222DCE90000A73201 /* RosterTVCell.swift in Sources */,
+				754164F522F6097900EB230D /* CreatePollVC.swift in Sources */,
+				7518B81A24396E1E00265EE4 /* CreateForumVC.swift in Sources */,
+				750F89C722F0D276006EA794 /* PollsTVCell.swift in Sources */,
+				750F89C522E25687006EA794 /* Player.swift in Sources */,
+				75CF82FC2425690F00C11CCB /* TopicVC.swift in Sources */,
+				75EE814224242CD700DC0F79 /* PaddingLabel.swift in Sources */,
+				752A3A4621F0727A00566127 /* ArticlesVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		75D0077D21E7F36800EBFB8D /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				75D0077E21E7F36800EBFB8D /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		75D0078221E7F36A00EBFB8D /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -280,16 +542,18 @@
 		};
 		75D0078921E7F36A00EBFB8D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D65220BDAB6ADC0D77E4DF8D /* Pods-USA Soccer Calendar.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USA Soccer Calendar/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USA-Soccer-Calendar";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -298,16 +562,18 @@
 		};
 		75D0078A21E7F36A00EBFB8D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CCC9470D865BFA64F1401881 /* Pods-USA Soccer Calendar.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USA Soccer Calendar/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USA-Soccer-Calendar";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
