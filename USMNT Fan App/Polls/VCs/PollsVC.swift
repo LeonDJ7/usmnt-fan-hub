@@ -54,6 +54,11 @@ class PollsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.refreshControl = refresher
+        
         loadPolls()
         setupLayout()
         
@@ -70,9 +75,6 @@ class PollsVC: UIViewController {
     func setupLayout() {
         
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.refreshControl = refresher
         addSubviews()
         applyAnchors()
         
@@ -158,7 +160,7 @@ class PollsVC: UIViewController {
         let cutoffDate = calendar.date(byAdding: cutoffDateComponent, to: Date())
         let cutoffTimestamp = cutoffDate!.timeIntervalSince1970
         
-        Firestore.firestore().collection("Polls").whereField("timestamp", isGreaterThan: cutoffTimestamp).getDocuments { (snap, error) in
+        Firestore.firestore().collection("Polls").whereField("timestamp", isGreaterThan: cutoffTimestamp).order(by: "timestamp").getDocuments { (snap, error) in
             
             for document in snap!.documents {
                 
@@ -168,7 +170,6 @@ class PollsVC: UIViewController {
                 
             }
             
-            self.polls.sort { $0.timestamp > $1.timestamp }
             self.tableView.reloadData()
             
         }

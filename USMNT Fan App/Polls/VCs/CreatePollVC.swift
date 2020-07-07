@@ -122,11 +122,11 @@ class CreatePollVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupLayout()
         answer1TF.delegate = self
         answer2TF.delegate = self
         answer3TF.delegate = self
         answer4TF.delegate = self
+        setupLayout()
         
     }
     

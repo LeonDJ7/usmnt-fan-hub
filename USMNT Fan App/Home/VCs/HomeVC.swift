@@ -8,10 +8,16 @@
 
 import UIKit
 import Firebase
+import SafariServices
+import WebKit
 
 class HomeVC: UIViewController {
     
     var articles: [Article] = []
+    
+    var webContent = """
+        <a class="twitter-timeline" href="https://twitter.com/usmnt_daily_/lists/usmnt-fan-app?ref_src=twsrc%5Etfw">A Twitter List by usmnt_daily_</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        """
     
     let welcomeView: UIView = {
         let view = UIView()
@@ -34,41 +40,32 @@ class HomeVC: UIViewController {
         let btn = UIButton()
         btn.setImage(UIImage(named: "settings"), for: .normal)
         btn.addTarget(self, action: #selector(settingsBtnTapped), for: .touchUpInside)
-        btn.backgroundColor = #colorLiteral(red: 1, green: 0.7920521498, blue: 0.7826431394, alpha: 1)
+        btn.backgroundColor = #colorLiteral(red: 1, green: 0.859785378, blue: 0.8399332166, alpha: 1)
         return btn
     }()
     
     let newsLbl: UILabel = {
         let lbl = UILabel()
-        lbl.font = UIFont(name: "Avenir-Book", size: 16)
-        lbl.textColor = .white
+        lbl.font = UIFont(name: "Avenir-Book", size: 18)
+        lbl.textColor = #colorLiteral(red: 1, green: 0.859785378, blue: 0.8399332166, alpha: 1)
         lbl.text = "news feed"
         return lbl
     }()
     
     let tweetsLbl: UILabel = {
         let lbl = UILabel()
-        lbl.font = UIFont(name: "Avenir-Book", size: 16)
-        lbl.textColor = .white
+        lbl.font = UIFont(name: "Avenir-Book", size: 18)
+        lbl.textColor = #colorLiteral(red: 0.8201153874, green: 0.9376305938, blue: 1, alpha: 1)
         lbl.text = "latest tweets"
         return lbl
     }()
     
     let newsTableView: UITableView = {
         let tv = UITableView()
-        tv.tag = 0
         tv.separatorStyle = .none
         tv.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
+        tv.isScrollEnabled = false
         tv.register(NewsCell.self, forCellReuseIdentifier: "newsCell")
-        return tv
-    }()
-    
-    let tweetsTableView: UITableView = {
-        let tv = UITableView()
-        tv.tag = 1
-        tv.separatorStyle = .none
-        tv.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        tv.register(TweetCell.self, forCellReuseIdentifier: "tweetCell")
         return tv
     }()
     
@@ -81,14 +78,27 @@ class HomeVC: UIViewController {
         return btn
     }()
     
+    let tweetWebView: WKWebView = {
+        let wv = WKWebView()
+        return wv
+    }()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        newsTableView.delegate = self
+        newsTableView.dataSource = self
+        tweetWebView.navigationDelegate = self
+        
+        loadArticles()
+        tweetWebView.loadHTMLString(webContent, baseURL: nil)
+        setupLayout()
+        
+    }
+    
     func setupLayout() {
         
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        
-        newsTableView.delegate = self
-        newsTableView.dataSource = self
-        tweetsTableView.delegate = self
-        tweetsTableView.dataSource = self
         
         addSubviews()
         applyAnchors()
@@ -104,7 +114,7 @@ class HomeVC: UIViewController {
         view.addSubview(newsTableView)
         view.addSubview(moreNewsBtn)
         view.addSubview(tweetsLbl)
-        view.addSubview(tweetsTableView)
+        view.addSubview(tweetWebView)
         
     }
     
@@ -116,15 +126,15 @@ class HomeVC: UIViewController {
         
         settingsBtn.anchors(top: welcomeView.topAnchor, topPad: 0, bottom: welcomeView.bottomAnchor, bottomPad: 0, left: welcomeLbl.rightAnchor, leftPad: 0, right: welcomeView.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        newsLbl.anchors(top: welcomeView.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        newsLbl.anchors(top: welcomeView.bottomAnchor, topPad: 30, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        newsTableView.anchors(top: newsLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        newsTableView.anchors(top: newsLbl.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 159, width: 0)
         
         moreNewsBtn.anchors(top: newsTableView.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         tweetsLbl.anchors(top: moreNewsBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        tweetsTableView.anchors(top: tweetsTableView.bottomAnchor, topPad: 5, bottom: view.bottomAnchor, bottomPad: -50, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        tweetWebView.anchors(top: tweetsLbl.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 10, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
     }
     
@@ -162,10 +172,6 @@ class HomeVC: UIViewController {
             present(settingsVC, animated: true, completion: nil)
         } else {
             // take to sign in page or give option
-            
-            //let signInNavController = UINavigationController(rootViewController: signInVC)
-            //signInNavController.navigationBar.isHidden = true
-            
             present(authVC, animated: true, completion: nil)
         }
         
@@ -183,24 +189,20 @@ class HomeVC: UIViewController {
 extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if tableView.tag == 0 {
-            return 3
-        } else {
-            return 0
-        }
+        return articles.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        var cell = UITableViewCell()
+        let url = URL(fileURLWithPath: articles[indexPath.row].url)
+        let image = getImageFromURL(url: url)
         
-        if tableView.tag == 0 {
-            cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
-        } else {
-            cell = tableView.dequeueReusableCell(withIdentifier: "tweetCell") as! TweetCell
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
+        cell.articleTitleLbl.text = articles[indexPath.row].title
+        cell.articleImageView.image = image
         
         return cell
+          
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -209,6 +211,36 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let urlString = articles[indexPath.row].url
+        if let url = URL(string: urlString) {
+            
+            let sf = SFSafariViewController(url: url)
+            present(sf, animated: true, completion: nil)
+            
+        }
+        
+    }
+    
+}
+
+extension HomeVC: WKNavigationDelegate {
+    
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        
+        if navigationAction.navigationType == .linkActivated  {
+            if let url = navigationAction.request.url, UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+                decisionHandler(.cancel)
+            } else {
+                decisionHandler(.allow)
+            }
+        } else {
+          decisionHandler(.allow)
+        }
     }
     
 }

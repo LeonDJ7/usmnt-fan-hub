@@ -19,6 +19,7 @@
 		7538A4A3243C017D0037B172 /* UserTopicsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7538A4A2243C017D0037B172 /* UserTopicsVC.swift */; };
 		754164F522F6097900EB230D /* CreatePollVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754164F422F6097900EB230D /* CreatePollVC.swift */; };
 		754164F722F74CCE00EB230D /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754164F622F74CCE00EB230D /* Poll.swift */; };
+		75551B9524B4D2DB00DB1225 /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75551B9424B4D2DB00DB1225 /* Functions.swift */; };
 		755A3DB621F154D90024DFBB /* ArticlesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755A3DB521F154D90024DFBB /* ArticlesCell.swift */; };
 		7560441222DCE90000A73201 /* RosterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560441122DCE90000A73201 /* RosterCell.swift */; };
 		7560441522DD163000A73201 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560441422DD163000A73201 /* HomeVC.swift */; };
@@ -30,7 +31,6 @@
 		75A48B5F23B5AF2E001338C6 /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A48B5E23B5AF2E001338C6 /* SettingsVC.swift */; };
 		75AB04F424ABD93B005C892C /* NewsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AB04F324ABD93B005C892C /* NewsVC.swift */; };
 		75AB04F824ABE0C3005C892C /* NewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AB04F724ABE0C3005C892C /* NewsCell.swift */; };
-		75AB04FA24ABE0D6005C892C /* TweetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AB04F924ABE0D6005C892C /* TweetCell.swift */; };
 		75AB04FC24ABF844005C892C /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AB04FB24ABF844005C892C /* Article.swift */; };
 		75CF82FC2425690F00C11CCB /* TopicVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CF82FB2425690F00C11CCB /* TopicVC.swift */; };
 		75CFF95121ED543200C3F8E1 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CFF95021ED543200C3F8E1 /* Event.swift */; };
@@ -65,6 +65,7 @@
 		7538A4A2243C017D0037B172 /* UserTopicsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserTopicsVC.swift; path = ../UserTopicsVC.swift; sourceTree = "<group>"; };
 		754164F422F6097900EB230D /* CreatePollVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePollVC.swift; sourceTree = "<group>"; };
 		754164F622F74CCE00EB230D /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
+		75551B9424B4D2DB00DB1225 /* Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
 		755A3DB521F154D90024DFBB /* ArticlesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesCell.swift; sourceTree = "<group>"; };
 		7560441122DCE90000A73201 /* RosterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosterCell.swift; sourceTree = "<group>"; };
 		7560441422DD163000A73201 /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
@@ -76,7 +77,6 @@
 		75A48B5E23B5AF2E001338C6 /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		75AB04F324ABD93B005C892C /* NewsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsVC.swift; sourceTree = "<group>"; };
 		75AB04F724ABE0C3005C892C /* NewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCell.swift; sourceTree = "<group>"; };
-		75AB04F924ABE0D6005C892C /* TweetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetCell.swift; sourceTree = "<group>"; };
 		75AB04FB24ABF844005C892C /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
 		75CF82FB2425690F00C11CCB /* TopicVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TopicVC.swift; path = ../TopicVC.swift; sourceTree = "<group>"; };
 		75CFF95021ED543200C3F8E1 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
@@ -244,7 +244,6 @@
 			isa = PBXGroup;
 			children = (
 				75AB04F724ABE0C3005C892C /* NewsCell.swift */,
-				75AB04F924ABE0D6005C892C /* TweetCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -278,6 +277,7 @@
 				752A7B972319D33E00C41CF1 /* Authentification */,
 				75E0344422AB1F6700B9A193 /* Custom Classes */,
 				75D0078F21E8010900EBFB8D /* Extensions.swift */,
+				75551B9424B4D2DB00DB1225 /* Functions.swift */,
 				752A7B952319D24F00C41CF1 /* AlertController.swift */,
 				75D0077921E7F36800EBFB8D /* AppDelegate.swift */,
 				75D0078021E7F36A00EBFB8D /* Assets.xcassets */,
@@ -474,7 +474,6 @@
 				75D0078E21E7FDBB00EBFB8D /* CalendarCell.swift in Sources */,
 				75D0077C21E7F36800EBFB8D /* CalendarVC.swift in Sources */,
 				7518B81824396DDB00265EE4 /* ForumHomeVC.swift in Sources */,
-				75AB04FA24ABE0D6005C892C /* TweetCell.swift in Sources */,
 				752A7B962319D24F00C41CF1 /* AlertController.swift in Sources */,
 				75D0079021E8010900EBFB8D /* Extensions.swift in Sources */,
 				75D7E88922C42FBB009EBF75 /* RosterVC.swift in Sources */,
@@ -491,6 +490,7 @@
 				75EE8140241F12B100DC0F79 /* UserPollsVC.swift in Sources */,
 				7518B81C24396E3B00265EE4 /* TopicCell.swift in Sources */,
 				7580206B248C6AD2001CB03C /* TopicsPageVC.swift in Sources */,
+				75551B9524B4D2DB00DB1225 /* Functions.swift in Sources */,
 				7518755C22D3CC730098494F /* PollsVC.swift in Sources */,
 				754164F722F74CCE00EB230D /* Poll.swift in Sources */,
 				755A3DB621F154D90024DFBB /* ArticlesCell.swift in Sources */,

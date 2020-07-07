@@ -39,6 +39,10 @@ class SavedPollsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        
         loadPolls()
         setupLayout()
         
@@ -57,10 +61,6 @@ class SavedPollsVC: UIViewController {
         
         
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        
         addSubviews()
         applyAnchors()
         

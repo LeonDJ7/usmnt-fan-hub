@@ -13,7 +13,7 @@ import GoogleMobileAds
 var selectedEvent = ""
 var selectedYear = 0
 
-class CalendarVC: UIViewController, GADBannerViewDelegate, GADInterstitialDelegate {
+class CalendarVC: UIViewController {
     
     var events: [Event] = []
     
@@ -25,8 +25,6 @@ class CalendarVC: UIViewController, GADBannerViewDelegate, GADInterstitialDelega
         tv.register(CalendarCell.self, forCellReuseIdentifier: "eventCell")
         return tv
     }()
-    
-    let bannerView = GADBannerView(adSize: kGADAdSizeSmartBannerPortrait)
     
     let yearLbl: UILabel = {
         let yearLbl = UILabel()
@@ -66,24 +64,20 @@ class CalendarVC: UIViewController, GADBannerViewDelegate, GADInterstitialDelega
     var novEvents: [Event] = []
     var decEvents: [Event] = []
     
-    var interstitial: GADInterstitial!
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.delegate = self
+        tableView.dataSource = self
         selectedYear = Calendar.current.component(.year, from: Date())
         loadEvents()
         setupLayout()
-        setupBannerView()
-        setupInterstitial()
         
     }
     
     func setupLayout() {
         
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        tableView.delegate = self
-        tableView.dataSource = self
         addSubviews()
         applyAnchors()
         
@@ -114,39 +108,6 @@ class CalendarVC: UIViewController, GADBannerViewDelegate, GADInterstitialDelega
         
         decreaseYearBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: yearLbl.leftAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
         
-    }
-    
-    private func setupInterstitial() {
-        interstitial = GADInterstitial(adUnitID: "ca-app-pub-2790005755690511/5270699946")
-        interstitial.delegate = self
-        let interstitialRequest = GADRequest()
-        interstitial.load(interstitialRequest)
-        interstitial = createAndLoadInterstitial()
-    }
-    
-    func createAndLoadInterstitial() -> GADInterstitial {
-        let interstitial = GADInterstitial(adUnitID: "ca-app-pub-2790005755690511/5406773531")
-        interstitial.delegate = self
-        let interstitialRequest = GADRequest()
-        interstitial.load(interstitialRequest)
-        return interstitial
-    }
-    
-    func interstitialDidDismissScreen(_ ad: GADInterstitial) {
-        interstitial = createAndLoadInterstitial()
-        
-        let newVC = ArticlesVC()
-        navigationController?.pushViewController(newVC, animated: true)
-    }
-    
-    private func setupBannerView() {
-        view.addSubview(bannerView)
-        bannerView.adUnitID = "ca-app-pub-2790005755690511/3056529097"
-        bannerView.rootViewController = self
-        let bannerRequest = GADRequest()
-        bannerView.load(bannerRequest)
-        bannerView.delegate = self
-        bannerView.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
     }
     
     @objc func increaseYear() {
@@ -227,8 +188,6 @@ extension CalendarVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int){
         
-        //view.tintColor = .white
-        
         let header = view as! UITableViewHeaderFooterView
         header.textLabel?.textColor = UIColor.darkGray
         
@@ -278,6 +237,7 @@ extension CalendarVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         if indexPath.section == 0 {
             selectedEvent = janEvents[indexPath.row].name
         } else if indexPath.section == 1 {
@@ -304,22 +264,9 @@ extension CalendarVC: UITableViewDelegate, UITableViewDataSource {
             selectedEvent = decEvents[indexPath.row].name
         }
         
-        let newVC = ArticlesVC()
+        let vc = ArticlesVC()
         
-        let randomNumber = arc4random_uniform(5)
-        if randomNumber == 0 {
-            
-            if interstitial.isReady {
-                interstitial.present(fromRootViewController: self)
-                print("interstitial ready")
-            } else {
-                navigationController?.pushViewController(newVC, animated: true)
-                print("interstitial not ready")
-            }
-        } else {
-            navigationController?.pushViewController(newVC, animated: true)
-            print("random number not correct")
-        }
+        navigationController?.pushViewController(vc, animated: true)
         
     }
     

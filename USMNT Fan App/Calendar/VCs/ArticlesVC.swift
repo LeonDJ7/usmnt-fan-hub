@@ -12,11 +12,9 @@ import SafariServices
 import GoogleMobileAds
 
 
-class ArticlesVC: UIViewController, GADBannerViewDelegate {
+class ArticlesVC: UIViewController {
     
-    var articleLinks: [String] = []
-    var articleTitles: [String] = []
-    let bannerView = GADBannerView(adSize: kGADAdSizeSmartBannerPortrait)
+    var articles: [Article] = []
     
     let articlesLbl: UILabel = {
         let lbl = UILabel()
@@ -39,25 +37,24 @@ class ArticlesVC: UIViewController, GADBannerViewDelegate {
     let backBtn: UIButton = {
         let btn = UIButton()
         btn.setImage(UIImage(named: "BackArrow"), for: .normal)
-        btn.addTarget(self, action: #selector(returnToEventsVC), for: .touchUpInside)
+        btn.addTarget(self, action: #selector(goBack), for: .touchUpInside)
         return btn
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.delegate = self
+        tableView.dataSource = self
+        
         loadEvents()
         setupLayout()
-        setupBannerView()
         
     }
     
     func setupLayout() {
         
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        tableView.delegate = self
-        tableView.dataSource = self
-        
         addSubviews()
         applyAnchors()
         
@@ -82,32 +79,25 @@ class ArticlesVC: UIViewController, GADBannerViewDelegate {
         
     }
     
-    private func setupBannerView() {
-        view.addSubview(bannerView)
-        bannerView.adUnitID = "ca-app-pub-2790005755690511/5598345228"
-        bannerView.rootViewController = self
-        let bannerRequest = GADRequest()
-        bannerView.load(bannerRequest)
-        bannerView.delegate = self
-        bannerView.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
-    }
-    
     func loadEvents() {
+        
         Firestore.firestore().collection("Years").document(String(selectedYear)).collection("Events").document(selectedEvent).collection("Articles").getDocuments { (snap, error) in
             
             for document in snap!.documents {
                 let data = document.data()
-                let link = data["url"] as! String
+                let url = data["url"] as! String
                 let title = data["title"] as! String
-                self.articleLinks.append(link)
-                self.articleTitles.append(title)
+                let article = Article(title: title, url: url, timestamp: 0)
+                self.articles.append(article)
             }
+            
             self.tableView.reloadData()
+            
         }
         
     }
     
-    @objc func returnToEventsVC() {
+    @objc func goBack() {
         navigationController?.popViewController(animated: true)
     }
     
@@ -124,11 +114,11 @@ extension ArticlesVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return articleLinks.count
+        return articles.count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let urlString = articleLinks[indexPath.row]
+        let urlString = articles[indexPath.row].url
         if let url = URL(string: urlString) {
             
             let sf = SFSafariViewController(url: url)
@@ -140,7 +130,7 @@ extension ArticlesVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "articleCell") as! ArticlesCell
         cell.articleNameLbl.numberOfLines = 0
-        cell.articleNameLbl.text = articleTitles[indexPath.row]
+        cell.articleNameLbl.text = articles[indexPath.row].title
         return cell
     }
     
