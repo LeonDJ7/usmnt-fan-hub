@@ -23,7 +23,7 @@ class NewsVC: UIViewController {
     
     let headerLbl: UILabel = {
         let lbl = UILabel()
-        lbl.text = "displays last 15 articles"
+        lbl.text = "Displays last 15 articles"
         lbl.font = UIFont(name: "Avenir-Book", size: 18)
         lbl.textColor = .white
         lbl.textAlignment = .center
@@ -44,6 +44,7 @@ class NewsVC: UIViewController {
 
         tableView.delegate = self
         tableView.dataSource = self
+        loadArticles()
         setupLayout()
         
     }
@@ -70,7 +71,7 @@ class NewsVC: UIViewController {
         
         headerLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: backBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
-        tableView.anchors(top: backBtn.bottomAnchor, topPad: 30, bottom: view.bottomAnchor, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        tableView.anchors(top: backBtn.bottomAnchor, topPad: 30, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 10, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
     }
     
     @objc func goBack() {
@@ -79,7 +80,7 @@ class NewsVC: UIViewController {
     
     func loadArticles() {
         
-        Firestore.firestore().collection("News").order(by: "timestamp").limit(to: 15).getDocuments { (snap, err) in
+        Firestore.firestore().collection("News").order(by: "timestamp", descending: true).limit(to: 15).getDocuments { (snap, err) in
             
             guard err == nil else {
                 print(err?.localizedDescription as Any)
@@ -90,8 +91,9 @@ class NewsVC: UIViewController {
                 let data = document.data()
                 let title = data["title"] as! String
                 let url = data["url"] as! String
-                let timestamp = data["timestamp"] as! Double
-                let article = Article(title: title, url: url, timestamp: timestamp)
+                let timestamp = data["timestamp"] as? Double
+                let imageURL = data["imageURL"] as! String
+                let article = Article(title: title, url: url, timestamp: timestamp ?? 0.0, imageURL: imageURL)
                 self.articles.append(article)
             }
             
@@ -111,12 +113,15 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let url = URL(fileURLWithPath: articles[indexPath.row].url)
-        let image = getImageFromURL(url: url)
-        
+        let imageURL = URL(string: articles[indexPath.row].imageURL)
         let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
         cell.articleTitleLbl.text = articles[indexPath.row].title
-        cell.articleImageView.image = image
+        
+        if let imageURL = imageURL {
+            cell.downloadImage(from: imageURL)
+        } else {
+            
+        }
         
         return cell
           

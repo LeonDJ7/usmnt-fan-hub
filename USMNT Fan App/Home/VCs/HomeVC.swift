@@ -10,10 +10,13 @@ import UIKit
 import Firebase
 import SafariServices
 import WebKit
+import GoogleMobileAds
 
 class HomeVC: UIViewController {
     
     var articles: [Article] = []
+    
+    var interstitial: GADInterstitial!
     
     var webContent = """
         <a class="twitter-timeline" href="https://twitter.com/usmnt_daily_/lists/usmnt-fan-app?ref_src=twsrc%5Etfw">A Twitter List by usmnt_daily_</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -94,6 +97,8 @@ class HomeVC: UIViewController {
         tweetWebView.loadHTMLString(webContent, baseURL: nil)
         setupLayout()
         
+        interstitial = createAndLoadInterstitial()
+        
     }
     
     func setupLayout() {
@@ -120,7 +125,7 @@ class HomeVC: UIViewController {
     
     func applyAnchors() {
         
-        welcomeView.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        welcomeView.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         welcomeLbl.anchors(top: welcomeView.topAnchor, topPad: 10, bottom: welcomeView.bottomAnchor, bottomPad: -5, left: welcomeView.leftAnchor, leftPad: 10, right: welcomeView.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -140,7 +145,7 @@ class HomeVC: UIViewController {
     
     func loadArticles() {
         
-        Firestore.firestore().collection("News").order(by: "timestamp").limit(to: 3).getDocuments { (snap, err) in
+        Firestore.firestore().collection("News").order(by: "timestamp", descending: true).limit(to: 3).getDocuments { (snap, err) in
             
             guard err == nil else {
                 print(err?.localizedDescription as Any)
@@ -152,7 +157,8 @@ class HomeVC: UIViewController {
                 let title = data["title"] as! String
                 let url = data["url"] as! String
                 let timestamp = data["timestamp"] as! Double
-                let article = Article(title: title, url: url, timestamp: timestamp)
+                let imageURL = data["imageURL"] as! String
+                let article = Article(title: title, url: url, timestamp: timestamp, imageURL: imageURL)
                 self.articles.append(article)
             }
             
@@ -180,7 +186,23 @@ class HomeVC: UIViewController {
     @objc func moreNewsBtnTapped() {
         
         let vc = NewsVC()
-        navigationController?.pushViewController(vc, animated: true)
+        
+        let random = arc4random_uniform(3)
+        
+        if random == 0 {
+            
+            if interstitial.isReady {
+                interstitial.present(fromRootViewController: self)
+                navigationController?.pushViewController(vc, animated: true)
+            } else {
+                print("interstitial not ready")
+                navigationController?.pushViewController(vc, animated: true)
+            }
+            
+        } else {
+            print("random number not correct")
+            navigationController?.pushViewController(vc, animated: true)
+        }
         
     }
     
@@ -194,12 +216,15 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let url = URL(fileURLWithPath: articles[indexPath.row].url)
-        let image = getImageFromURL(url: url)
-        
+        let imageURL = URL(string: articles[indexPath.row].imageURL)
         let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
         cell.articleTitleLbl.text = articles[indexPath.row].title
-        cell.articleImageView.image = image
+        
+        if let imageURL = imageURL {
+            cell.downloadImage(from: imageURL)
+        } else {
+            
+        }
         
         return cell
           
@@ -241,6 +266,21 @@ extension HomeVC: WKNavigationDelegate {
         } else {
           decisionHandler(.allow)
         }
+    }
+    
+}
+
+extension HomeVC: GADInterstitialDelegate {
+    
+    func createAndLoadInterstitial() -> GADInterstitial {
+        let interstitial = GADInterstitial(adUnitID: "ca-app-pub-2790005755690511/2057144590")
+        interstitial.delegate = self
+        interstitial.load(GADRequest())
+        return interstitial
+    }
+
+    func interstitialDidDismissScreen(_ ad: GADInterstitial) {
+        interstitial = createAndLoadInterstitial()
     }
     
 }

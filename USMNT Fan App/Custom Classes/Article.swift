@@ -13,11 +13,13 @@ class Article {
     let title: String
     let url: String
     let timestamp: Double
+    let imageURL: String
     
-    init(title: String, url: String, timestamp: Double) {
+    init(title: String, url: String, timestamp: Double, imageURL: String) {
         self.title = title
         self.url = url
         self.timestamp = timestamp
+        self.imageURL = imageURL
     }
     
 }

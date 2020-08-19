@@ -12,6 +12,14 @@ class TopicsPageVC: UIPageViewController, UIPageViewControllerDelegate, UIPageVi
 
     var pages = [UIViewController]()
     let pageControl = UIPageControl()
+    
+    
+    let backBtn: UIButton = {
+        let btn = UIButton()
+        btn.setImage(UIImage(named: "BackArrow"), for: .normal)
+        btn.addTarget(self, action: #selector(goBack), for: .touchUpInside)
+        return btn
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,8 +41,15 @@ class TopicsPageVC: UIPageViewController, UIPageViewControllerDelegate, UIPageVi
         pageControl.currentPage = initialPage
         
         view.addSubview(self.pageControl)
-        pageControl.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -5, left: view.leftAnchor, leftPad: 10, right: view.rightAnchor, rightPad: -10, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        pageControl.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: view.leftAnchor, leftPad: 10, right: view.rightAnchor, rightPad: -10, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
+        view.addSubview(backBtn)
+        backBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+    }
+    
+    @objc func goBack() {
+        navigationController?.popViewController(animated: true)
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {

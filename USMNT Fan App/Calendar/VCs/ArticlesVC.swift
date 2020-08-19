@@ -28,9 +28,8 @@ class ArticlesVC: UIViewController {
     let tableView: UITableView = {
         let tv = UITableView()
         tv.backgroundColor = .clear
-        tv.separatorStyle = .singleLine
-        tv.separatorColor = #colorLiteral(red: 1, green: 0.8878712058, blue: 0.872946322, alpha: 1)
-        tv.register(ArticlesCell.self, forCellReuseIdentifier: "articleCell")
+        tv.separatorStyle = .none
+        tv.register(NewsCell.self, forCellReuseIdentifier: "newsCell")
         return tv
     }()
     
@@ -74,8 +73,7 @@ class ArticlesVC: UIViewController {
         
         articlesLbl.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        tableView.anchors(top: articlesLbl.bottomAnchor, topPad: 40, bottom: view.bottomAnchor, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
-        
+        tableView.anchors(top: articlesLbl.bottomAnchor, topPad: 40, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 10, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
     }
     
@@ -87,7 +85,8 @@ class ArticlesVC: UIViewController {
                 let data = document.data()
                 let url = data["url"] as! String
                 let title = data["title"] as! String
-                let article = Article(title: title, url: url, timestamp: 0)
+                let imageURL = data["imageURL"] as! String
+                let article = Article(title: title, url: url, timestamp: 0, imageURL: imageURL)
                 self.articles.append(article)
             }
             
@@ -128,10 +127,17 @@ extension ArticlesVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "articleCell") as! ArticlesCell
-        cell.articleNameLbl.numberOfLines = 0
-        cell.articleNameLbl.text = articles[indexPath.row].title
+        
+        let imageURL = URL(string: articles[indexPath.row].imageURL)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
+        cell.articleTitleLbl.text = articles[indexPath.row].title
+        
+        if let imageURL = imageURL {
+            cell.downloadImage(from: imageURL)
+        }
+        
         return cell
+        
     }
     
 }

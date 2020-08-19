@@ -24,6 +24,7 @@ class PollsCell: UITableViewCell {
     let questionLbl: UILabel = {
         let lbl = UILabel()
         lbl.numberOfLines = 0
+        lbl.lineBreakMode = NSLineBreakMode.byWordWrapping
         lbl.font = UIFont(name: "Avenir-Medium", size: 20)
         lbl.textColor = .white
         return lbl
@@ -31,8 +32,10 @@ class PollsCell: UITableViewCell {
     
     let timeRemainingLbl: UILabel = {
         let lbl = UILabel()
+        lbl.numberOfLines = 1
         lbl.font = UIFont(name: "Avenir-Medium", size: 16)
         lbl.textColor = .gray
+        lbl.text = "0 hr 0 min"
         return lbl
     }()
     
@@ -131,6 +134,13 @@ class PollsCell: UITableViewCell {
         return lbl
     }()
     
+    let deleteBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setImage(UIImage(named: "DeleteBtnImage"), for: .normal)
+        return btn
+    }()
+    
     var answer1Score = 0.0
     var answer2Score = 0.0
     var answer3Score = 0.0
@@ -139,6 +149,8 @@ class PollsCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupLayout()
+        addTargets() // connect each btn with its method
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -150,8 +162,7 @@ class PollsCell: UITableViewCell {
         self.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
         addSubviews() // add all subviews to layout
         applyAnchors() // layout constraints for each subview
-        addTargets() // connect each btn with its method
-        randomizeBtnColor() // randomize color of buttons for each poll
+        randomizeColor() // randomize color of buttons for each poll and author profile image voew background
         
     }
     
@@ -172,6 +183,7 @@ class PollsCell: UITableViewCell {
         cellView.addSubview(answer2Btn)
         cellView.addSubview(answer3Btn)
         cellView.addSubview(answer4Btn)
+        cellView.addSubview(deleteBtn)
         
     }
     
@@ -179,13 +191,15 @@ class PollsCell: UITableViewCell {
         
         cellView.anchors(top: topAnchor, topPad: 5, bottom: bottomAnchor, bottomPad: -5, left: leftAnchor, leftPad: 5, right: rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
+        deleteBtn.anchors(top: cellView.topAnchor, topPad: 13, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
+        
         questionLbl.anchors(top: cellView.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        timeRemainingLbl.anchors(top: questionLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        timeRemainingLbl.anchors(top: questionLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 22, width: 0)
         
         authorProfileImageView.anchors(top: timeRemainingLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
         
-        authorLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: authorProfileImageView.rightAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorProfileImageView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        authorLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: authorProfileImageView.rightAnchor, leftPad: 10, right: cellView.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorProfileImageView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
         totalVotesLbl.anchors(top: timeRemainingLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 80)
         
@@ -213,35 +227,92 @@ class PollsCell: UITableViewCell {
         answer2Btn.addTarget(self, action: #selector(selectAnswer2(sender:)), for: .touchUpInside)
         answer3Btn.addTarget(self, action: #selector(selectAnswer3(sender:)), for: .touchUpInside)
         answer4Btn.addTarget(self, action: #selector(selectAnswer4(sender:)), for: .touchUpInside)
+        deleteBtn.addTarget(self, action: #selector(deleteBtnPressed(sender:)), for: .touchUpInside)
         
     }
     
-    func scheduledTimerWithTimeInterval(){
+    func scheduleTimeRemainingTimer(){
         // Scheduling timer to Call the function "updateCounting" with the interval of 1 seconds
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(refreshTimeRemaining), userInfo: nil, repeats: true)
+        
+        refreshTimeRemaining()
+        
+        timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(refreshTimeRemaining), userInfo: nil, repeats: true)
     }
     
     @objc func refreshTimeRemaining() {
         
         let calendar = Calendar.current
-        let endTimestamp = timestamp + 86400 // one day
-        let currentTimestamp = Date().timeIntervalSince1970
+        let datePostedAt = Date(timeIntervalSince1970: timestamp)
+        let datePostWillEnd = calendar.date(byAdding: .day, value: 1, to: datePostedAt)!
+        let currentDate = Date()
         
-        if (currentTimestamp >= endTimestamp) {
+        let currentDay = calendar.component(.day, from: currentDate)
+        let endDay = calendar.component(.day, from: datePostWillEnd)
+        
+        let currentHour = calendar.component(.hour, from: currentDate)
+        let endHour = calendar.component(.hour, from: datePostWillEnd)
+        
+        let currentMinute = calendar.component(.minute, from: currentDate)
+        let endMinute = calendar.component(.minute, from: datePostWillEnd)
+        
+        if currentDay == endDay {
+            // endDay hour must be greater than or equal to currentDay hour
             
-            timeRemainingLbl.text = "00 : 00 : 00"
-            return
+            var hoursLeft = endHour - currentHour
+            
+            if currentMinute > endMinute {
+                
+                hoursLeft -= 1
+                let minutesLeft = 60 - (currentMinute - endMinute)
+                timeRemainingLbl.text = "\(hoursLeft) hr \(minutesLeft) min"
+                
+                if hoursLeft <= 0 && minutesLeft <= 0 {
+                    timeRemainingLbl.text = "0 hr 0 min"
+                } else {
+                    timeRemainingLbl.text = "\(hoursLeft) hr \(minutesLeft) min"
+                }
+                
+            } else {
+                
+                let minutesLeft = endMinute - currentMinute
+                
+                if hoursLeft <= 0 && minutesLeft <= 0 {
+                    timeRemainingLbl.text = "0 hr 0 min"
+                } else {
+                    timeRemainingLbl.text = "\(hoursLeft) hr \(minutesLeft) min"
+                }
+                
+            }
+            
+        } else {
+            // currentDay hour must be greater than or equal to endDay hour
+            
+            var hoursLeft = 24 - (currentHour - endHour)
+            
+            if currentMinute > endMinute {
+                
+                hoursLeft -= 1
+                let minutesLeft = 60 - (currentMinute - endMinute)
+                
+                if hoursLeft <= 0 && minutesLeft <= 0 {
+                    timeRemainingLbl.text = "0 hr 0 min"
+                } else {
+                    timeRemainingLbl.text = "\(hoursLeft) hr \(minutesLeft) min"
+                }
+                
+            } else {
+                
+                let minutesLeft = endMinute - currentMinute
+                
+                if hoursLeft <= 0 && minutesLeft <= 0 {
+                    timeRemainingLbl.text = "0 hr 0 min"
+                } else {
+                    timeRemainingLbl.text = "\(hoursLeft) hr \(minutesLeft) min"
+                }
+                
+            }
             
         }
-        
-        let remainingTimestamp = endTimestamp - Date().timeIntervalSince1970
-        let remainingDate = Date(timeIntervalSince1970: remainingTimestamp)
-        
-        let hours = calendar.component(.hour, from: remainingDate)
-        let minutes = calendar.component(.minute, from: remainingDate)
-        let seconds = calendar.component(.second, from: remainingDate)
-        
-        timeRemainingLbl.text = "\(hours) : \(minutes) : \(seconds)"
         
     }
     
@@ -249,7 +320,7 @@ class PollsCell: UITableViewCell {
         
         let storageRef = Storage.storage().reference(forURL: "gs://usmnt-fan-app.appspot.com").child("profile_image").child(uid)
         
-        let imageURL = storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+        storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
             
             if let error = error {
                 print("Error: \(error)")
@@ -260,7 +331,7 @@ class PollsCell: UITableViewCell {
         
     }
     
-    func randomizeBtnColor() {
+    func randomizeColor() {
         
         let randomNumber = arc4random_uniform(8)
         let backgroundColor: UIColor
@@ -290,23 +361,28 @@ class PollsCell: UITableViewCell {
         answer2Btn.backgroundColor = backgroundColor
         answer3Btn.backgroundColor = backgroundColor
         answer4Btn.backgroundColor = backgroundColor
+        authorProfileImageView.backgroundColor = backgroundColor
         
     }
     
     @objc func selectAnswer1(sender: UIButton) {
-        delegate?.didSelectAnswer1(row: (sender.tag))
+        delegate?.didSelectAnswer1(row: sender.tag)
     }
     
     @objc func selectAnswer2(sender: UIButton) {
-        delegate?.didSelectAnswer2(row: (sender.tag))
+        delegate?.didSelectAnswer2(row: sender.tag)
     }
     
     @objc func selectAnswer3(sender: UIButton) {
-        delegate?.didSelectAnswer3(row: (sender.tag))
+        delegate?.didSelectAnswer3(row: sender.tag)
     }
     
     @objc func selectAnswer4(sender: UIButton) {
-        delegate?.didSelectAnswer4(row: (sender.tag))
+        delegate?.didSelectAnswer4(row: sender.tag)
+    }
+    
+    @objc func deleteBtnPressed(sender: UIButton) {
+        delegate?.deleteBtnPressed(row: sender.tag)
     }
     
 }
@@ -320,5 +396,7 @@ protocol PollsCellDelegate : class {
     func didSelectAnswer3(row: Int)
     
     func didSelectAnswer4(row: Int)
+    
+    func deleteBtnPressed(row: Int)
     
 }

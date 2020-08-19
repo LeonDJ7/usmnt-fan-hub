@@ -9,6 +9,8 @@
 import UIKit
 import Firebase
 
+var userHasChanged = false
+
 class SettingsVC: UIViewController {
 
     var selectedImage: UIImage?
@@ -75,21 +77,10 @@ class SettingsVC: UIViewController {
         return btn
     }()
     
-    let termsBtn: UIButton = {
-        let btn = UIButton()
-        btn.titleLabel?.font = UIFont(name: "Avenir-Book", size: 15)
-        btn.setTitle("terms", for: .normal)
-        btn.layer.borderWidth = 1
-        btn.layer.borderColor = UIColor.white.cgColor
-        btn.layer.cornerRadius = 5
-        btn.clipsToBounds = true
-        return btn
-    }()
-    
     let privacyBtn: UIButton = {
         let btn = UIButton()
         btn.titleLabel?.font = UIFont(name: "Avenir-Book", size: 15)
-        btn.setTitle("privacy", for: .normal)
+        btn.setTitle("rate app", for: .normal)
         btn.layer.borderWidth = 1
         btn.layer.borderColor = UIColor.white.cgColor
         btn.layer.cornerRadius = 5
@@ -126,11 +117,9 @@ class SettingsVC: UIViewController {
         view.addSubview(usernameLbl)
         view.addSubview(usernameTF)
         view.addSubview(logOutBtn)
-        view.addSubview(termsBtn)
         view.addSubview(privacyBtn)
         view.addSubview(confirmImageBtn)
         view.addSubview(confirmUsernameBtn)
-
         
     }
     
@@ -144,11 +133,9 @@ class SettingsVC: UIViewController {
         
         usernameTF.anchors(top: usernameLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        logOutBtn.anchors(top: usernameTF.bottomAnchor, topPad: 20, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        logOutBtn.anchors(top: usernameTF.bottomAnchor, topPad: 15, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        termsBtn.anchors(top: logOutBtn.bottomAnchor, topPad: 20, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
-        
-        privacyBtn.anchors(top: termsBtn.bottomAnchor, topPad: 20, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        privacyBtn.anchors(top: logOutBtn.bottomAnchor, topPad: 15, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         confirmImageBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: profileImageView.rightAnchor, leftPad: 10, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: profileImageView.centerYAnchor, centerYPad: 0, height: 30, width: 30)
         
@@ -165,7 +152,7 @@ class SettingsVC: UIViewController {
         if let uid = Auth.auth().currentUser?.uid {
             let storageRef = Storage.storage().reference(forURL: "gs://usmnt-fan-app.appspot.com").child("profile_image").child(uid)
             
-            let imageURL = storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+            storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
                 
                 if let error = error {
                     print("Error: \(error)")
@@ -174,6 +161,7 @@ class SettingsVC: UIViewController {
                 }
             }
         }
+        
     }
     
     @objc func confirmUsername() {
@@ -211,6 +199,22 @@ class SettingsVC: UIViewController {
         }
         
         confirmUsernameBtn.isHidden = true
+        
+    }
+    
+    func rateApp() {
+        
+        if #available(iOS 10.3, *) {
+            SKStoreReviewController.requestReview()
+
+        } else if let url = URL(string: "itms-apps://itunes.apple.com/app/" + "appId") {
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+
+            } else {
+                UIApplication.shared.openURL(url)
+            }
+        }
         
     }
     
@@ -285,15 +289,23 @@ class SettingsVC: UIViewController {
         }))
         
         alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (action) in
-            alert.dismiss(animated: true, completion: nil)
-            let firebaseAuth = Auth.auth()
-            do {
-                try firebaseAuth.signOut()
-            } catch let signOutError as NSError {
-                print ("Error signing out: %@", signOutError)
+            alert.dismiss(animated: true) {
+                
+                let firebaseAuth = Auth.auth()
+                do {
+                    
+                    try firebaseAuth.signOut()
+                    userHasChanged = true
+                    self.dismiss(animated: true, completion: nil)
+                    userHasChanged = true
+                    
+                } catch let signOutError as NSError {
+                    print ("Error signing out: %@", signOutError)
+                }
+                
+                
             }
-            // take user back to home
-            self.navigationController?.popViewController(animated: true)
+            
         }))
         
         self.present(alert, animated: true, completion: nil)

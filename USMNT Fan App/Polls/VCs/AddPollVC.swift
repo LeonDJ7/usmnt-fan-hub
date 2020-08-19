@@ -9,7 +9,9 @@
 import UIKit
 import Firebase
 
-class CreatePollVC: UIViewController {
+class AddPollVC: UIViewController {
+    
+    var parentVC: PollsVC = PollsVC()
     
     let popUpView: UIView = {
         let view = UIView()
@@ -189,63 +191,100 @@ class CreatePollVC: UIViewController {
             return
         }
         
-        if answer1TF.text == "" && answer2TF.text == "" {
+        if answer1TF.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || answer2TF.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             AlertController.showAlert(self, title: "Error", message: "must provide at least 2 answer options")
             return
         }
         
-        if answer4TF.text != "" && answer3TF.text == "" {
+        if !answer4TF.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && answer3TF.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             AlertController.showAlert(self, title: "Error", message: "must provide 3rd answer option if also providing 4th answer option")
             return
         }
         
         var totalAnswerOptions = 4
         
-        if answer4TF.text == "" {
+        if answer1TF.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            // string doesn't contain non-whitespace characters
+            AlertController.showAlert(self, title: "Error", message: "username must contain non-whitespace characters")
+            return
+        }
+        
+        if answer4TF.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             totalAnswerOptions -= 1
         }
         
-        if answer3TF.text == "" {
+        if answer3TF.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             totalAnswerOptions -= 1
         }
         
         if let user = Auth.auth().currentUser {
             
-            let questionData : [String : Any] = [
-                "question" : questionTV.text!,
-                "answer1" : answer1TF.text!,
-                "answer2" : answer2TF.text!,
-                "answer3" : answer3TF.text!,
-                "answer4" : answer4TF.text!,
-                "answer1Score" : 0,
-                "answer2Score" : 0,
-                "answer3Score" : 0,
-                "answer4Score" : 0,
-                "timestamp" : Double(NSDate().timeIntervalSince1970),
-                "totalAnswerOptions" : totalAnswerOptions,
-                "totalVotes" : 0,
-                "author" : user.displayName!,
-                "authorUID" : user.uid
-            ]
-            
-            var ref: DocumentReference? = nil
-            var docID = ""
-            ref = Firestore.firestore().collection("Polls").addDocument(data: questionData) { err in
-                if let err = err {
-                    print("Error adding document: \(err)")
-                } else {
-                    docID = ref!.documentID
-                    Firestore.firestore().collection("Users").document(user.uid).collection("UserPolls").addDocument(data: ["docID":docID])
-                }
-            }
-            
-            let poll = Poll(question: questionTV.text!, author: user.displayName!, authorUID: user.uid, answer1: answer1TF.text!, answer2: answer2TF.text!, answer3: answer3TF.text!, answer4: answer4TF.text!, answer1Score: 0, answer2Score: 0, answer3Score: 0, answer4Score: 0, timestamp: Double(NSDate().timeIntervalSince1970), totalAnswerOptions: Double(totalAnswerOptions), docID: docID)
-            
-            dismiss(animated: true) {
+            Firestore.firestore().collection("Polls").order(by: "timestamp", descending: true).limit(to: 1).getDocuments { (snap, err) in
                 
-                if let myParent = self.parent as? PollsVC {
-                    myParent.polls.append(poll)
-                    myParent.tableView.reloadData()
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                var largestTimestamp = 0.0
+            
+                for document in snap!.documents {
+                    
+                    // get largest timestamp to tell whether or not to immediately add newc poll to users tableview, or wait for it to be loaded naturally
+                    
+                    largestTimestamp = document.data()["timestamp"] as! Double
+                    
+                }
+                
+                let timestamp = Double(Date().timeIntervalSince1970)
+                
+                let questionData : [String : Any] = [
+                    "question" : self.questionTV.text!,
+                    "answer1" : self.answer1TF.text!,
+                    "answer2" : self.answer2TF.text!,
+                    "answer3" : self.answer3TF.text!,
+                    "answer4" : self.answer4TF.text!,
+                    "answer1Score" : 0,
+                    "answer2Score" : 0,
+                    "answer3Score" : 0,
+                    "answer4Score" : 0,
+                    "timestamp" : timestamp,
+                    "totalAnswerOptions" : totalAnswerOptions,
+                    "totalVotes" : 0,
+                    "author" : user.displayName!,
+                    "authorUID" : user.uid
+                ]
+                
+                var ref: DocumentReference? = nil
+                var docID = ""
+                ref = Firestore.firestore().collection("Polls").addDocument(data: questionData) { err in
+                    if let err = err {
+                        print("Error adding document: \(err)")
+                    } else {
+                        docID = ref!.documentID
+                        Firestore.firestore().collection("Users").document(user.uid).collection("UserPolls").addDocument(data: ["docID":docID,
+                                                                        "timestamp":timestamp])
+                    }
+                }
+                
+                let poll = Poll(question: self.questionTV.text!, author: user.displayName!, authorUID: user.uid, answer1: self.answer1TF.text!, answer2: self.answer2TF.text!, answer3: self.answer3TF.text!, answer4: self.answer4TF.text!, answer1Score: 0, answer2Score: 0, answer3Score: 0, answer4Score: 0, timestamp: Double(NSDate().timeIntervalSince1970), totalAnswerOptions: Double(totalAnswerOptions), docID: docID)
+                
+                self.dismiss(animated: true) {
+                    
+                    // if all active polls are in tableview already, then add this one to it
+                    
+                    if self.parentVC.polls.count > 0 {
+                        if largestTimestamp == self.parentVC.polls[self.parentVC.polls.count-1].timestamp {
+                            self.parentVC.polls.append(poll)
+                            self.parentVC.maxPollsLoaded += 1
+                            self.parentVC.tableView.reloadData()
+                        }
+                    } else {
+                        self.parentVC.polls.append(poll)
+                        self.parentVC.maxPollsLoaded += 1
+                        self.parentVC.tableView.reloadData()
+                    }
+                    
                 }
                 
             }
@@ -265,7 +304,7 @@ class CreatePollVC: UIViewController {
     
 }
 
-extension CreatePollVC: UITextFieldDelegate {
+extension AddPollVC: UITextFieldDelegate {
     
     // limits answer character count
     

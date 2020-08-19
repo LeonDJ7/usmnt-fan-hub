@@ -21,13 +21,6 @@ class SavedTopicsVC: UIViewController {
         return tv
     }()
     
-    let backBtn: UIButton = {
-        let btn = UIButton()
-        btn.setImage(UIImage(named: "BackArrow"), for: .normal)
-        btn.addTarget(self, action: #selector(goBack), for: .touchUpInside)
-        return btn
-    }()
-    
     let descriptionLbl: UILabel = {
         let lbl = UILabel()
         lbl.text = "Saved Topics"
@@ -64,7 +57,6 @@ class SavedTopicsVC: UIViewController {
     
     func addSubviews() {
         
-        view.addSubview(backBtn)
         view.addSubview(descriptionLbl)
         view.addSubview(tableView)
         
@@ -72,11 +64,9 @@ class SavedTopicsVC: UIViewController {
     
     func applyAnchors() {
         
-        backBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        descriptionLbl.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        descriptionLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: backBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
-        
-        tableView.anchors(top: backBtn.bottomAnchor, topPad: 30, bottom: view.bottomAnchor, bottomPad: -50, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        tableView.anchors(top: descriptionLbl.bottomAnchor, topPad: 30, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 50, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
     }
     
@@ -104,8 +94,9 @@ class SavedTopicsVC: UIViewController {
                         let authorUID = data["authorUID"] as! String
                         let text = data["text"] as! String
                         let id = document.documentID
+                        let commentCount = data["commentCount"] as! Int
                         let dbref = Firestore.firestore().collection("Topics").document(id)
-                        self.forumTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref))
+                        self.forumTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount))
                         
                     }
                     
@@ -119,14 +110,8 @@ class SavedTopicsVC: UIViewController {
                 
             }
             
-            
-            
         }
         
-    }
-    
-    @objc func goBack() {
-        navigationController?.popViewController(animated: true)
     }
 
 }

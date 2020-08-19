@@ -19,6 +19,8 @@ class NewsCell: UITableViewCell {
     let articleImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .darkGray
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -32,6 +34,7 @@ class NewsCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
         setupLayout()
     }
     
@@ -61,6 +64,24 @@ class NewsCell: UITableViewCell {
         articleImageView.anchors(top: cellView.topAnchor, topPad: 0, bottom: cellView.bottomAnchor, bottomPad: 0, left: cellView.leftAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 50, width: 50)
         
         articleTitleLbl.anchors(top: cellView.topAnchor, topPad: 0, bottom: cellView.bottomAnchor, bottomPad: 0, left: articleImageView.rightAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+    }
+    
+    func getData(from url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
+        URLSession.shared.dataTask(with: url, completionHandler: completion).resume()
+    }
+
+    func downloadImage(from url: URL) {
+        
+        getData(from: url) { data, response, error in
+            
+            guard let data = data, error == nil else { return }
+            
+            DispatchQueue.main.async() { [weak self] in
+                self?.articleImageView.image = UIImage(data: data)
+            }
+            
+        }
         
     }
 

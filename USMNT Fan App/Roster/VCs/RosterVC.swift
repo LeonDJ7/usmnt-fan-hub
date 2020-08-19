@@ -9,19 +9,21 @@
 import UIKit
 import Firebase
 
+
+
 class RosterVC: UIViewController {
     
-    // create webview for articles rather than sending to safari
+    var showAgeGroupDropDown = false
+    
+    var bannerView: GADBannerView!
+    
+    var ageGroupSelected = "USMNT"
+    var ageGroups: [String] = ["USMNT", "U-23", "U-20", "U-17"]
     
     var goalkeepers: [Player] = []
     var defenders: [Player] = []
     var midfielders: [Player] = []
     var forwards: [Player] = []
-    
-    var showAgeGroupDropDown = false
-    
-    var ageGroupSelected = "USMNT"
-    var ageGroups: [String] = ["USMNT", "U-23", "U-20", "U-17"]
     
     var ageGroupSelectorTV: UITableView = {
         let tv = UITableView()
@@ -48,6 +50,7 @@ class RosterVC: UIViewController {
         tv.tag = 0
         tv.separatorStyle = .none
         tv.allowsSelection = false
+        tv.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
         tv.register(RosterCell.self, forCellReuseIdentifier: "rosterCell")
         return tv
     }()
@@ -82,11 +85,47 @@ class RosterVC: UIViewController {
         return imgView
     }()
     
+    let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.hidesWhenStopped = true
+        indicator.style = .whiteLarge
+        return indicator
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        rosterTV.delegate = self
+        rosterTV.dataSource = self
+        ageGroupSelectorTV.delegate = self
+        ageGroupSelectorTV.dataSource = self
+        
+        bannerView = GADBannerView(adSize: kGADAdSizeBanner)
+        bannerView.adUnitID = "ca-app-pub-2790005755690511/7934596736"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
+        
         setupLayout()
-        getPlayers()
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+        activityIndicator.startAnimating()
+        
+        DispatchQueue.global().async { // might take a sec or 2
+            
+            while USMNTforwards.count == 0 {
+                
+            }
+            
+            let deadline = DispatchTime.now() + .milliseconds(100) // give little gap to make sure rest of players load
+            DispatchQueue.main.asyncAfter(deadline: deadline) {
+                self.activityIndicator.stopAnimating()
+                self.setPlayers()
+            }
+            
+        }
         
     }
     
@@ -97,111 +136,45 @@ class RosterVC: UIViewController {
         addSubviews()
         applyAnchors()
         
-        rosterTV.delegate = self
-        rosterTV.dataSource = self
-        
-        ageGroupSelectorTV.delegate = self
-        ageGroupSelectorTV.dataSource = self
-        
     }
     
     func addSubviews() {
         
         view.addSubview(ageGroupSelectorBtn)
         view.addSubview(listIndicator)
+        view.addSubview(bannerView)
         view.addSubview(rosterTV)
-        view.addSubview(ageGroupSelectorTV)
         view.addSubview(leftBorder)
         view.addSubview(centerLeftBorder)
         view.addSubview(centerRightBorder)
         view.addSubview(rightBorder)
+        view.addSubview(ageGroupSelectorTV)
+        view.addSubview(activityIndicator)
         
     }
     
     func applyAnchors() {
         
-        ageGroupSelectorBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        ageGroupSelectorBtn.anchors(top: view.topAnchor, topPad: 40, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         listIndicator.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: ageGroupSelectorBtn.rightAnchor, leftPad: 3, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: ageGroupSelectorBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
-        rosterTV.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!-15, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        leftBorder.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
+        
+        centerLeftBorder.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: leftBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
+        
+        centerRightBorder.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: centerLeftBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
+        
+        rightBorder.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: centerRightBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
+        
+        bannerView.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        rosterTV.anchors(top: centerLeftBorder.bottomAnchor, topPad: 0, bottom: bannerView.topAnchor, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         ageGroupSelectorTV.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 160, width: 150)
         
-        leftBorder.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: view.leftAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
-        
-        centerLeftBorder.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: leftBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
-        
-        centerRightBorder.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: centerLeftBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
-        
-        rightBorder.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: centerRightBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
-        
+        activityIndicator.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: view.centerYAnchor, centerYPad: 0, height: 0, width: 0)
     }
-    
-    func getPlayers() {
-        
-        // Forwards
-        
-        Firestore.firestore().collection("Rosters").document(ageGroupSelected).collection("Forwards").getDocuments { (snap, error) in
-            
-            for document in (snap?.documents)! {
-                let data = document.data()
-                let age = data["age"] as! String
-                let club = data["club"] as! String
-                let name = document.documentID
-                let player = Player(name: name, age: age, club: club)
-                self.forwards.append(player)
-            }
-            self.rosterTV.reloadData()
-        }
-        
-        // Midfielders
-        
-        Firestore.firestore().collection("Rosters").document(ageGroupSelected).collection("Midfielders").getDocuments { (snap, error) in
-            
-            for document in (snap?.documents)! {
-                let data = document.data()
-                let age = data["age"] as! String
-                let club = data["club"] as! String
-                let name = document.documentID
-                let player = Player(name: name, age: age, club: club)
-                self.midfielders.append(player)
-            }
-            self.rosterTV.reloadData()
-        }
-        
-        // Defenders
-        
-        Firestore.firestore().collection("Rosters").document(ageGroupSelected).collection("Defenders").getDocuments { (snap, error) in
-            
-            for document in (snap?.documents)! {
-                let data = document.data()
-                let age = data["age"] as! String
-                let club = data["club"] as! String
-                let name = document.documentID
-                let player = Player(name: name, age: age, club: club)
-                self.defenders.append(player)
-            }
-            self.rosterTV.reloadData()
-        }
-        
-        // Goalkeepers
-        
-        Firestore.firestore().collection("Rosters").document(ageGroupSelected).collection("Goalkeepers").getDocuments { (snap, error) in
-            
-            for document in (snap?.documents)! {
-                let data = document.data()
-                let age = data["age"] as! String
-                let club = data["club"] as! String
-                let name = document.documentID
-                let player = Player(name: name, age: age, club: club)
-                self.goalkeepers.append(player)
-            }
-            self.rosterTV.reloadData()
-        }
-        
-    }
-    
     
     @objc func handleAgeGroupDropDown() {
         
@@ -222,6 +195,41 @@ class RosterVC: UIViewController {
             listIndicator.image = UIImage(named: "ListClosed")
         }
     }
+    
+    func setPlayers() {
+        
+        if ageGroupSelected == "USMNT" {
+            goalkeepers = USMNTgoalkeepers
+            defenders = USMNTdefenders
+            midfielders = USMNTmidfielders
+            forwards = USMNTforwards
+        }
+        
+        if ageGroupSelected == "U-23" {
+            goalkeepers = U23goalkeepers
+            defenders = U23defenders
+            midfielders = U23midfielders
+            forwards = U23forwards
+        }
+        
+        if ageGroupSelected == "U-20" {
+            goalkeepers = U20goalkeepers
+            defenders = U20defenders
+            midfielders = U20midfielders
+            forwards = U20forwards
+        }
+        
+        if ageGroupSelected == "U-17" {
+            goalkeepers = U17goalkeepers
+            defenders = U17defenders
+            midfielders = U17midfielders
+            forwards = U17forwards
+        }
+        
+        rosterTV.reloadData()
+        
+    }
+    
 }
 
 extension RosterVC: UITableViewDelegate, UITableViewDataSource {
@@ -230,6 +238,7 @@ extension RosterVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if tableView.tag == 0 {
+            
             let cell = tableView.dequeueReusableCell(withIdentifier: "rosterCell") as! RosterCell
             
             if indexPath.section == 0 {
@@ -248,12 +257,19 @@ extension RosterVC: UITableViewDelegate, UITableViewDataSource {
                 cell.playerLbl.text = forwards[indexPath.row].name
                 cell.ageLbl.text = forwards[indexPath.row].age
                 cell.clubLbl.text = forwards[indexPath.row].club
+            } else {
+                
             }
+            
             return cell
+            
         } else {
+            
             let cell = tableView.dequeueReusableCell(withIdentifier: "ageGroupCell") as! AgeGroupCell
             cell.ageGroupLbl.text = ageGroups[indexPath.row]
+            
             return cell
+            
         }
     }
     
@@ -318,37 +334,19 @@ extension RosterVC: UITableViewDelegate, UITableViewDataSource {
         if tableView.tag == 1 {
             if indexPath.row == 0 && ageGroupSelected != "USMNT" {
                 ageGroupSelected = "USMNT"
-                ageGroupSelectorBtn.setTitle(ageGroupSelected, for: .normal)
-                goalkeepers = []
-                defenders = []
-                midfielders = []
-                forwards = []
-                getPlayers()
             } else if indexPath.row == 1 && ageGroupSelected != "U-23" {
                 ageGroupSelected = "U-23"
-                ageGroupSelectorBtn.setTitle(ageGroupSelected, for: .normal)
-                goalkeepers = []
-                defenders = []
-                midfielders = []
-                forwards = []
-                getPlayers()
             } else if indexPath.row == 2 && ageGroupSelected != "U-20" {
                 ageGroupSelected = "U-20"
-                ageGroupSelectorBtn.setTitle(ageGroupSelected, for: .normal)
-                goalkeepers = []
-                defenders = []
-                midfielders = []
-                forwards = []
-                getPlayers()
-            } else {
+            } else if indexPath.row == 3 && ageGroupSelected != "U-17"{
                 ageGroupSelected = "U-17"
-                ageGroupSelectorBtn.setTitle(ageGroupSelected, for: .normal)
-                goalkeepers = []
-                defenders = []
-                midfielders = []
-                forwards = []
-                getPlayers()
             }
+            
+            ageGroupSelectorBtn.setTitle(ageGroupSelected, for: .normal)
+            setPlayers()
+            handleAgeGroupDropDown()
+            
         }
     }
+    
 }

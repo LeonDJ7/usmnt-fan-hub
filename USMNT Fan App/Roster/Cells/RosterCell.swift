@@ -26,14 +26,14 @@ class RosterCell: UITableViewCell {
     let ageLbl: UILabel = {
         let lbl = UILabel()
         lbl.font = UIFont(name: "Avenir-Book", size: 12)
-        lbl.textColor = .white
+        lbl.textColor = .lightGray
         return lbl
     }()
     
     let clubLbl: UILabel = {
         let lbl = UILabel()
         lbl.font = UIFont(name: "Avenir-Book", size: 12)
-        lbl.textColor = .white
+        lbl.textColor = .lightGray
         return lbl
     }()
 

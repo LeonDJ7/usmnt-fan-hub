@@ -12,18 +12,19 @@
 		751696772469E77B0056E4A6 /* CommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751696762469E77B0056E4A6 /* CommentCell.swift */; };
 		7518755C22D3CC730098494F /* PollsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518755B22D3CC730098494F /* PollsVC.swift */; };
 		7518B81824396DDB00265EE4 /* ForumHomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81724396DDB00265EE4 /* ForumHomeVC.swift */; };
-		7518B81A24396E1E00265EE4 /* CreateForumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81924396E1E00265EE4 /* CreateForumVC.swift */; };
+		7518B81A24396E1E00265EE4 /* AddTopicVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81924396E1E00265EE4 /* AddTopicVC.swift */; };
 		7518B81C24396E3B00265EE4 /* TopicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81B24396E3B00265EE4 /* TopicCell.swift */; };
 		752A3A4621F0727A00566127 /* ArticlesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A3A4521F0727A00566127 /* ArticlesVC.swift */; };
 		752A7B962319D24F00C41CF1 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A7B952319D24F00C41CF1 /* AlertController.swift */; };
 		7538A4A3243C017D0037B172 /* UserTopicsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7538A4A2243C017D0037B172 /* UserTopicsVC.swift */; };
-		754164F522F6097900EB230D /* CreatePollVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754164F422F6097900EB230D /* CreatePollVC.swift */; };
+		754164F522F6097900EB230D /* AddPollVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754164F422F6097900EB230D /* AddPollVC.swift */; };
 		754164F722F74CCE00EB230D /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754164F622F74CCE00EB230D /* Poll.swift */; };
 		75551B9524B4D2DB00DB1225 /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75551B9424B4D2DB00DB1225 /* Functions.swift */; };
-		755A3DB621F154D90024DFBB /* ArticlesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755A3DB521F154D90024DFBB /* ArticlesCell.swift */; };
+		755A3DB621F154D90024DFBB /* ArticleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755A3DB521F154D90024DFBB /* ArticleCell.swift */; };
 		7560441222DCE90000A73201 /* RosterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560441122DCE90000A73201 /* RosterCell.swift */; };
 		7560441522DD163000A73201 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560441422DD163000A73201 /* HomeVC.swift */; };
 		7560441722DFB22400A73201 /* AgeGroupCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560441622DFB22400A73201 /* AgeGroupCell.swift */; };
+		7574C54E24D4E2680025F939 /* SubCommentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7574C54D24D4E2680025F939 /* SubCommentVC.swift */; };
 		75802065248C64BB001CB03C /* SavedPollsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75802064248C64BB001CB03C /* SavedPollsVC.swift */; };
 		75802067248C64D0001CB03C /* SavedTopicsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75802066248C64D0001CB03C /* SavedTopicsVC.swift */; };
 		75802069248C6AB9001CB03C /* PollsPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75802068248C6AB9001CB03C /* PollsPageVC.swift */; };
@@ -32,6 +33,7 @@
 		75AB04F424ABD93B005C892C /* NewsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AB04F324ABD93B005C892C /* NewsVC.swift */; };
 		75AB04F824ABE0C3005C892C /* NewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AB04F724ABE0C3005C892C /* NewsCell.swift */; };
 		75AB04FC24ABF844005C892C /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AB04FB24ABF844005C892C /* Article.swift */; };
+		75AB270A24E99D3100389DC2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 75AB270924E99D3100389DC2 /* GoogleService-Info.plist */; };
 		75CF82FC2425690F00C11CCB /* TopicVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CF82FB2425690F00C11CCB /* TopicVC.swift */; };
 		75CFF95121ED543200C3F8E1 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CFF95021ED543200C3F8E1 /* Event.swift */; };
 		75D0077A21E7F36800EBFB8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D0077921E7F36800EBFB8D /* AppDelegate.swift */; };
@@ -42,8 +44,7 @@
 		75D0079021E8010900EBFB8D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D0078F21E8010900EBFB8D /* Extensions.swift */; };
 		75D7E88922C42FBB009EBF75 /* RosterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D7E88822C42FBB009EBF75 /* RosterVC.swift */; };
 		75DC06652484915300E3E768 /* AddCommentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DC06642484915300E3E768 /* AddCommentVC.swift */; };
-		75E0345622B0565A00B9A193 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 75E0345522B0565A00B9A193 /* GoogleService-Info.plist */; };
-		75E0345822B1831C00B9A193 /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75E0345722B1831C00B9A193 /* Topic.swift */; };
+		75E0345822B1831C00B9A193 /* Posts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75E0345722B1831C00B9A193 /* Posts.swift */; };
 		75EE8140241F12B100DC0F79 /* UserPollsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EE813F241F12B100DC0F79 /* UserPollsVC.swift */; };
 		75EE814224242CD700DC0F79 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EE814124242CD700DC0F79 /* PaddingLabel.swift */; };
 		75EEBA77230DEA2700F151BF /* AuthVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EEBA76230DEA2700F151BF /* AuthVC.swift */; };
@@ -58,18 +59,20 @@
 		751696762469E77B0056E4A6 /* CommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCell.swift; sourceTree = "<group>"; };
 		7518755B22D3CC730098494F /* PollsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollsVC.swift; sourceTree = "<group>"; };
 		7518B81724396DDB00265EE4 /* ForumHomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ForumHomeVC.swift; path = ../ForumHomeVC.swift; sourceTree = "<group>"; };
-		7518B81924396E1E00265EE4 /* CreateForumVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CreateForumVC.swift; path = ../CreateForumVC.swift; sourceTree = "<group>"; };
+		7518B81924396E1E00265EE4 /* AddTopicVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AddTopicVC.swift; path = ../AddTopicVC.swift; sourceTree = "<group>"; };
 		7518B81B24396E3B00265EE4 /* TopicCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TopicCell.swift; path = ../TopicCell.swift; sourceTree = "<group>"; };
 		752A3A4521F0727A00566127 /* ArticlesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesVC.swift; sourceTree = "<group>"; };
 		752A7B952319D24F00C41CF1 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
 		7538A4A2243C017D0037B172 /* UserTopicsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserTopicsVC.swift; path = ../UserTopicsVC.swift; sourceTree = "<group>"; };
-		754164F422F6097900EB230D /* CreatePollVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePollVC.swift; sourceTree = "<group>"; };
+		754164F422F6097900EB230D /* AddPollVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPollVC.swift; sourceTree = "<group>"; };
 		754164F622F74CCE00EB230D /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
 		75551B9424B4D2DB00DB1225 /* Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
-		755A3DB521F154D90024DFBB /* ArticlesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesCell.swift; sourceTree = "<group>"; };
+		755A3DB521F154D90024DFBB /* ArticleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCell.swift; sourceTree = "<group>"; };
 		7560441122DCE90000A73201 /* RosterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosterCell.swift; sourceTree = "<group>"; };
 		7560441422DD163000A73201 /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
 		7560441622DFB22400A73201 /* AgeGroupCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeGroupCell.swift; sourceTree = "<group>"; };
+		7565238D24E47230005C28B2 /* USMNT Live.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "USMNT Live.entitlements"; sourceTree = "<group>"; };
+		7574C54D24D4E2680025F939 /* SubCommentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubCommentVC.swift; sourceTree = "<group>"; };
 		75802064248C64BB001CB03C /* SavedPollsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPollsVC.swift; sourceTree = "<group>"; };
 		75802066248C64D0001CB03C /* SavedTopicsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedTopicsVC.swift; sourceTree = "<group>"; };
 		75802068248C6AB9001CB03C /* PollsPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollsPageVC.swift; sourceTree = "<group>"; };
@@ -78,9 +81,10 @@
 		75AB04F324ABD93B005C892C /* NewsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsVC.swift; sourceTree = "<group>"; };
 		75AB04F724ABE0C3005C892C /* NewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCell.swift; sourceTree = "<group>"; };
 		75AB04FB24ABF844005C892C /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
+		75AB270924E99D3100389DC2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		75CF82FB2425690F00C11CCB /* TopicVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TopicVC.swift; path = ../TopicVC.swift; sourceTree = "<group>"; };
 		75CFF95021ED543200C3F8E1 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
-		75D0077621E7F36800EBFB8D /* USMNT Fan App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "USMNT Fan App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		75D0077621E7F36800EBFB8D /* USMNT Live.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "USMNT Live.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		75D0077921E7F36800EBFB8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		75D0077B21E7F36800EBFB8D /* CalendarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarVC.swift; sourceTree = "<group>"; };
 		75D0078021E7F36A00EBFB8D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -90,8 +94,7 @@
 		75D0078F21E8010900EBFB8D /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		75D7E88822C42FBB009EBF75 /* RosterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosterVC.swift; sourceTree = "<group>"; };
 		75DC06642484915300E3E768 /* AddCommentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCommentVC.swift; sourceTree = "<group>"; };
-		75E0345522B0565A00B9A193 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		75E0345722B1831C00B9A193 /* Topic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Topic.swift; sourceTree = "<group>"; };
+		75E0345722B1831C00B9A193 /* Posts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Posts.swift; sourceTree = "<group>"; };
 		75EE813F241F12B100DC0F79 /* UserPollsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPollsVC.swift; sourceTree = "<group>"; };
 		75EE814124242CD700DC0F79 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
 		75EEBA76230DEA2700F151BF /* AuthVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthVC.swift; sourceTree = "<group>"; };
@@ -122,11 +125,12 @@
 			isa = PBXGroup;
 			children = (
 				7518B81724396DDB00265EE4 /* ForumHomeVC.swift */,
+				75CF82FB2425690F00C11CCB /* TopicVC.swift */,
+				7574C54D24D4E2680025F939 /* SubCommentVC.swift */,
 				7580206A248C6AD2001CB03C /* TopicsPageVC.swift */,
 				7538A4A2243C017D0037B172 /* UserTopicsVC.swift */,
 				75802066248C64D0001CB03C /* SavedTopicsVC.swift */,
-				7518B81924396E1E00265EE4 /* CreateForumVC.swift */,
-				75CF82FB2425690F00C11CCB /* TopicVC.swift */,
+				7518B81924396E1E00265EE4 /* AddTopicVC.swift */,
 				75DC06642484915300E3E768 /* AddCommentVC.swift */,
 			);
 			path = VCs;
@@ -148,7 +152,7 @@
 				75802068248C6AB9001CB03C /* PollsPageVC.swift */,
 				75EE813F241F12B100DC0F79 /* UserPollsVC.swift */,
 				75802064248C64BB001CB03C /* SavedPollsVC.swift */,
-				754164F422F6097900EB230D /* CreatePollVC.swift */,
+				754164F422F6097900EB230D /* AddPollVC.swift */,
 			);
 			path = VCs;
 			sourceTree = "<group>";
@@ -191,7 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				75D0078D21E7FDBB00EBFB8D /* CalendarCell.swift */,
-				755A3DB521F154D90024DFBB /* ArticlesCell.swift */,
+				755A3DB521F154D90024DFBB /* ArticleCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -261,7 +265,7 @@
 		75D0077721E7F36800EBFB8D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				75D0077621E7F36800EBFB8D /* USMNT Fan App.app */,
+				75D0077621E7F36800EBFB8D /* USMNT Live.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -269,11 +273,12 @@
 		75D0077821E7F36800EBFB8D /* USMNT Fan App */ = {
 			isa = PBXGroup;
 			children = (
+				7565238D24E47230005C28B2 /* USMNT Live.entitlements */,
 				7560441322DD160800A73201 /* Home */,
-				7518755A22D3CC520098494F /* Polls */,
-				75D7E88722C42F50009EBF75 /* Roster */,
-				75E0344A22AEFDC400B9A193 /* Forum */,
 				75E0344522AB200A00B9A193 /* Calendar */,
+				75E0344A22AEFDC400B9A193 /* Forum */,
+				75D7E88722C42F50009EBF75 /* Roster */,
+				7518755A22D3CC520098494F /* Polls */,
 				752A7B972319D33E00C41CF1 /* Authentification */,
 				75E0344422AB1F6700B9A193 /* Custom Classes */,
 				75D0078F21E8010900EBFB8D /* Extensions.swift */,
@@ -282,7 +287,7 @@
 				75D0077921E7F36800EBFB8D /* AppDelegate.swift */,
 				75D0078021E7F36A00EBFB8D /* Assets.xcassets */,
 				75D0078221E7F36A00EBFB8D /* LaunchScreen.storyboard */,
-				75E0345522B0565A00B9A193 /* GoogleService-Info.plist */,
+				75AB270924E99D3100389DC2 /* GoogleService-Info.plist */,
 				75D0078521E7F36A00EBFB8D /* Info.plist */,
 			);
 			path = "USMNT Fan App";
@@ -302,7 +307,7 @@
 			children = (
 				75CFF95021ED543200C3F8E1 /* Event.swift */,
 				75AB04FB24ABF844005C892C /* Article.swift */,
-				75E0345722B1831C00B9A193 /* Topic.swift */,
+				75E0345722B1831C00B9A193 /* Posts.swift */,
 				750F89C422E25687006EA794 /* Player.swift */,
 				754164F622F74CCE00EB230D /* Poll.swift */,
 				75EE814124242CD700DC0F79 /* PaddingLabel.swift */,
@@ -348,8 +353,8 @@
 				75D0077221E7F36800EBFB8D /* Sources */,
 				75D0077321E7F36800EBFB8D /* Frameworks */,
 				75D0077421E7F36800EBFB8D /* Resources */,
-				E056830698CDCAA183917CB4 /* [CP] Embed Pods Frameworks */,
-				A1B1A5FEAA84A18EAC133827 /* [CP] Copy Pods Resources */,
+				51CA87A78FFE66CBBDEC35D5 /* [CP] Embed Pods Frameworks */,
+				0AAB25E0C7B3C3EFB72D143E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -357,7 +362,7 @@
 			);
 			name = "USMNT Fan App";
 			productName = "USA Soccer Calendar";
-			productReference = 75D0077621E7F36800EBFB8D /* USMNT Fan App.app */;
+			productReference = 75D0077621E7F36800EBFB8D /* USMNT Live.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -401,13 +406,30 @@
 			files = (
 				75D0078421E7F36A00EBFB8D /* LaunchScreen.storyboard in Resources */,
 				75D0078121E7F36A00EBFB8D /* Assets.xcassets in Resources */,
-				75E0345622B0565A00B9A193 /* GoogleService-Info.plist in Resources */,
+				75AB270A24E99D3100389DC2 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0AAB25E0C7B3C3EFB72D143E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		157EE75A13DD82B47ACF5717 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -430,24 +452,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A1B1A5FEAA84A18EAC133827 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E056830698CDCAA183917CB4 /* [CP] Embed Pods Frameworks */ = {
+		51CA87A78FFE66CBBDEC35D5 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -479,7 +484,7 @@
 				75D7E88922C42FBB009EBF75 /* RosterVC.swift in Sources */,
 				75AB04FC24ABF844005C892C /* Article.swift in Sources */,
 				7560441522DD163000A73201 /* HomeVC.swift in Sources */,
-				75E0345822B1831C00B9A193 /* Topic.swift in Sources */,
+				75E0345822B1831C00B9A193 /* Posts.swift in Sources */,
 				75A48B5F23B5AF2E001338C6 /* SettingsVC.swift in Sources */,
 				75EEBA77230DEA2700F151BF /* AuthVC.swift in Sources */,
 				7560441722DFB22400A73201 /* AgeGroupCell.swift in Sources */,
@@ -492,13 +497,14 @@
 				7580206B248C6AD2001CB03C /* TopicsPageVC.swift in Sources */,
 				75551B9524B4D2DB00DB1225 /* Functions.swift in Sources */,
 				7518755C22D3CC730098494F /* PollsVC.swift in Sources */,
+				7574C54E24D4E2680025F939 /* SubCommentVC.swift in Sources */,
 				754164F722F74CCE00EB230D /* Poll.swift in Sources */,
-				755A3DB621F154D90024DFBB /* ArticlesCell.swift in Sources */,
+				755A3DB621F154D90024DFBB /* ArticleCell.swift in Sources */,
 				7560441222DCE90000A73201 /* RosterCell.swift in Sources */,
-				754164F522F6097900EB230D /* CreatePollVC.swift in Sources */,
+				754164F522F6097900EB230D /* AddPollVC.swift in Sources */,
 				75AB04F424ABD93B005C892C /* NewsVC.swift in Sources */,
 				75AB04F824ABE0C3005C892C /* NewsCell.swift in Sources */,
-				7518B81A24396E1E00265EE4 /* CreateForumVC.swift in Sources */,
+				7518B81A24396E1E00265EE4 /* AddTopicVC.swift in Sources */,
 				750F89C722F0D276006EA794 /* PollsCell.swift in Sources */,
 				75802065248C64BB001CB03C /* SavedPollsVC.swift in Sources */,
 				751696772469E77B0056E4A6 /* CommentCell.swift in Sources */,
@@ -646,6 +652,7 @@
 			baseConfigurationReference = C9E7C34A40BD4D84A482BC18 /* Pods-USMNT Fan App.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "USMNT Fan App/USMNT Live.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USMNT Fan App/Info.plist";
@@ -655,7 +662,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "USMNT Live";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -666,6 +673,7 @@
 			baseConfigurationReference = 547635DE9EBED25123D8B1AF /* Pods-USMNT Fan App.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "USMNT Fan App/USMNT Live.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USMNT Fan App/Info.plist";
@@ -675,7 +683,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "USMNT Live";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

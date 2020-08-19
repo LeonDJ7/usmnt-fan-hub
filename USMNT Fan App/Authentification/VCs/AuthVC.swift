@@ -9,15 +9,15 @@
 import UIKit
 import Firebase
 
-class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class AuthVC: UIViewController {
     
     let signInBtn: UIButton = {
         let btn = UIButton()
         btn.backgroundColor = #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
         btn.layer.cornerRadius = 2
-        btn.setTitle("Sign In", for: .normal)
+        btn.setTitle("sign in", for: .normal)
         btn.titleLabel?.textColor = .white
-        btn.titleLabel?.font = UIFont(name: "Avenir-Medium", size: 15)
+        btn.titleLabel?.font = UIFont(name: "Avenir Medium", size: 15)
         btn.addTarget(self, action: #selector(signInBtnTapped), for: .touchUpInside)
         return btn
     }()
@@ -31,13 +31,22 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         return btn
     }()
     
+    let switchToResetBtn: UIButton = {
+        let btn = UIButton()
+        btn.setTitle("forgot password?", for: .normal)
+        btn.titleLabel?.font = UIFont(name: "Avenir Medium", size: 15)
+        btn.setTitleColor(#colorLiteral(red: 1, green: 0.6067909002, blue: 0.5591675639, alpha: 1), for: .normal)
+        btn.addTarget(self, action: #selector(switchToResetBtnTapped), for: .touchUpInside)
+        return btn
+    }()
+    
     let signInEmailTF: UITextField = {
         let tf = UITextField()
         let attributes = [
             NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "email", attributes: attributes)
-        tf.font = UIFont(name: "Avenir-Medium", size: 15)
+        tf.font = UIFont(name: "Avenir Medium", size: 15)
         tf.autocorrectionType = .no
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
@@ -54,6 +63,7 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         tf.autocorrectionType = .no
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
+        tf.isSecureTextEntry = true
         return tf
     }()
     
@@ -74,16 +84,11 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
     
     
     
-    
-    
-    
-    
-    
     let signUpBtn: UIButton = {
         let btn = UIButton()
         btn.backgroundColor = #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
         btn.layer.cornerRadius = 2
-        btn.setTitle("Sign Up", for: .normal)
+        btn.setTitle("sign up", for: .normal)
         btn.titleLabel?.textColor = .white
         btn.titleLabel?.font = UIFont(name: "Avenir-Medium", size: 15)
         btn.addTarget(self, action: #selector(signUpBtnTapped), for: .touchUpInside)
@@ -143,6 +148,7 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         tf.autocorrectionType = .no
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
+        tf.isSecureTextEntry = true
         return tf
     }()
     
@@ -156,6 +162,7 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         tf.autocorrectionType = .no
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
+        tf.isSecureTextEntry = true
         return tf
     }()
     
@@ -187,6 +194,46 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
     
     
     
+    
+    
+    
+    
+    let resetEmailTF: UITextField = {
+        let tf = UITextField()
+        let attributes = [
+            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
+        ]
+        tf.attributedPlaceholder = NSAttributedString(string: "email", attributes: attributes)
+        tf.font = UIFont(name: "Avenir Medium", size: 15)
+        tf.autocorrectionType = .no
+        tf.autocapitalizationType = .none
+        tf.spellCheckingType = .no
+        return tf
+    }()
+    
+    let resetBtn: UIButton = {
+        let btn = UIButton()
+        btn.backgroundColor = #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
+        btn.layer.cornerRadius = 2
+        btn.setTitle("request reset email", for: .normal)
+        btn.titleLabel?.textColor = .white
+        btn.titleLabel?.font = UIFont(name: "Avenir-Medium", size: 15)
+        btn.addTarget(self, action: #selector(resetBtnTapped), for: .touchUpInside)
+        return btn
+    }()
+    
+    let resetEmailUnderline: UIView = {
+        let view = UIView()
+        view.backgroundColor = .darkGray
+        return view
+    }()
+    
+    
+    
+    
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -210,6 +257,7 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         view.addSubview(signInEmailUnderline)
         view.addSubview(signInPasswordUnderline)
         view.addSubview(switchToSignUpBtn)
+        view.addSubview(switchToResetBtn)
         
     }
     
@@ -225,7 +273,9 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         
         signInPasswordUnderline.anchors(top: signInPasswordTF.bottomAnchor, topPad: -7, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 222)
         
-        switchToSignUpBtn.anchors(top: signInBtn.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 222)
+        switchToResetBtn.anchors(top: signInBtn.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 222)
+        
+        switchToSignUpBtn.anchors(top: switchToResetBtn.bottomAnchor, topPad: -10, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 222)
         
     }
     
@@ -249,10 +299,13 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
                 AlertController.showAlert(self, title: "Error", message: error!.localizedDescription)
                 return
             }
+            
             guard user?.user.uid != nil else {
                 AlertController.showAlert(self, title: "Error", message: "User does not exist")
                 return
             }
+            
+            userHasChanged = true
             
         }
         
@@ -265,10 +318,16 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         setupSignUpLayout()
     }
     
+    @objc func switchToResetBtnTapped() {
+        view.subviews.forEach({ $0.removeFromSuperview() })
+        setupResetLayout()
+    }
     
     
     
     
+    
+    // sign up functions
     
     
     
@@ -345,6 +404,12 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
                 return
         }
         
+        if username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            // string doesn't contain non-whitespace characters
+            AlertController.showAlert(self, title: "Error", message: "username must contain non-whitespace characters")
+            return
+        }
+        
         guard let passwordRequirement = self.signUpPasswordTF.text,
             passwordRequirement.count >= 6
             else    {
@@ -372,63 +437,64 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
                 
             }
             
-        }
-        
-        Auth.auth().createUser(withEmail: email, password: password) { (user, error) in
-            
-            guard error == nil else {
-                AlertController.showAlert(self, title: "Error", message: error!.localizedDescription)
-                print ("Error: \(error!.localizedDescription)")
-                return
-            }
-            
-            let changeRequest = user?.user.createProfileChangeRequest()
-            changeRequest?.displayName = username
-            changeRequest?.commitChanges { (error) in
+            Auth.auth().createUser(withEmail: email, password: password) { (user, error) in
+                
                 guard error == nil else {
                     AlertController.showAlert(self, title: "Error", message: error!.localizedDescription)
+                    print ("Error: \(error!.localizedDescription)")
                     return
                 }
-            }
-            
-            
-            let uid = user?.user.uid
-            let storageRef = Storage.storage().reference(forURL: "gs://usmnt-fan-app.appspot.com").child("profile_image").child(uid!)
-            
-            if let profileImage = self.selectedImage, let imageData = profileImage.jpegData(compressionQuality: 0.1) {
                 
-                storageRef.putData(imageData, metadata: nil, completion: { (metadata, error) in
-                    
-                    if error != nil {
-                        print("error")
+                let changeRequest = user?.user.createProfileChangeRequest()
+                changeRequest?.displayName = username
+                changeRequest?.commitChanges { (error) in
+                    guard error == nil else {
+                        AlertController.showAlert(self, title: "Error", message: error!.localizedDescription)
                         return
                     }
+                }
+                
+                userHasChanged = true
+                
+                let uid = user!.user.uid
+                let storageRef = Storage.storage().reference(forURL: "gs://usmnt-fan-app.appspot.com").child("profile_image").child(uid)
+                
+                if let profileImage = self.selectedImage, let imageData = profileImage.jpegData(compressionQuality: 0.1) {
                     
-                    metadata?.storageReference?.downloadURL(completion: { (url, error) in
+                    storageRef.putData(imageData, metadata: nil, completion: { (metadata, error) in
                         
                         if error != nil {
                             print("error")
                             return
                         }
                         
-                        if let profilePicURL = url {
+                        metadata?.storageReference?.downloadURL(completion: { (url, error) in
                             
-                            let userData: [String : Any] = ["profilePicURL" : profilePicURL.absoluteString,
-                                                             "username" : username,
-                                                             "email" : email]
-                            Firestore.firestore().collection("Users").document((user?.user.uid)!).setData(userData)
-                        }
+                            if error != nil {
+                                print("error")
+                                return
+                            }
+                            
+                            if let profilePicURL = url {
+                                
+                                let userData: [String : Any] = ["profilePicURL" : profilePicURL.absoluteString,
+                                                                 "username" : username,
+                                                                 "email" : email]
+                                Firestore.firestore().collection("Users").document(uid).setData(userData)
+                            }
+                            
+                        })
                         
                     })
                     
-                })
-                
-            } else {
-                
-                let userData: [String : Any] = ["profilePicURL" : "",
-                                                 "username" : username,
-                                                 "email" : email]
-                Firestore.firestore().collection("Users").document((user?.user.uid)!).setData(userData)
+                } else {
+                    
+                    let userData: [String : Any] = ["profilePicURL" : "",
+                                                     "username" : username,
+                                                     "email" : email]
+                    Firestore.firestore().collection("Users").document((user?.user.uid)!).setData(userData)
+                    
+                }
                 
             }
             
@@ -448,5 +514,74 @@ class AuthVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         view.subviews.forEach({ $0.removeFromSuperview() })
         setupSignInLayout()
     }
+    
+    
+    
+    
+    
+    // reset password functions
+    
+    
+    
+    
+    
+    
+    func setupResetLayout() {
+        
+        view.backgroundColor = .white
+        addResetSubviews()
+        applyResetAnchors()
+        
+    }
+    
+    @objc func resetBtnTapped() {
+        
+        Auth.auth().sendPasswordReset(withEmail: (resetEmailTF.text)!) { (error) in
+            if error != nil {
+                AlertController.showAlert(self, title: "Error", message: error!.localizedDescription)
+            } else {
+                AlertController.showAlert(self, title: "Success", message: "an email has been sent this address")
+                self.resetEmailTF.text = ""
+            }
+        }
+        
+    }
+    
+    func addResetSubviews() {
+        
+        view.addSubview(resetEmailTF)
+        view.addSubview(resetBtn)
+        view.addSubview(resetEmailUnderline)
+        view.addSubview(switchToSignInBtn)
+        
+    }
+    
+    func applyResetAnchors() {
+        
+        resetEmailTF.anchors(top: view.topAnchor, topPad: 150, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
+        
+        resetEmailUnderline.anchors(top: resetEmailTF.bottomAnchor, topPad: -7, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 222)
+        
+        resetBtn.anchors(top: resetEmailTF.bottomAnchor, topPad: 25, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
+        
+        switchToSignInBtn.anchors(top: resetBtn.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 222)
+        
+    }
+    
+    
 
+}
+
+extension AuthVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            signUpProfileImageView.image = image
+            selectedImage = image
+        }
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
 }
