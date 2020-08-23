@@ -50,6 +50,8 @@ class AuthVC: UIViewController {
         tf.autocorrectionType = .no
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
+        tf.textColor = .darkGray
+        tf.backgroundColor = .white
         return tf
     }()
     
@@ -64,6 +66,8 @@ class AuthVC: UIViewController {
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
         tf.isSecureTextEntry = true
+        tf.textColor = .darkGray
+        tf.backgroundColor = .white
         return tf
     }()
     
@@ -122,6 +126,8 @@ class AuthVC: UIViewController {
         tf.autocorrectionType = .no
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
+        tf.textColor = .darkGray
+        tf.backgroundColor = .white
         return tf
     }()
     
@@ -135,6 +141,8 @@ class AuthVC: UIViewController {
         tf.autocorrectionType = .no
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
+        tf.textColor = .darkGray
+        tf.backgroundColor = .white
         return tf
     }()
     
@@ -149,6 +157,8 @@ class AuthVC: UIViewController {
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
         tf.isSecureTextEntry = true
+        tf.textColor = .darkGray
+        tf.backgroundColor = .white
         return tf
     }()
     
@@ -163,6 +173,8 @@ class AuthVC: UIViewController {
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
         tf.isSecureTextEntry = true
+        tf.textColor = .darkGray
+        tf.backgroundColor = .white
         return tf
     }()
     
@@ -208,6 +220,8 @@ class AuthVC: UIViewController {
         tf.autocorrectionType = .no
         tf.autocapitalizationType = .none
         tf.spellCheckingType = .no
+        tf.textColor = .darkGray
+        tf.backgroundColor = .white
         return tf
     }()
     
@@ -426,13 +440,17 @@ class AuthVC: UIViewController {
         
         Firestore.firestore().collection("Users").getDocuments { (snap, err) in
             
-            for document in snap!.documents {
+            if let snap = snap {
                 
-                let takenUsername = document.data()["username"] as! String
-                
-                if (takenUsername == self.signUpUsernameTF.text) {
-                    AlertController.showAlert(self, title: "Error", message: "Username taken")
-                    return
+                for document in snap.documents {
+                    
+                    let takenUsername = document.data()["username"] as! String
+                    
+                    if (takenUsername == self.signUpUsernameTF.text) {
+                        AlertController.showAlert(self, title: "Error", message: "Username taken")
+                        return
+                    }
+                    
                 }
                 
             }
@@ -449,7 +467,7 @@ class AuthVC: UIViewController {
                 changeRequest?.displayName = username
                 changeRequest?.commitChanges { (error) in
                     guard error == nil else {
-                        AlertController.showAlert(self, title: "Error", message: error!.localizedDescription)
+                        AlertController.showAlert(self, title: "Error", message: error!.localizedDescription ?? "")
                         return
                     }
                 }

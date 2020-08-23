@@ -1,20 +1,20 @@
 //
-//  SubCommentVC.swift
-//  USMNT Fan App
+//  TopicVC.swift
+//  USA Soccer Calendar
 //
-//  Created by Leon Djusberg on 7/31/20.
+//  Created by Leon Djusberg on 3/20/20.
 //  Copyright © 2020 Leon Djusberg. All rights reserved.
 //
 
 import UIKit
 import Firebase
 
-class SubCommentVC: UIViewController {
+class TopicVC: UIViewController {
     
-    var comment: Comment = Comment()
-    var parentCell: CommentCell = CommentCell()
     var topic: Topic = Topic()
-    var commentRow: Int?
+    var parentVC: ForumHomeVC = ForumHomeVC()
+    var topicRow: Int?
+    var topicIsSaved = false
     
     let tableView: UITableView = {
         let tv = UITableView()
@@ -32,7 +32,15 @@ class SubCommentVC: UIViewController {
         return btn
     }()
     
-    let textLbl: UILabel = {
+    let topicLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.numberOfLines = 0
+        lbl.font = UIFont(name: "Avenir-Book", size: 18)
+        lbl.textColor = #colorLiteral(red: 0.8058902025, green: 0.9378458858, blue: 1, alpha: 1)
+        return lbl
+    }()
+    
+    let descriptionLbl: UILabel = {
         let lbl = UILabel()
         lbl.numberOfLines = 0
         lbl.font = UIFont(name: "Avenir-Book", size: 16)
@@ -55,27 +63,6 @@ class SubCommentVC: UIViewController {
         return imgView
     }()
     
-    let likeBtn: UIButton = {
-        let btn = UIButton()
-        btn.setImage(UIImage(named: "LikeBtnImage"), for: .normal)
-        btn.addTarget(self, action: #selector(like), for: .touchUpInside)
-        return btn
-    }()
-    
-    let likesLbl: UILabel = {
-        let lbl = UILabel()
-        lbl.textColor = .white
-        lbl.font = UIFont(name: "Avenir-Book", size: 16)
-        return lbl
-    }()
-    
-    let dislikeBtn: UIButton = {
-        let btn = UIButton()
-        btn.setImage(UIImage(named: "DislikeBtnImage"), for: .normal)
-        btn.addTarget(self, action: #selector(dislike), for: .touchUpInside)
-        return btn
-    }()
-    
     let seperatorView: UIView = {
         let view = UIView()
         view.backgroundColor = #colorLiteral(red: 1, green: 0.7053028941, blue: 0.7190689445, alpha: 1)
@@ -89,13 +76,19 @@ class SubCommentVC: UIViewController {
         return btn
     }()
     
-    let deletedLbl: UILabel = {
-        let lbl = UILabel()
-        lbl.isHidden = true
-        lbl.textColor = .white
-        lbl.text = "this comment has been deleted"
-        lbl.font = UIFont(name: "Avenir-Book", size: 16)
-        return lbl
+    let saveBtn: UIButton = {
+        let btn = UIButton()
+        btn.addTarget(self, action: #selector(saveBtnTapped), for: .touchUpInside)
+        btn.setImage(UIImage(named: "SaveBtnImage"), for: .normal)
+        return btn
+    }()
+    
+    let deleteBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.addTarget(self, action: #selector(deleteAlert), for: .touchUpInside)
+        btn.setImage(UIImage(named: "DeleteBtnImage"), for: .normal)
+        return btn
     }()
     
     lazy var refresher: UIRefreshControl = {
@@ -125,25 +118,61 @@ class SubCommentVC: UIViewController {
         tableView.dataSource = self
         tableView.refreshControl = refresher
         
-        comment.comments.sort { $0.likes > $1.likes }
+        activityIndicator.startAnimating()
+        
+        topic.comments.sort { $0.likes > $1.likes }
         
         setTopicInfo()
         setupLayout()
+        randomizeColor()
         
-        tableView.reloadData()
-        activityIndicator.startAnimating()
-
+        // if this is the users post show deleteBtn
+        
+        if let user = Auth.auth().currentUser {
+            
+            if user.uid == topic.authorUID {
+                deleteBtn.isHidden = false
+                saveBtn.isHidden = true
+            }
+            
+        }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
         
+        if userHasChanged == true {
+            
+            if let user = Auth.auth().currentUser {
+                
+                if user.uid != topic.authorUID {
+                    deleteBtn.isHidden = true
+                    saveBtn.isHidden = false
+                } else {
+                    deleteBtn.isHidden = false
+                    saveBtn.isHidden = true
+                }
+                
+            } else {
+                
+                deleteBtn.isHidden = true
+                saveBtn.isHidden = false
+                
+            }
+            
+            userHasChanged = false
+            
+        }
+        
         tableView.reloadData()
+        
         
         activityIndicatorView.isHidden = true
         self.activityIndicator.stopAnimating()
-            
+        
     }
+    
     
     func setupLayout() {
         
@@ -159,14 +188,13 @@ class SubCommentVC: UIViewController {
         view.addSubview(backBtn)
         view.addSubview(authorImageView)
         view.addSubview(authorAndTimePostedLbl)
-        view.addSubview(textLbl)
-        view.addSubview(likeBtn)
-        view.addSubview(likesLbl)
-        view.addSubview(dislikeBtn)
+        view.addSubview(topicLbl)
+        view.addSubview(descriptionLbl)
         view.addSubview(commentBtn)
+        view.addSubview(saveBtn)
         view.addSubview(seperatorView)
         view.addSubview(tableView)
-        view.addSubview(deletedLbl)
+        view.addSubview(deleteBtn)
         view.addSubview(activityIndicatorView)
         activityIndicatorView.addSubview(activityIndicator)
         
@@ -174,59 +202,29 @@ class SubCommentVC: UIViewController {
     
     func applyAnchors() {
         
-        backBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        backBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         authorImageView.anchors(top: backBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
         
         authorAndTimePostedLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: authorImageView.rightAnchor, leftPad: 5, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
-        textLbl.anchors(top: authorImageView.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        topicLbl.anchors(top: authorImageView.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        likeBtn.anchors(top: textLbl.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 30)
+        descriptionLbl.anchors(top: topicLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        likesLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: likeBtn.rightAnchor, leftPad: 3, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: likeBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        commentBtn.anchors(top: descriptionLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 20)
         
-        dislikeBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: likesLbl.rightAnchor, leftPad: 3, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: likeBtn.centerYAnchor, centerYPad: 0, height: 30, width: 30)
-        
-        commentBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: dislikeBtn.rightAnchor, leftPad: 6, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: likeBtn.centerYAnchor, centerYPad: 0, height: 30, width: 30)
+        saveBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: commentBtn.rightAnchor, leftPad: 5, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: commentBtn.centerYAnchor, centerYPad: 0, height: 0, width: 20)
         
         seperatorView.anchors(top: commentBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
         
         tableView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 10, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
-
-        deletedLbl.anchors(top: textLbl.topAnchor, topPad: 0, bottom: textLbl.bottomAnchor, bottomPad: 0, left: textLbl.leftAnchor, leftPad: 0, right: textLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
+        deleteBtn.anchors(top: nil, topPad: 5, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 20, width: 20)
+
         activityIndicatorView.anchors(top: seperatorView.bottomAnchor, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         activityIndicator.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: activityIndicatorView.centerXAnchor, centerXPad: 0, centerY: activityIndicatorView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
-        
-    }
-    
-    @objc func like() {
-        
-        if let user = Auth.auth().currentUser {
-            
-            comment.like(user: user)
-            
-        } else {
-            AlertController.showAlert(self, title: "Error", message: "must be logged in to like comments")
-        }
-        
-        likesLbl.text = "\(comment.likes)"
-        
-    }
-    
-    @objc func dislike() {
-        
-        if let user = Auth.auth().currentUser {
-            
-            comment.dislike(user: user)
-            
-        } else {
-            AlertController.showAlert(self, title: "Error", message: "must be logged in to dislike comments")
-        }
-        
-        likesLbl.text = "\(comment.likes)"
         
     }
     
@@ -253,25 +251,83 @@ class SubCommentVC: UIViewController {
         
         let deadline = DispatchTime.now() + .seconds(1)
         DispatchQueue.main.asyncAfter(deadline: deadline) {
-            self.comment.comments.sort { $0.likes > $1.likes }
+            self.topic.comments.sort { $0.likes > $1.likes }
             self.tableView.reloadData()
             self.refresher.endRefreshing()
         }
         
     }
     
+    func randomizeColor() {
+        
+        let randomNumber = arc4random_uniform(8)
+        let backgroundColor: UIColor
+        
+        switch randomNumber {
+        case 0:
+            backgroundColor = #colorLiteral(red: 0.8484226465, green: 0.9622095227, blue: 0.9975820184, alpha: 1)
+        case 1:
+            backgroundColor = #colorLiteral(red: 0.9808904529, green: 0.8153990507, blue: 0.8155520558, alpha: 1)
+        case 2:
+            backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        case 3:
+            backgroundColor = #colorLiteral(red: 0.8720894456, green: 0.8917983174, blue: 0.9874122739, alpha: 1)
+        case 4:
+            backgroundColor = #colorLiteral(red: 0.9295411706, green: 1, blue: 0.9999595284, alpha: 1)
+        case 5:
+            backgroundColor = #colorLiteral(red: 1, green: 0.8973084092, blue: 0.8560125232, alpha: 1)
+        case 6:
+            backgroundColor = #colorLiteral(red: 0.8479840159, green: 0.8594029546, blue: 0.9951685071, alpha: 1)
+        case 7:
+            backgroundColor = #colorLiteral(red: 0.9530633092, green: 0.879604578, blue: 0.8791741729, alpha: 1)
+        default:
+            backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        }
+        
+        authorImageView.backgroundColor = backgroundColor
+        
+    }
+    
     func setTopicInfo() {
         
         setAuthorProfileImage()
-        authorAndTimePostedLbl.text = comment.author + " : " + translateTimestamp(timestamp: comment.timestamp)
-        textLbl.text = comment.text
-        likesLbl.text = "\(comment.likes)"
+        authorAndTimePostedLbl.text = topic.author + " : " + translateTimestamp(timestamp: topic.timestamp)
+        topicLbl.text = topic.topic
+        descriptionLbl.text = topic.text
+        
+        // check if user has saved this topic
+        
+        if let user = Auth.auth().currentUser {
+            
+            Firestore.firestore().collection("Users").document(user.uid).collection("SavedTopics").whereField("docID", isEqualTo: topic.id).getDocuments { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                if let snap = snap {
+                    
+                    if snap.documents.count > 0 {
+                        self.topicIsSaved = true
+                        self.saveBtn.setImage(UIImage(named: "Check"), for: .normal)
+                    }
+                    
+                }
+                
+            }
+            
+        } else {
+            
+            // topic cannot and is not saved
+            
+        }
         
     }
     
     func setAuthorProfileImage() {
         
-        let storageRef = Storage.storage().reference(forURL: "gs://usmnt-fan-app.appspot.com").child("profile_image").child(comment.authorUID)
+        let storageRef = Storage.storage().reference(forURL: "gs://usmnt-fan-app.appspot.com").child("profile_image").child(topic.authorUID)
         
         storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
             
@@ -300,9 +356,9 @@ class SubCommentVC: UIViewController {
         if Auth.auth().currentUser != nil {
             
             let vc = AddCommentVC()
-            vc.parentIsComment = true
-            vc.parentComment = self.comment
-            vc.parentSubCommentVC = self
+            vc.parentIsComment = false
+            vc.parentTopic = self.topic
+            vc.parentTopicVC = self
             present(vc, animated: true, completion: nil)
             
         } else {
@@ -312,6 +368,150 @@ class SubCommentVC: UIViewController {
             
         }
         
+    }
+    
+    @objc func saveBtnTapped() {
+        
+        if let user = Auth.auth().currentUser {
+            
+            if topicIsSaved == false {
+                
+                // set as saved in firestore for user
+                
+                Firestore.firestore().collection("Users").document(user.uid).collection("SavedTopics").addDocument(data: ["docID":topic.id])
+                
+                // add to savers collection of topic
+                
+                topic.dbref.collection("Savers").addDocument(data: ["uid":user.uid])
+                
+                saveBtn.setImage(UIImage(named: "Check"), for: .normal)
+                topicIsSaved = !topicIsSaved
+                
+            } else {
+                
+                Firestore.firestore().collection("Users").document(user.uid).collection("SavedTopics").whereField("docID", isEqualTo: topic.id).getDocuments { (snap, err) in
+                    
+                    guard err == nil else {
+                        print(err?.localizedDescription ?? "")
+                        return
+                    }
+                    
+                    if let snap = snap {
+                        
+                        for document in snap.documents {
+                            document.reference.delete()
+                        }
+                        
+                    }
+                    
+                }
+                
+                saveBtn.setImage(UIImage(named: "SaveBtnImage"), for: .normal)
+                topicIsSaved = !topicIsSaved
+                
+            }
+            
+            
+            
+        } else {
+            
+            let vc = AuthVC()
+            present(vc, animated: true, completion: nil)
+            
+        }
+        
+        // change btn color or something to show saved completion
+        
+    }
+    
+    @objc func goBack() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func deleteAlert() {
+        
+        let alert = UIAlertController(title: "just checking", message: "are you sure you want to delete this topic?", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "No", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            let docID = self.topic.id
+            
+            // delete from User's UserTopics collection
+            
+            Firestore.firestore().collection("Users").document(Auth.auth().currentUser!.uid).collection("UserTopics").whereField("docID", isEqualTo: docID).getDocuments { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                if let snap = snap {
+                    
+                    for document in snap.documents { document.reference.delete() }
+                    
+                }
+                
+            }
+            
+            // delete from saver's SavedTopics collection
+            
+            self.topic.dbref.collection("Savers").getDocuments { (snap1, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                if let snap = snap1 {
+                    
+                    for document in snap.documents {
+                        
+                        let data = document.data()
+                        let voterUID = data["uid"] as! String
+                        
+                        Firestore.firestore().collection("Users").document(voterUID).collection("SavedTopics").whereField("docID", isEqualTo: docID).getDocuments { (snap2, err) in
+                            
+                            guard err == nil else {
+                                print(err?.localizedDescription ?? "")
+                                return
+                            }
+                            
+                            if let snap = snap2 {
+                                for document in snap.documents { document.reference.delete() }
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                }
+                
+            }
+            
+            self.parentVC.naturalTopics = self.parentVC.naturalTopics.filter({ (topic) -> Bool in
+                return topic.id != self.topic.id
+            })
+            
+            self.parentVC.allTopics = self.parentVC.allTopics.filter({ (topic) -> Bool in
+                return topic.id != self.topic.id
+            })
+            
+            if let row = self.topicRow {
+                self.parentVC.topicsDisplayed.remove(at: row)
+                self.parentVC.tableView.reloadData()
+            }
+            
+            self.topic.dbref.delete()
+            self.navigationController?.popViewController(animated: true)
+            
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
     }
     
     func deleteSubCommentAlert(comment: Comment, parentCell: CommentCell, commentRow: Int, cell: CommentCell) {
@@ -418,7 +618,7 @@ class SubCommentVC: UIViewController {
                 // comment has no comments, delete from firebase and from parentVC tv
                 
                 comment.dbref.delete()
-                self.comment.comments.remove(at: commentRow)
+                self.topic.comments.remove(at: commentRow)
                 self.tableView.deleteRows(at: [IndexPath(row: commentRow, section: 0)], with: .automatic)
                 self.tableView.reloadData()
                 
@@ -428,17 +628,13 @@ class SubCommentVC: UIViewController {
         
         self.present(alert, animated: true, completion: nil)
     }
-    
-    @objc func goBack() {
-        navigationController?.popViewController(animated: true)
-    }
 
 }
 
-extension SubCommentVC: UITableViewDelegate, UITableViewDataSource {
+extension TopicVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return comment.comments.count
+        return topic.comments.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -447,7 +643,7 @@ extension SubCommentVC: UITableViewDelegate, UITableViewDataSource {
         
         if let user = Auth.auth().currentUser {
             
-            if comment.comments[indexPath.row].authorUID == user.uid && comment.comments[indexPath.row].isDeleted == false {
+            if topic.comments[indexPath.row].authorUID == user.uid && topic.comments[indexPath.row].isDeleted == false {
                 cell.deleteBtn.isHidden = false
             } else {
                 cell.deleteBtn.isHidden = true
@@ -460,18 +656,18 @@ extension SubCommentVC: UITableViewDelegate, UITableViewDataSource {
         // set all data
         
         cell.delegate = self
-        cell.parentSubCommentVC = self
+        cell.parentTopicVC = self
         cell.parentCell = nil
         cell.deleteBtn.tag = indexPath.row
         cell.subCommentBtn.tag = indexPath.row
-        cell.comment = comment.comments[indexPath.row]
-        cell.authorAndTimePostedLbl.text = comment.comments[indexPath.row].author + " : " + translateTimestamp(timestamp: comment.comments[indexPath.row].timestamp)
-        cell.textLbl.text = comment.comments[indexPath.row].text
-        cell.likesLbl.text = "\(comment.comments[indexPath.row].likes)"
-        cell.setAuthorProfileImage(uid: comment.comments[indexPath.row].authorUID)
+        cell.comment = topic.comments[indexPath.row]
+        cell.authorAndTimePostedLbl.text = topic.comments[indexPath.row].author + " : " + translateTimestamp(timestamp: topic.comments[indexPath.row].timestamp)
+        cell.textLbl.text = topic.comments[indexPath.row].text
+        cell.likesLbl.text = "\(topic.comments[indexPath.row].likes)"
+        cell.setAuthorProfileImage(uid: topic.comments[indexPath.row].authorUID)
         cell.commentsOutOfRangeBtn.tag = indexPath.row
         
-        if comment.comments[indexPath.row].isDeleted == true {
+        if topic.comments[indexPath.row].isDeleted == true {
             
             for view in cell.subviews {
                 view.isHidden = true
@@ -514,13 +710,14 @@ extension SubCommentVC: UITableViewDelegate, UITableViewDataSource {
     
 }
 
-extension SubCommentVC: CommentCellDelegate {
+extension TopicVC: CommentCellDelegate {
     
     func commentsOutOfRangeBtnTapped(comment: Comment, parentCell: CommentCell, commentRow: Int) {
         
         let vc = SubCommentVC()
         vc.comment = comment
         vc.commentRow = commentRow
+        vc.topic = self.topic
         vc.parentCell = parentCell
         navigationController?.pushViewController(vc, animated: true)
         
@@ -534,7 +731,7 @@ extension SubCommentVC: CommentCellDelegate {
             vc.parentIsComment = true
             vc.parentComment = comment
             vc.parentCell = cell
-            vc.parentSubCommentVC = self
+            vc.parentTopicVC = self
             present(vc, animated: true, completion: nil)
             
         } else {
@@ -566,7 +763,10 @@ extension SubCommentVC: CommentCellDelegate {
             comment.like(user: user)
             
         } else {
-            AlertController.showAlert(self, title: "Error", message: "must be logged in to like comments")
+            
+            let vc = AuthVC()
+            present(vc, animated: true, completion: nil)
+            
         }
         
         
@@ -579,7 +779,10 @@ extension SubCommentVC: CommentCellDelegate {
             comment.dislike(user: user)
             
         } else {
-            AlertController.showAlert(self, title: "Error", message: "must be logged in to dislike comments")
+            
+            let vc = AuthVC()
+            present(vc, animated: true, completion: nil)
+            
         }
         
     }

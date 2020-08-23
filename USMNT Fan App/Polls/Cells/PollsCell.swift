@@ -80,6 +80,15 @@ class PollsCell: UITableViewCell {
         return lbl
     }()
     
+    let answer1PercentLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.font = UIFont(name: "Avenir-Book", size: 14)
+        lbl.textColor = .darkGray
+        lbl.isHidden = true
+        lbl.textAlignment = .center
+        return lbl
+    }()
+    
     let answer2Btn: UIButton = {
         let btn = UIButton()
         btn.titleLabel?.font = UIFont(name: "Avenir-Book", size: 14)
@@ -95,6 +104,15 @@ class PollsCell: UITableViewCell {
         lbl.backgroundColor = .darkGray
         lbl.layer.cornerRadius = 5
         lbl.clipsToBounds = true
+        return lbl
+    }()
+    
+    let answer2PercentLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.font = UIFont(name: "Avenir-Book", size: 14)
+        lbl.textColor = .darkGray
+        lbl.isHidden = true
+        lbl.textAlignment = .center
         return lbl
     }()
     
@@ -116,6 +134,15 @@ class PollsCell: UITableViewCell {
         return lbl
     }()
     
+    let answer3PercentLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.font = UIFont(name: "Avenir-Book", size: 14)
+        lbl.textColor = .darkGray
+        lbl.isHidden = true
+        lbl.textAlignment = .center
+        return lbl
+    }()
+    
     let answer4Btn: UIButton = {
         let btn = UIButton()
         btn.titleLabel?.font = UIFont(name: "Avenir-Book", size: 14)
@@ -131,6 +158,15 @@ class PollsCell: UITableViewCell {
         lbl.backgroundColor = .darkGray
         lbl.layer.cornerRadius = 5
         lbl.clipsToBounds = true
+        return lbl
+    }()
+    
+    let answer4PercentLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.font = UIFont(name: "Avenir-Book", size: 14)
+        lbl.textColor = .darkGray
+        lbl.isHidden = true
+        lbl.textAlignment = .center
         return lbl
     }()
     
@@ -184,6 +220,10 @@ class PollsCell: UITableViewCell {
         cellView.addSubview(answer3Btn)
         cellView.addSubview(answer4Btn)
         cellView.addSubview(deleteBtn)
+        answer1Btn.addSubview(answer1PercentLbl)
+        answer2Btn.addSubview(answer2PercentLbl)
+        answer3Btn.addSubview(answer3PercentLbl)
+        answer4Btn.addSubview(answer4PercentLbl)
         
     }
     
@@ -218,6 +258,14 @@ class PollsCell: UITableViewCell {
         answer4Lbl.anchors(top: answer3Lbl.bottomAnchor, topPad: 5, bottom: cellView.bottomAnchor, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 50, width: 0)
         
         answer4Btn.anchors(top: answer4Lbl.topAnchor, topPad: 0, bottom: answer4Lbl.bottomAnchor, bottomPad: 0, left: answer4Lbl.rightAnchor, leftPad: -80, right: answer4Lbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        answer1PercentLbl.anchors(top: answer1Btn.topAnchor, topPad: 0, bottom: answer1Btn.bottomAnchor, bottomPad: 0, left: answer1Btn.leftAnchor, leftPad: 0, right: answer1Btn.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        answer2PercentLbl.anchors(top: answer2Btn.topAnchor, topPad: 0, bottom: answer2Btn.bottomAnchor, bottomPad: 0, left: answer2Btn.leftAnchor, leftPad: 0, right: answer2Btn.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        answer3PercentLbl.anchors(top: answer3Btn.topAnchor, topPad: 0, bottom: answer3Btn.bottomAnchor, bottomPad: 0, left: answer3Btn.leftAnchor, leftPad: 0, right: answer3Btn.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        answer4PercentLbl.anchors(top: answer4Btn.topAnchor, topPad: 0, bottom: answer4Btn.bottomAnchor, bottomPad: 0, left: answer4Btn.leftAnchor, leftPad: 0, right: answer4Btn.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
     }
     

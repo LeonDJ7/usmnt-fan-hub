@@ -67,7 +67,7 @@ class NewsVC: UIViewController {
     
     func applyAnchors() {
         
-        backBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        backBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         headerLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: backBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
@@ -87,14 +87,18 @@ class NewsVC: UIViewController {
                 return
             }
             
-            for document in snap!.documents {
-                let data = document.data()
-                let title = data["title"] as! String
-                let url = data["url"] as! String
-                let timestamp = data["timestamp"] as? Double
-                let imageURL = data["imageURL"] as! String
-                let article = Article(title: title, url: url, timestamp: timestamp ?? 0.0, imageURL: imageURL)
-                self.articles.append(article)
+            if let snap = snap {
+                
+                for document in snap.documents {
+                    let data = document.data()
+                    let title = data["title"] as! String
+                    let url = data["url"] as! String
+                    let timestamp = data["timestamp"] as? Double
+                    let imageURL = data["imageURL"] as! String
+                    let article = Article(title: title, url: url, timestamp: timestamp ?? 0.0, imageURL: imageURL)
+                    self.articles.append(article)
+                }
+                
             }
             
             self.tableView.reloadData()

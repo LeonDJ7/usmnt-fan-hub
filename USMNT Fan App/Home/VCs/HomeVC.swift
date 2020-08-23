@@ -125,7 +125,7 @@ class HomeVC: UIViewController {
     
     func applyAnchors() {
         
-        welcomeView.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        welcomeView.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         welcomeLbl.anchors(top: welcomeView.topAnchor, topPad: 10, bottom: welcomeView.bottomAnchor, bottomPad: -5, left: welcomeView.leftAnchor, leftPad: 10, right: welcomeView.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -152,14 +152,18 @@ class HomeVC: UIViewController {
                 return
             }
             
-            for document in snap!.documents {
-                let data = document.data()
-                let title = data["title"] as! String
-                let url = data["url"] as! String
-                let timestamp = data["timestamp"] as! Double
-                let imageURL = data["imageURL"] as! String
-                let article = Article(title: title, url: url, timestamp: timestamp, imageURL: imageURL)
-                self.articles.append(article)
+            if let snap = snap {
+                
+                for document in snap.documents {
+                    let data = document.data()
+                    let title = data["title"] as! String
+                    let url = data["url"] as! String
+                    let timestamp = data["timestamp"] as! Double
+                    let imageURL = data["imageURL"] as! String
+                    let article = Article(title: title, url: url, timestamp: timestamp, imageURL: imageURL)
+                    self.articles.append(article)
+                }
+                
             }
             
             self.newsTableView.reloadData()

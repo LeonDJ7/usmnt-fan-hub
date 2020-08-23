@@ -107,11 +107,11 @@ class RosterVC: UIViewController {
         
         setupLayout()
         
+        activityIndicator.startAnimating()
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        
-        activityIndicator.startAnimating()
         
         DispatchQueue.global().async { // might take a sec or 2
             
@@ -155,7 +155,7 @@ class RosterVC: UIViewController {
     
     func applyAnchors() {
         
-        ageGroupSelectorBtn.anchors(top: view.topAnchor, topPad: 40, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        ageGroupSelectorBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         listIndicator.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: ageGroupSelectorBtn.rightAnchor, leftPad: 3, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: ageGroupSelectorBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         

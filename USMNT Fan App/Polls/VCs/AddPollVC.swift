@@ -29,7 +29,7 @@ class AddPollVC: UIViewController {
         tf.attributedPlaceholder = NSAttributedString(string: "answer 1", attributes: attributes)
         tf.font = UIFont(name: "Avenir-Book", size: 15)
         tf.textColor = .darkGray
-        tf.autocorrectionType = .no
+        tf.autocorrectionType = .default
         return tf
     }()
     
@@ -42,7 +42,7 @@ class AddPollVC: UIViewController {
         tf.attributedPlaceholder = NSAttributedString(string: "answer 2", attributes: attributes)
         tf.font = UIFont(name: "Avenir-Book", size: 15)
         tf.textColor = .darkGray
-        tf.autocorrectionType = .no
+        tf.autocorrectionType = .default
         return tf
     }()
     
@@ -55,7 +55,7 @@ class AddPollVC: UIViewController {
         tf.attributedPlaceholder = NSAttributedString(string: "answer 3 (optional)", attributes: attributes)
         tf.font = UIFont(name: "Avenir-Book", size: 15)
         tf.textColor = .darkGray
-        tf.autocorrectionType = .no
+        tf.autocorrectionType = .default
         return tf
     }()
     
@@ -67,7 +67,7 @@ class AddPollVC: UIViewController {
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "answer 4 (optional)", attributes: attributes)
         tf.font = UIFont(name: "Avenir-Book", size: 15)
-        tf.autocorrectionType = .no
+        tf.autocorrectionType = .default
         tf.textColor = .darkGray
         return tf
     }()
@@ -100,8 +100,9 @@ class AddPollVC: UIViewController {
         let tv = UITextView()
         tv.font = UIFont(name: "Avenir-Book", size: 18)
         tv.layer.cornerRadius = 5
-        tv.autocorrectionType = .no
+        tv.autocorrectionType = .default
         tv.textColor = .darkGray
+        tv.backgroundColor = .white
         return tv
     }()
     
@@ -267,7 +268,7 @@ class AddPollVC: UIViewController {
                     }
                 }
                 
-                let poll = Poll(question: self.questionTV.text!, author: user.displayName!, authorUID: user.uid, answer1: self.answer1TF.text!, answer2: self.answer2TF.text!, answer3: self.answer3TF.text!, answer4: self.answer4TF.text!, answer1Score: 0, answer2Score: 0, answer3Score: 0, answer4Score: 0, timestamp: Double(NSDate().timeIntervalSince1970), totalAnswerOptions: Double(totalAnswerOptions), docID: docID)
+                let poll = Poll(question: self.questionTV.text!, author: user.displayName!, authorUID: user.uid, answer1: self.answer1TF.text!, answer2: self.answer2TF.text!, answer3: self.answer3TF.text!, answer4: self.answer4TF.text!, answer1Score: 0, answer2Score: 0, answer3Score: 0, answer4Score: 0, timestamp: Double(NSDate().timeIntervalSince1970), totalAnswerOptions: Double(totalAnswerOptions), docID: docID, userVote: 0)
                 
                 self.dismiss(animated: true) {
                     

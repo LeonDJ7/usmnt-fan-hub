@@ -170,13 +170,17 @@ class SettingsVC: UIViewController {
         
         Firestore.firestore().collection("Users").getDocuments { (snap, err) in
             
-            for document in snap!.documents {
+            if let snap = snap {
                 
-                let takenUsername = document.data()["username"] as! String
-                
-                if (takenUsername == self.usernameTF.text) {
-                    AlertController.showAlert(self, title: "Error", message: "Username taken")
-                    return
+                for document in snap.documents {
+                    
+                    let takenUsername = document.data()["username"] as! String
+                    
+                    if (takenUsername == self.usernameTF.text) {
+                        AlertController.showAlert(self, title: "Error", message: "Username taken")
+                        return
+                    }
+                    
                 }
                 
             }

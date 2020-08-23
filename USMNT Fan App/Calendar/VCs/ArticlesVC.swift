@@ -81,13 +81,17 @@ class ArticlesVC: UIViewController {
         
         Firestore.firestore().collection("Years").document(String(selectedYear)).collection("Events").document(selectedEvent).collection("Articles").getDocuments { (snap, error) in
             
-            for document in snap!.documents {
-                let data = document.data()
-                let url = data["url"] as! String
-                let title = data["title"] as! String
-                let imageURL = data["imageURL"] as! String
-                let article = Article(title: title, url: url, timestamp: 0, imageURL: imageURL)
-                self.articles.append(article)
+            if let snap = snap {
+                
+                for document in snap.documents {
+                    let data = document.data()
+                    let url = data["url"] as! String
+                    let title = data["title"] as! String
+                    let imageURL = data["imageURL"] as! String
+                    let article = Article(title: title, url: url, timestamp: 0, imageURL: imageURL)
+                    self.articles.append(article)
+                }
+                
             }
             
             self.tableView.reloadData()

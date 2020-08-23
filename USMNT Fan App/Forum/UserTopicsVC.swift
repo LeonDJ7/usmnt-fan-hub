@@ -1,15 +1,15 @@
 //
-//  SavedTopicsVC.swift
-//  USMNT Fan App
+//  AllUserTopicsVC.swift
+//  USA Soccer Calendar
 //
-//  Created by Leon Djusberg on 6/6/20.
-//  Copyright © 2020 Leon Djusberg. All rights reserved.
+//  Created by Leon Djusberg on 8/22/19.
+//  Copyright © 2019 Leon Djusberg. All rights reserved.
 //
 
 import UIKit
 import Firebase
 
-class SavedTopicsVC: UIViewController {
+class UserTopicsVC: UIViewController {
     
     var forumTopics: [Topic] = []
     
@@ -17,13 +17,13 @@ class SavedTopicsVC: UIViewController {
         let tv = UITableView()
         tv.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
         tv.separatorStyle = .none
-        tv.register(TopicCell.self, forCellReuseIdentifier: "savedTopicsCell")
+        tv.register(TopicCell.self, forCellReuseIdentifier: "userTopicsCell")
         return tv
     }()
     
     let descriptionLbl: UILabel = {
         let lbl = UILabel()
-        lbl.text = "Saved Topics"
+        lbl.text = "User Topics"
         lbl.font = UIFont(name: "Avenir-Book", size: 20)
         lbl.textColor = .white
         return lbl
@@ -76,7 +76,7 @@ class SavedTopicsVC: UIViewController {
     
         let uid = Auth.auth().currentUser?.uid
         
-        Firestore.firestore().collection("Users").document(uid!).collection("SavedTopics").getDocuments { (snap1, err) in
+        Firestore.firestore().collection("Users").document(uid!).collection("UserTopics").getDocuments { (snap1, err) in
             
             guard err == nil else {
                 print(err?.localizedDescription ?? "")
@@ -118,13 +118,15 @@ class SavedTopicsVC: UIViewController {
                 
             }
             
+            
+            
         }
         
     }
 
 }
 
-extension SavedTopicsVC: UITableViewDelegate, UITableViewDataSource {
+extension UserTopicsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return forumTopics.count
@@ -132,7 +134,7 @@ extension SavedTopicsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "savedTopicsCell") as! TopicCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "userTopicsCell") as! TopicCell
         
         cell.topicLbl.text = forumTopics[indexPath.row].topic
         cell.authorLbl.text = forumTopics[indexPath.row].author

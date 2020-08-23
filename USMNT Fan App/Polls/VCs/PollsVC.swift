@@ -97,7 +97,7 @@ class PollsVC: UIViewController {
     
     func applyAnchors() {
         
-        userPollsBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 25, width: 25)
+        userPollsBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 25, width: 25)
         
         createPollBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: userPollsBtn.leftAnchor, rightPad: -10, centerX: nil, centerXPad: 0, centerY: userPollsBtn.centerYAnchor, centerYPad: 0, height: 25, width: 25)
         
@@ -172,31 +172,92 @@ class PollsVC: UIViewController {
         let cutoffDate = calendar.date(byAdding: cutoffDateComponent, to: Date())
         let activePollCutOffTimestamp = cutoffDate!.timeIntervalSince1970
         
-        Firestore.firestore().collection("Polls").whereField("timestamp", isGreaterThan: activePollCutOffTimestamp).whereField("timestamp", isGreaterThan: timestampFloor).order(by: "timestamp").limit(to: 10).getDocuments { (snap, err) in
+        Firestore.firestore().collection("Polls").whereField("timestamp", isGreaterThan: activePollCutOffTimestamp).whereField("timestamp", isGreaterThan: timestampFloor).order(by: "timestamp").limit(to: 10).getDocuments { (snap1, err) in
             
             guard err == nil else {
                 print(err?.localizedDescription ?? "")
                 return
             }
             
-            for document in snap!.documents {
+            if let user = Auth.auth().currentUser {
                 
-                let data = document.data()
-                let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID)
-                self.polls.append(poll)
+                Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").getDocuments { (snap2, err) in
+                    
+                    guard err == nil else {
+                        print(err?.localizedDescription ?? "")
+                        return
+                    }
+                    
+                    var userVotes: [String:Int] = [:]
+                    
+                    if let snap = snap2 {
+                        
+                        for document in snap.documents {
+                            
+                            let data = document.data()
+                            let docID = data["docID"] as? String ?? ""
+                            let vote = data["vote"] as? Int ?? 0
+                            userVotes[docID] = vote
+                            
+                        }
+                        
+                        if let snap = snap1 {
+                            
+                            for document in snap.documents {
+                                
+                                let data = document.data()
+                                
+                                let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: userVotes[document.documentID] ?? 0)
+                                
+                                self.polls.append(poll)
+                                
+                            }
+                            
+                            self.polls.sort { $0.timestamp < $1.timestamp }
+                            self.tableView.reloadData()
+                            
+                            if (self.polls.count > 0) {
+                                self.timestampFloor = self.polls[self.polls.count-1].timestamp
+                            }
+                            
+                            if resetPolls == false {
+                                self.maxPollsLoaded += 10
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                }
                 
-            }
-            
-            
-            self.polls.sort { $0.timestamp < $1.timestamp }
-            self.tableView.reloadData()
-            
-            if (self.polls.count > 0) {
-                self.timestampFloor = self.polls[self.polls.count-1].timestamp
-            }
-            
-            if resetPolls == false {
-                self.maxPollsLoaded += 10
+            } else {
+                
+                if let snap = snap1 {
+                    
+                    for document in snap.documents {
+                        
+                        let data = document.data()
+                        let userVote = UserDefaults.standard.object(forKey: document.documentID) ?? 0
+                        
+                        let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: userVote as! Int)
+                        
+                        self.polls.append(poll)
+                        
+                    }
+                    
+                    self.polls.sort { $0.timestamp < $1.timestamp }
+                    self.tableView.reloadData()
+                    
+                    if (self.polls.count > 0) {
+                        self.timestampFloor = self.polls[self.polls.count-1].timestamp
+                    }
+                    
+                    if resetPolls == false {
+                        self.maxPollsLoaded += 10
+                    }
+                    
+                }
+                
             }
             
         }
@@ -352,21 +413,80 @@ extension PollsVC: UITableViewDelegate, UITableViewDataSource {
           a3perc = 0.0
           a4perc = 0.0
           
-      }
+        }
         
-        cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-        cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-        cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-        cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
+        cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+        cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+        cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+        cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
         
         cell.scheduleTimeRemainingTimer()
         
         if let user = Auth.auth().currentUser {
             
             if user.uid == polls[indexPath.row].authorUID {
+                
+                // user's poll
+                
                 cell.backgroundColor = #colorLiteral(red: 1, green: 0.944347918, blue: 0.9286107421, alpha: 1)
                 cell.questionLbl.textColor = .darkGray
                 cell.deleteBtn.isHidden = false
+                
+                cell.answer1PercentLbl.isHidden = false
+                cell.answer2PercentLbl.isHidden = false
+                cell.answer3PercentLbl.isHidden = false
+                cell.answer4PercentLbl.isHidden = false
+                
+                cell.answer1Btn.isEnabled = false
+                cell.answer2Btn.isEnabled = false
+                cell.answer3Btn.isEnabled = false
+                cell.answer4Btn.isEnabled = false
+                
+            } else {
+                
+                cell.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
+                cell.questionLbl.textColor = .white
+                cell.deleteBtn.isHidden = true
+                
+                if polls[indexPath.row].userVote != 0 {
+                    
+                    // vote has been cast
+                    
+                    if polls[indexPath.row].userVote == 1 {
+                        cell.answer1Btn.backgroundColor = .darkGray
+                        cell.answer1PercentLbl.textColor = .white
+                    } else if polls[indexPath.row].userVote == 2 {
+                        cell.answer2Btn.backgroundColor = .darkGray
+                        cell.answer2PercentLbl.textColor = .white
+                    } else if polls[indexPath.row].userVote == 3 {
+                        cell.answer3Btn.backgroundColor = .darkGray
+                        cell.answer3PercentLbl.textColor = .white
+                    } else {
+                        cell.answer4Btn.backgroundColor = .darkGray
+                        cell.answer4PercentLbl.textColor = .white
+                    }
+                    
+                    cell.answer1PercentLbl.isHidden = false
+                    cell.answer2PercentLbl.isHidden = false
+                    cell.answer3PercentLbl.isHidden = false
+                    cell.answer4PercentLbl.isHidden = false
+                    
+                    cell.answer1Btn.isEnabled = false
+                    cell.answer2Btn.isEnabled = false
+                    cell.answer3Btn.isEnabled = false
+                    cell.answer4Btn.isEnabled = false
+                    
+                } else {
+                    
+                    // no vote has been cast
+                    
+                    cell.answer1PercentLbl.isHidden = true
+                    cell.answer2PercentLbl.isHidden = true
+                    cell.answer3PercentLbl.isHidden = true
+                    cell.answer4PercentLbl.isHidden = true
+                    
+                }
+                
             }
             
         } else {
@@ -375,11 +495,53 @@ extension PollsVC: UITableViewDelegate, UITableViewDataSource {
             cell.questionLbl.textColor = .white
             cell.deleteBtn.isHidden = true
             
+            if polls[indexPath.row].userVote != 0 {
+                
+                // vote has been cast
+                
+                if polls[indexPath.row].userVote == 1 {
+                    cell.answer1Btn.backgroundColor = .darkGray
+                    cell.answer1PercentLbl.textColor = .white
+                } else if polls[indexPath.row].userVote == 2 {
+                    cell.answer2Btn.backgroundColor = .darkGray
+                    cell.answer2PercentLbl.textColor = .white
+                } else if polls[indexPath.row].userVote == 3 {
+                    cell.answer3Btn.backgroundColor = .darkGray
+                    cell.answer3PercentLbl.textColor = .white
+                } else {
+                    cell.answer4Btn.backgroundColor = .darkGray
+                    cell.answer4PercentLbl.textColor = .white
+                }
+                
+                cell.answer1PercentLbl.isHidden = false
+                cell.answer2PercentLbl.isHidden = false
+                cell.answer3PercentLbl.isHidden = false
+                cell.answer4PercentLbl.isHidden = false
+                
+                cell.answer1Btn.isEnabled = false
+                cell.answer2Btn.isEnabled = false
+                cell.answer3Btn.isEnabled = false
+                cell.answer4Btn.isEnabled = false
+                
+            } else {
+                
+                // no vote has been cast
+                
+                cell.answer1PercentLbl.isHidden = true
+                cell.answer2PercentLbl.isHidden = true
+                cell.answer3PercentLbl.isHidden = true
+                cell.answer4PercentLbl.isHidden = true
+                
+                cell.answer1Btn.isEnabled = true
+                cell.answer2Btn.isEnabled = true
+                cell.answer3Btn.isEnabled = true
+                cell.answer4Btn.isEnabled = true
+                
+            }
+            
         }
         
         cell.questionLbl.sizeToFit()
-        cell.layoutSubviews()
-        cell.layoutIfNeeded()
         
         return cell
         
@@ -409,72 +571,9 @@ extension PollsVC: PollsCellDelegate {
         
         if let user = Auth.auth().currentUser {
             
-            if user.uid != polls[row].authorUID {
+            if polls[row].userVote == 0 {
                 
-                Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").whereField("docID", isEqualTo: polls[row].docID).getDocuments { (snap1, err) in
-                    
-                    if let err = err {
-                        
-                        print(err.localizedDescription)
-                        
-                    } else {
-                        
-                        if snap1!.documents.count < 1 {
-                            // user has not already voted
-                            
-                            let indexPath = IndexPath(row: row, section: 0)
-                            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
-                            
-                            cell.answer1Score += 1
-                            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
-                            let a1perc = cell.answer1Score / totalVotes * 100
-                            let a2perc = cell.answer2Score / totalVotes * 100
-                            let a3perc = cell.answer3Score / totalVotes * 100
-                            let a4perc = cell.answer4Score / totalVotes * 100
-                            cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-                            cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-                            cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-                            cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
-                            cell.totalVotesLbl.text = "\(Int(totalVotes))"
-                            
-                            Firestore.firestore().collection("Polls").document(self.polls[row].docID).getDocument { (snap2, err) in
-                                
-                                if let err = err {
-                                    print(err.localizedDescription)
-                                } else {
-                                    let data = snap2?.data()
-                                    let answer1Score = data?["answer1Score"] as? Int
-                                    let totalVotes = data?["totalVotes"] as? Int
-                                    snap2?.reference.updateData(["answer1Score":answer1Score! + 1,
-                                                                "totalVotes":totalVotes! + 1])
-                                    
-                                    // add user to polls collection of voters
-                                    
-                                    snap2?.reference.collection("Voters").addDocument(data: ["uid" : user.uid])
-                                    
-                                    // add to users saved polls collection
-                                    
-                                    Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").addDocument(data: ["docID":snap2!.documentID,
-                                         "timestamp": Double(Date().timeIntervalSince1970)])
-                                    
-                                }
-                                
-                            }
-                            
-                        } else {
-                            // user has already voted
-                        }
-                        
-                    }
-                    
-                }
-                
-            }
-            
-        } else {
-            
-            if UserDefaults.standard.bool(forKey: polls[row].docID) == false {
-                // anonymous device has not already voted
+                // user has not voted yet
                 
                 let indexPath = IndexPath(row: row, section: 0)
                 let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
@@ -485,29 +584,96 @@ extension PollsVC: PollsCellDelegate {
                 let a2perc = cell.answer2Score / totalVotes * 100
                 let a3perc = cell.answer3Score / totalVotes * 100
                 let a4perc = cell.answer4Score / totalVotes * 100
-                cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-                cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-                cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-                cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
+                cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+                cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+                cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+                cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
                 cell.totalVotesLbl.text = "\(Int(totalVotes))"
+                cell.answer1Btn.backgroundColor = .darkGray
+                cell.answer1PercentLbl.textColor = .white
+                cell.answer1PercentLbl.isHidden = false
+                cell.answer2PercentLbl.isHidden = false
+                cell.answer3PercentLbl.isHidden = false
+                cell.answer4PercentLbl.isHidden = false
                 
-                Firestore.firestore().collection("Polls").document(polls[row].docID).getDocument { (snap, err) in
+                Firestore.firestore().collection("Polls").document(self.polls[row].docID).getDocument { (snap, err) in
                     
-                    if let err = err {
-                        print(err.localizedDescription)
-                    } else {
-                        let data = snap?.data()
+                    guard err == nil else {
+                        print(err?.localizedDescription ?? "")
+                        return
+                    }
+                    
+                    if let snap = snap {
+                        
+                        let data = snap.data()
                         let answer1Score = data?["answer1Score"] as? Int
                         let totalVotes = data?["totalVotes"] as? Int
-                        snap?.reference.updateData(["answer1Score":answer1Score! + 1,
+                        snap.reference.updateData(["answer1Score":answer1Score! + 1,
                                                     "totalVotes":totalVotes! + 1])
-                        UserDefaults.standard.set(true, forKey: self.polls[row].docID)
+                        
+                        // add user to polls collection of voters
+                        
+                        let voteData = (["uid" : user.uid,
+                                         "vote" : 1] as [String : Any])
+                        
+                        snap.reference.collection("Voters").addDocument(data: voteData)
+                        
+                        // add to users saved polls collection
+                        
+                        Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").addDocument(data: ["docID":snap.documentID,
+                             "timestamp": Double(Date().timeIntervalSince1970),
+                             "vote": 1])
+                        
                     }
                     
                 }
                 
             } else {
-                // anonymous device has already voted
+                // user has voted already
+            }
+            
+        } else {
+                
+            // device has not voted
+            
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
+            
+            cell.answer1Score += 1
+            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
+            let a1perc = cell.answer1Score / totalVotes * 100
+            let a2perc = cell.answer2Score / totalVotes * 100
+            let a3perc = cell.answer3Score / totalVotes * 100
+            let a4perc = cell.answer4Score / totalVotes * 100
+            cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+            cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+            cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+            cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
+            cell.totalVotesLbl.text = "\(Int(totalVotes))"
+            cell.answer1Btn.backgroundColor = .darkGray
+            cell.answer1PercentLbl.textColor = .white
+            cell.answer1PercentLbl.isHidden = false
+            cell.answer2PercentLbl.isHidden = false
+            cell.answer3PercentLbl.isHidden = false
+            cell.answer4PercentLbl.isHidden = false
+            
+            Firestore.firestore().collection("Polls").document(polls[row].docID).getDocument { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                if let snap = snap {
+                    
+                    let data = snap.data()
+                    let answer1Score = data?["answer1Score"] as? Int
+                    let totalVotes = data?["totalVotes"] as? Int
+                    snap.reference.updateData(["answer1Score":answer1Score! + 1,
+                                                "totalVotes":totalVotes! + 1])
+                    UserDefaults.standard.set(1, forKey: self.polls[row].docID)
+                }
+                
             }
             
         }
@@ -518,104 +684,103 @@ extension PollsVC: PollsCellDelegate {
         
         if let user = Auth.auth().currentUser {
             
-            if user.uid != polls[row].authorUID {
+            // user has not voted yet
             
-                Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").whereField("docID", isEqualTo: polls[row].docID).getDocuments { (snap1, err) in
-                    
-                    if let err = err {
-                        
-                        print(err.localizedDescription)
-                        
-                    } else {
-                        
-                        if snap1!.documents.count < 1 {
-                            // user has not already voted
-                            
-                            let indexPath = IndexPath(row: row, section: 0)
-                            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
-                            
-                            cell.answer2Score += 1
-                            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
-                            let a1perc = cell.answer1Score / totalVotes * 100
-                            let a2perc = cell.answer2Score / totalVotes * 100
-                            let a3perc = cell.answer3Score / totalVotes * 100
-                            let a4perc = cell.answer4Score / totalVotes * 100
-                            cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-                            cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-                            cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-                            cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
-                            cell.totalVotesLbl.text = "\(Int(totalVotes))"
-                            
-                            Firestore.firestore().collection("Polls").document(self.polls[row].docID).getDocument { (snap2, err) in
-                                
-                                if let err = err {
-                                    print(err.localizedDescription)
-                                } else {
-                                    let data = snap2?.data()
-                                    let answer2Score = data?["answer2Score"] as? Int
-                                    let totalVotes = data?["totalVotes"] as? Int
-                                    snap2?.reference.updateData(["answer2Score":answer2Score! + 1,
-                                                                "totalVotes":totalVotes! + 1])
-                                    
-                                    // add user to polls collection of voters
-                                    
-                                    snap2?.reference.collection("Voters").addDocument(data: ["uid" : user.uid])
-                                    
-                                    // add to users saved polls collection
-                                    
-                                    Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").addDocument(data: ["docID":snap2!.documentID,
-                                         "timestamp": Double(Date().timeIntervalSince1970)])
-                                }
-                                
-                            }
-                            
-                        } else {
-                            // user has already voted
-                        }
-                        
-                    }
-                    
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
+            
+            cell.answer2Score += 1
+            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
+            let a1perc = cell.answer1Score / totalVotes * 100
+            let a2perc = cell.answer2Score / totalVotes * 100
+            let a3perc = cell.answer3Score / totalVotes * 100
+            let a4perc = cell.answer4Score / totalVotes * 100
+            cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+            cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+            cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+            cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
+            cell.totalVotesLbl.text = "\(Int(totalVotes))"
+            cell.answer2Btn.backgroundColor = .darkGray
+            cell.answer2PercentLbl.textColor = .white
+            cell.answer1PercentLbl.isHidden = false
+            cell.answer2PercentLbl.isHidden = false
+            cell.answer3PercentLbl.isHidden = false
+            cell.answer4PercentLbl.isHidden = false
+            
+            Firestore.firestore().collection("Polls").document(self.polls[row].docID).getDocument { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
                 }
                 
+                if let snap = snap {
+                    
+                    let data = snap.data()
+                    let answer2Score = data?["answer2Score"] as? Int
+                    let totalVotes = data?["totalVotes"] as? Int
+                    snap.reference.updateData(["answer2Score":answer2Score! + 1,
+                                                "totalVotes":totalVotes! + 1])
+                    
+                    // add user to polls collection of voters
+                    
+                    let voteData = (["uid" : user.uid,
+                                     "vote" : 2] as [String : Any])
+                    
+                    snap.reference.collection("Voters").addDocument(data: voteData)
+                    
+                    // add to users saved polls collection
+                    
+                    Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").addDocument(data: ["docID":snap.documentID,
+                         "timestamp": Double(Date().timeIntervalSince1970),
+                         "vote": 2])
+                    
+                }
+                    
             }
             
         } else {
+                
+            // device has not voted
             
-            if UserDefaults.standard.bool(forKey: polls[row].docID) == false {
-                // anonymous device has not already voted
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
+            
+            cell.answer2Score += 1
+            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
+            let a1perc = cell.answer1Score / totalVotes * 100
+            let a2perc = cell.answer2Score / totalVotes * 100
+            let a3perc = cell.answer3Score / totalVotes * 100
+            let a4perc = cell.answer4Score / totalVotes * 100
+            cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+            cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+            cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+            cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
+            cell.totalVotesLbl.text = "\(Int(totalVotes))"
+            cell.answer2Btn.backgroundColor = .darkGray
+            cell.answer2PercentLbl.textColor = .white
+            cell.answer1PercentLbl.isHidden = false
+            cell.answer2PercentLbl.isHidden = false
+            cell.answer3PercentLbl.isHidden = false
+            cell.answer4PercentLbl.isHidden = false
+            
+            Firestore.firestore().collection("Polls").document(polls[row].docID).getDocument { (snap, err) in
                 
-                let indexPath = IndexPath(row: row, section: 0)
-                let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
-                
-                cell.answer2Score += 1
-                let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
-                let a1perc = cell.answer1Score / totalVotes * 100
-                let a2perc = cell.answer2Score / totalVotes * 100
-                let a3perc = cell.answer3Score / totalVotes * 100
-                let a4perc = cell.answer4Score / totalVotes * 100
-                cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-                cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-                cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-                cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
-                cell.totalVotesLbl.text = "\(Int(totalVotes))"
-                
-                Firestore.firestore().collection("Polls").document(polls[row].docID).getDocument { (snap, err) in
-                    
-                    if let err = err {
-                        print(err.localizedDescription)
-                    } else {
-                        let data = snap?.data()
-                        let answer2Score = data?["answer2Score"] as? Int
-                        let totalVotes = data?["totalVotes"] as? Int
-                        snap?.reference.updateData(["answer2Score":answer2Score! + 1,
-                                                    "totalVotes":totalVotes! + 1])
-                        UserDefaults.standard.set(true, forKey: self.polls[row].docID)
-                    }
-                    
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
                 }
                 
-            } else {
-                // anonymous device has already voted
+                if let snap = snap {
+                    
+                    let data = snap.data()
+                    let answer2Score = data?["answer2Score"] as? Int
+                    let totalVotes = data?["totalVotes"] as? Int
+                    snap.reference.updateData(["answer2Score":answer2Score! + 1,
+                                                "totalVotes":totalVotes! + 1])
+                    UserDefaults.standard.set(2, forKey: self.polls[row].docID)
+                }
+                
             }
             
         }
@@ -625,105 +790,103 @@ extension PollsVC: PollsCellDelegate {
     func didSelectAnswer3(row: Int) {
         
         if let user = Auth.auth().currentUser {
+                
+            // user has not voted yet
             
-            if user.uid != polls[row].authorUID {
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
             
-                Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").whereField("docID", isEqualTo: polls[row].docID).getDocuments { (snap1, err) in
+            cell.answer3Score += 1
+            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
+            let a1perc = cell.answer1Score / totalVotes * 100
+            let a2perc = cell.answer2Score / totalVotes * 100
+            let a3perc = cell.answer3Score / totalVotes * 100
+            let a4perc = cell.answer4Score / totalVotes * 100
+            cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+            cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+            cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+            cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
+            cell.totalVotesLbl.text = "\(Int(totalVotes))"
+            cell.answer3Btn.backgroundColor = .darkGray
+            cell.answer3PercentLbl.textColor = .white
+            cell.answer1PercentLbl.isHidden = false
+            cell.answer2PercentLbl.isHidden = false
+            cell.answer3PercentLbl.isHidden = false
+            cell.answer4PercentLbl.isHidden = false
+            
+            Firestore.firestore().collection("Polls").document(self.polls[row].docID).getDocument { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                if let snap = snap {
+                    let data = snap.data()
+                    let answer3Score = data?["answer3Score"] as? Int
+                    let totalVotes = data?["totalVotes"] as? Int
+                    snap.reference.updateData(["answer3Score":answer3Score! + 1,
+                                                "totalVotes":totalVotes! + 1])
                     
-                    if let err = err {
-                        
-                        print(err.localizedDescription)
-                        
-                    } else {
-                        
-                        if snap1!.documents.count < 1 {
-                            // user has not already voted
-                            
-                            let indexPath = IndexPath(row: row, section: 0)
-                            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
-                            
-                            cell.answer3Score += 1
-                            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
-                            let a1perc = cell.answer1Score / totalVotes * 100
-                            let a2perc = cell.answer2Score / totalVotes * 100
-                            let a3perc = cell.answer3Score / totalVotes * 100
-                            let a4perc = cell.answer4Score / totalVotes * 100
-                            cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-                            cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-                            cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-                            cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
-                            cell.totalVotesLbl.text = "\(Int(totalVotes))"
-                            
-                            Firestore.firestore().collection("Polls").document(self.polls[row].docID).getDocument { (snap2, err) in
-                                
-                                if let err = err {
-                                    print(err.localizedDescription)
-                                } else {
-                                    let data = snap2?.data()
-                                    let answer3Score = data?["answer3Score"] as? Int
-                                    let totalVotes = data?["totalVotes"] as? Int
-                                    snap2?.reference.updateData(["answer3Score":answer3Score! + 1,
-                                                                "totalVotes":totalVotes! + 1])
-                                    
-                                    // add user to polls collection of voters
-                                    
-                                    snap2?.reference.collection("Voters").addDocument(data: ["uid" : user.uid])
-                                    
-                                    // add to users saved polls collection
-                                    
-                                    Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").addDocument(data: ["docID":snap2!.documentID,
-                                         "timestamp": Double(Date().timeIntervalSince1970)])
-                                }
-                                
-                            }
-                            
-                        } else {
-                            // user has already voted
-                        }
-                        
-                    }
+                    // add user to polls collection of voters
+                    
+                    let voteData = (["uid" : user.uid,
+                                     "vote" : 3] as [String : Any])
+                    
+                    snap.reference.collection("Voters").addDocument(data: voteData)
+                    
+                    // add to users saved polls collection
+                    
+                    Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").addDocument(data: ["docID":snap.documentID,
+                         "timestamp": Double(Date().timeIntervalSince1970),
+                         "vote": 3])
                     
                 }
                 
             }
-            
+                
         } else {
+                
+            // device has not voted
             
-            if UserDefaults.standard.bool(forKey: polls[row].docID) == false {
-                // anonymous device has not already voted
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
+            
+            cell.answer3Score += 1
+            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
+            let a1perc = cell.answer1Score / totalVotes * 100
+            let a2perc = cell.answer2Score / totalVotes * 100
+            let a3perc = cell.answer3Score / totalVotes * 100
+            let a4perc = cell.answer4Score / totalVotes * 100
+            cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+            cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+            cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+            cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
+            cell.totalVotesLbl.text = "\(Int(totalVotes))"
+            cell.answer3Btn.backgroundColor = .darkGray
+            cell.answer3PercentLbl.textColor = .white
+            cell.answer1PercentLbl.isHidden = false
+            cell.answer2PercentLbl.isHidden = false
+            cell.answer3PercentLbl.isHidden = false
+            cell.answer4PercentLbl.isHidden = false
+            
+            Firestore.firestore().collection("Polls").document(polls[row].docID).getDocument { (snap, err) in
                 
-                let indexPath = IndexPath(row: row, section: 0)
-                let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
-                
-                cell.answer3Score += 1
-                let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
-                let a1perc = cell.answer1Score / totalVotes * 100
-                let a2perc = cell.answer2Score / totalVotes * 100
-                let a3perc = cell.answer3Score / totalVotes * 100
-                let a4perc = cell.answer4Score / totalVotes * 100
-                cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-                cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-                cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-                cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
-                cell.totalVotesLbl.text = "\(Int(totalVotes))"
-                
-                Firestore.firestore().collection("Polls").document(polls[row].docID).getDocument { (snap, err) in
-                    
-                    if let err = err {
-                        print(err.localizedDescription)
-                    } else {
-                        let data = snap?.data()
-                        let answer3Score = data?["answer3Score"] as? Int
-                        let totalVotes = data?["totalVotes"] as? Int
-                        snap?.reference.updateData(["answer3Score":answer3Score! + 1,
-                                                    "totalVotes":totalVotes! + 1])
-                        UserDefaults.standard.set(true, forKey: self.polls[row].docID)
-                    }
-                    
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
                 }
                 
-            } else {
-                // anonymous device has already voted
+                if let snap = snap {
+                    
+                    let data = snap.data()
+                    let answer3Score = data?["answer3Score"] as? Int
+                    let totalVotes = data?["totalVotes"] as? Int
+                    snap.reference.updateData(["answer3Score":answer3Score! + 1,
+                                                "totalVotes":totalVotes! + 1])
+                    UserDefaults.standard.set(3, forKey: self.polls[row].docID)
+                }
+                
             }
             
         }
@@ -733,107 +896,106 @@ extension PollsVC: PollsCellDelegate {
     func didSelectAnswer4(row: Int) {
         
         if let user = Auth.auth().currentUser {
+                
+            // user has not voted yet
             
-            if user.uid != polls[row].authorUID {
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
             
-                Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").whereField("docID", isEqualTo: polls[row].docID).getDocuments { (snap1, err) in
+            cell.answer4Score += 1
+            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
+            let a1perc = cell.answer1Score / totalVotes * 100
+            let a2perc = cell.answer2Score / totalVotes * 100
+            let a3perc = cell.answer3Score / totalVotes * 100
+            let a4perc = cell.answer4Score / totalVotes * 100
+            cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+            cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+            cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+            cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
+            cell.totalVotesLbl.text = "\(Int(totalVotes))"
+            cell.answer4Btn.backgroundColor = .darkGray
+            cell.answer4PercentLbl.textColor = .white
+            cell.answer1PercentLbl.isHidden = false
+            cell.answer2PercentLbl.isHidden = false
+            cell.answer3PercentLbl.isHidden = false
+            cell.answer4PercentLbl.isHidden = false
+            
+            Firestore.firestore().collection("Polls").document(self.polls[row].docID).getDocument { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                if let snap = snap {
                     
-                    if let err = err {
-                        
-                        print(err.localizedDescription)
-                        
-                    } else {
-                        
-                        if snap1!.documents.count < 1 {
-                            // user has not already voted
-                            
-                            let indexPath = IndexPath(row: row, section: 0)
-                            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
-                            
-                            cell.answer4Score += 1
-                            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
-                            let a1perc = cell.answer1Score / totalVotes * 100
-                            let a2perc = cell.answer2Score / totalVotes * 100
-                            let a3perc = cell.answer3Score / totalVotes * 100
-                            let a4perc = cell.answer4Score / totalVotes * 100
-                            cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-                            cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-                            cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-                            cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
-                            cell.totalVotesLbl.text = "\(Int(totalVotes))"
-                            
-                            Firestore.firestore().collection("Polls").document(self.polls[row].docID).getDocument { (snap2, err) in
-                                
-                                if let err = err {
-                                    print(err.localizedDescription)
-                                } else {
-                                    let data = snap2?.data()
-                                    let answer4Score = data?["answer4Score"] as? Int
-                                    let totalVotes = data?["totalVotes"] as? Int
-                                    snap2?.reference.updateData(["answer4Score":answer4Score! + 1,
-                                                                "totalVotes":totalVotes! + 1])
-                                    
-                                    // add user to polls collection of voters
-                                    
-                                    snap2?.reference.collection("Voters").addDocument(data: ["uid" : user.uid])
-                                    
-                                    // add to users saved polls collection
-                                    
-                                    Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").addDocument(data: ["docID":snap2!.documentID,
-                                         "timestamp": Double(Date().timeIntervalSince1970)])
-                                }
-                                
-                            }
-                            
-                        } else {
-                            // user has already voted
-                        }
-                        
-                    }
+                    let data = snap.data()
+                    let answer4Score = data?["answer4Score"] as? Int
+                    let totalVotes = data?["totalVotes"] as? Int
+                    snap.reference.updateData(["answer4Score":answer4Score! + 1,
+                                                "totalVotes":totalVotes! + 1])
+                    
+                    // add user to polls collection of voters
+                    
+                    let voteData = (["uid" : user.uid,
+                                     "vote" : 4] as [String : Any])
+                    
+                    snap.reference.collection("Voters").addDocument(data: voteData)
+                    
+                    // add to users saved polls collection
+                    
+                    Firestore.firestore().collection("Users").document(user.uid).collection("SavedPolls").addDocument(data: ["docID":snap.documentID,
+                         "timestamp": Double(Date().timeIntervalSince1970),
+                         "vote": 4])
                     
                 }
                 
             }
             
         } else {
+                
+            // device has not voted
             
-            if UserDefaults.standard.bool(forKey: polls[row].docID) == false {
-                // anonymous device has not already voted
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
+            
+            cell.answer4Score += 1
+            let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
+            let a1perc = cell.answer1Score / totalVotes * 100
+            let a2perc = cell.answer2Score / totalVotes * 100
+            let a3perc = cell.answer3Score / totalVotes * 100
+            let a4perc = cell.answer4Score / totalVotes * 100
+            cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+            cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+            cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+            cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
+            cell.totalVotesLbl.text = "\(Int(totalVotes))"
+            cell.answer4Btn.backgroundColor = .darkGray
+            cell.answer4PercentLbl.textColor = .white
+            cell.answer1PercentLbl.isHidden = false
+            cell.answer2PercentLbl.isHidden = false
+            cell.answer3PercentLbl.isHidden = false
+            cell.answer4PercentLbl.isHidden = false
+            
+            Firestore.firestore().collection("Polls").document(polls[row].docID).getDocument { (snap, err) in
                 
-                let indexPath = IndexPath(row: row, section: 0)
-                let cell = self.tableView.cellForRow(at: indexPath) as! PollsCell
-                
-                cell.answer4Score += 1
-                let totalVotes = cell.answer1Score + cell.answer2Score + cell.answer3Score + cell.answer4Score
-                let a1perc = cell.answer1Score / totalVotes * 100
-                let a2perc = cell.answer2Score / totalVotes * 100
-                let a3perc = cell.answer3Score / totalVotes * 100
-                let a4perc = cell.answer4Score / totalVotes * 100
-                cell.answer1Btn.setTitle(String(format: "%.0f", a1perc) + "%", for: .normal)
-                cell.answer2Btn.setTitle(String(format: "%.0f", a2perc) + "%", for: .normal)
-                cell.answer3Btn.setTitle(String(format: "%.0f", a3perc) + "%", for: .normal)
-                cell.answer4Btn.setTitle(String(format: "%.0f", a4perc) + "%", for: .normal)
-                cell.totalVotesLbl.text = "\(Int(totalVotes))"
-                
-                Firestore.firestore().collection("Polls").document(polls[row].docID).getDocument { (snap, err) in
-                    
-                    if let err = err {
-                        print(err.localizedDescription)
-                    } else {
-                        let data = snap?.data()
-                        let answer4Score = data?["answer4Score"] as? Int
-                        let totalVotes = data?["totalVotes"] as? Int
-                        snap?.reference.updateData(["answer4Score":answer4Score! + 1,
-                                                    "totalVotes":totalVotes! + 1])
-                        UserDefaults.standard.set(true, forKey: self.polls[row].docID)
-                    }
-                    
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
                 }
                 
-            } else {
-                // anonymous device has already voted
+                if let snap = snap {
+                    
+                    let data = snap.data()
+                    let answer4Score = data?["answer4Score"] as? Int
+                    let totalVotes = data?["totalVotes"] as? Int
+                    snap.reference.updateData(["answer4Score":answer4Score! + 1,
+                                                "totalVotes":totalVotes! + 1])
+                    UserDefaults.standard.set(4, forKey: self.polls[row].docID)
+                }
+                
             }
-            
+                
         }
         
     }

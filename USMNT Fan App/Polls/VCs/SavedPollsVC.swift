@@ -81,12 +81,15 @@ class SavedPollsVC: UIViewController {
                 
                 for document in snap1!.documents {
                     
-                    let docID = document.data()["docID"] as! String
+                    let data = document.data()
+                    let docID = data["docID"] as! String
+                    let vote = data["vote"] as! Int
                     
                     Firestore.firestore().collection("Polls").document(docID).getDocument { (snap2, err) in
                         
                         let data = snap2!.data()!
-                        let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID)
+                        let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: vote)
+                        
                         self.polls.append(poll)
                         
                         self.polls.sort { $0.timestamp > $1.timestamp }
@@ -175,10 +178,10 @@ extension SavedPollsVC: UITableViewDelegate, UITableViewDataSource {
             
         }
         
-        cell.answer1Btn.setTitle(String(format: "%.1f", a1perc) + "%", for: .normal)
-        cell.answer2Btn.setTitle(String(format: "%.1f", a2perc) + "%", for: .normal)
-        cell.answer3Btn.setTitle(String(format: "%.1f", a3perc) + "%", for: .normal)
-        cell.answer4Btn.setTitle(String(format: "%.1f", a4perc) + "%", for: .normal)
+        cell.answer1PercentLbl.text = String(format: "%.0f", a1perc) + "%"
+        cell.answer2PercentLbl.text = String(format: "%.0f", a2perc) + "%"
+        cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
+        cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
         
         let calendar = Calendar.current
         let postedDate = Date(timeIntervalSince1970: polls[indexPath.row].timestamp)
@@ -190,6 +193,45 @@ extension SavedPollsVC: UITableViewDelegate, UITableViewDataSource {
         } else {
             cell.timeRemainingLbl.text = "0 hr 0 min"
         }
+        
+        if polls[indexPath.row].userVote != 0 {
+            
+            // vote has been cast
+            
+            if polls[indexPath.row].userVote == 1 {
+                cell.answer1Btn.backgroundColor = .darkGray
+                cell.answer1PercentLbl.textColor = .white
+            } else if polls[indexPath.row].userVote == 2 {
+                cell.answer2Btn.backgroundColor = .darkGray
+                cell.answer2PercentLbl.textColor = .white
+            } else if polls[indexPath.row].userVote == 3 {
+                cell.answer3Btn.backgroundColor = .darkGray
+                cell.answer3PercentLbl.textColor = .white
+            } else {
+                cell.answer4Btn.backgroundColor = .darkGray
+                cell.answer4PercentLbl.textColor = .white
+            }
+            
+            cell.answer1PercentLbl.isHidden = false
+            cell.answer2PercentLbl.isHidden = false
+            cell.answer3PercentLbl.isHidden = false
+            cell.answer4PercentLbl.isHidden = false
+            
+        } else {
+            
+            // no vote has been cast
+            
+            cell.answer1PercentLbl.isHidden = true
+            cell.answer2PercentLbl.isHidden = true
+            cell.answer3PercentLbl.isHidden = true
+            cell.answer4PercentLbl.isHidden = true
+            
+        }
+        
+        cell.answer1Btn.isEnabled = false
+        cell.answer2Btn.isEnabled = false
+        cell.answer3Btn.isEnabled = false
+        cell.answer4Btn.isEnabled = false
         
         return cell
         

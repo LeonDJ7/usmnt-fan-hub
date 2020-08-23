@@ -107,13 +107,13 @@ class CalendarVC: UIViewController {
     
     func applyAnchors() {
         
-        yearLbl.anchors(top: view.topAnchor, topPad: 40, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
+        yearLbl.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
         
         tableView.anchors(top: yearLbl.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        increaseYearBtn.anchors(top: view.topAnchor, topPad: 40, bottom: nil, bottomPad: 0, left: yearLbl.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
+        increaseYearBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: yearLbl.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
         
-        decreaseYearBtn.anchors(top: view.topAnchor, topPad: 40, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: yearLbl.leftAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
+        decreaseYearBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: yearLbl.leftAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
         
     }
     
@@ -141,13 +141,17 @@ class CalendarVC: UIViewController {
             
             self.events = []
             
-            for document in snap!.documents {
-                let name = document.documentID
-                let data = document.data()
-                let month = data["month"] as? Int
-                let day = data["day"] as? Int
-                let event = Event(name: name, month: month ?? 0, day: day ?? 0)
-                self.events.append(event)
+            if let snap = snap {
+                
+                for document in snap.documents {
+                    let name = document.documentID
+                    let data = document.data()
+                    let month = data["month"] as? Int
+                    let day = data["day"] as? Int
+                    let event = Event(name: name, month: month ?? 0, day: day ?? 0)
+                    self.events.append(event)
+                }
+                
             }
             
             self.janEvents = self.events.filter { $0.month == 1 }

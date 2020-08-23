@@ -353,8 +353,8 @@
 				75D0077221E7F36800EBFB8D /* Sources */,
 				75D0077321E7F36800EBFB8D /* Frameworks */,
 				75D0077421E7F36800EBFB8D /* Resources */,
-				51CA87A78FFE66CBBDEC35D5 /* [CP] Embed Pods Frameworks */,
-				0AAB25E0C7B3C3EFB72D143E /* [CP] Copy Pods Resources */,
+				B3704C7E4BA115286C8FF8A3 /* [CP] Embed Pods Frameworks */,
+				7F923E3C18407D187A9AFE51 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -413,23 +413,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0AAB25E0C7B3C3EFB72D143E /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		157EE75A13DD82B47ACF5717 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,7 +435,24 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		51CA87A78FFE66CBBDEC35D5 /* [CP] Embed Pods Frameworks */ = {
+		7F923E3C18407D187A9AFE51 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B3704C7E4BA115286C8FF8A3 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -654,6 +654,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "USMNT Fan App/USMNT Live.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USMNT Fan App/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -675,6 +676,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "USMNT Fan App/USMNT Live.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USMNT Fan App/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
