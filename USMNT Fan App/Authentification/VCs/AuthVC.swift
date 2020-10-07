@@ -43,7 +43,8 @@ class AuthVC: UIViewController {
     let signInEmailTF: UITextField = {
         let tf = UITextField()
         let attributes = [
-            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
+            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)!, // Note the !
+            NSAttributedString.Key.foregroundColor : UIColor.darkGray
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "email", attributes: attributes)
         tf.font = UIFont(name: "Avenir Medium", size: 15)
@@ -58,7 +59,8 @@ class AuthVC: UIViewController {
     let signInPasswordTF: UITextField = {
         let tf = UITextField()
         let attributes = [
-            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
+            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)!, // Note the !
+            NSAttributedString.Key.foregroundColor : UIColor.darkGray
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "password", attributes: attributes)
         tf.font = UIFont(name: "Avenir Medium", size: 15)
@@ -119,7 +121,8 @@ class AuthVC: UIViewController {
     let signUpEmailTF: UITextField = {
         let tf = UITextField()
         let attributes = [
-            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
+            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)!, // Note the !
+            NSAttributedString.Key.foregroundColor : UIColor.darkGray
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "email", attributes: attributes)
         tf.font = UIFont(name: "Avenir Medium", size: 15)
@@ -134,7 +137,8 @@ class AuthVC: UIViewController {
     let signUpUsernameTF: UITextField = {
         let tf = UITextField()
         let attributes = [
-            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
+            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)!, // Note the !
+            NSAttributedString.Key.foregroundColor : UIColor.darkGray
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "username", attributes: attributes)
         tf.font = UIFont(name: "Avenir Medium", size: 15)
@@ -149,7 +153,8 @@ class AuthVC: UIViewController {
     let signUpPasswordTF: UITextField = {
         let tf = UITextField()
         let attributes = [
-            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
+            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)!, // Note the !
+            NSAttributedString.Key.foregroundColor : UIColor.darkGray
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "password", attributes: attributes)
         tf.font = UIFont(name: "Avenir Medium", size: 15)
@@ -165,7 +170,8 @@ class AuthVC: UIViewController {
     let signUpConfirmPasswordTF: UITextField = {
         let tf = UITextField()
         let attributes = [
-            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
+            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)!, // Note the !
+            NSAttributedString.Key.foregroundColor : UIColor.darkGray
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "confirm password", attributes: attributes)
         tf.font = UIFont(name: "Avenir Medium", size: 15)
@@ -213,7 +219,8 @@ class AuthVC: UIViewController {
     let resetEmailTF: UITextField = {
         let tf = UITextField()
         let attributes = [
-            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)! // Note the !
+            NSAttributedString.Key.font : UIFont(name: "Avenir-Medium", size: 15)!, // Note the !
+            NSAttributedString.Key.foregroundColor : UIColor.darkGray
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "email", attributes: attributes)
         tf.font = UIFont(name: "Avenir Medium", size: 15)
@@ -251,6 +258,7 @@ class AuthVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        addDoneButtonOnKeyboard()
         setupSignInLayout()
         
     }
@@ -277,7 +285,11 @@ class AuthVC: UIViewController {
     
     func applySignInAnchors() {
         
-        signInEmailTF.anchors(top: view.topAnchor, topPad: 150, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
+        if #available(iOS 11.0, *) {
+            signInEmailTF.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 100, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
+        } else {
+            signInEmailTF.anchors(top: view.topAnchor, topPad: 150, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
+        }
         
         signInPasswordTF.anchors(top: signInEmailTF.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
         
@@ -320,10 +332,11 @@ class AuthVC: UIViewController {
             }
             
             userHasChanged = true
-            
+            loadBlockedUsers()
+            self.dismiss(animated: true) {
+                loadBlockedUsers()
+            }
         }
-        
-        dismiss(animated: true, completion: nil)
         
     }
     
@@ -379,7 +392,11 @@ class AuthVC: UIViewController {
     
     func applySignUpAnchors() {
         
-        signUpProfileImageView.anchors(top: view.topAnchor, topPad: 150, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 60, width: 60)
+        if #available(iOS 11.0, *) {
+            signUpProfileImageView.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 100, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 60, width: 60)
+        } else {
+            signUpProfileImageView.anchors(top: view.topAnchor, topPad: 150, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 60, width: 60)
+        }
         
         signUpEmailTF.anchors(top: signUpProfileImageView.bottomAnchor, topPad: 20, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
         
@@ -465,9 +482,9 @@ class AuthVC: UIViewController {
                 
                 let changeRequest = user?.user.createProfileChangeRequest()
                 changeRequest?.displayName = username
-                changeRequest?.commitChanges { (error) in
+                changeRequest?.commitChanges { (err) in
                     guard error == nil else {
-                        AlertController.showAlert(self, title: "Error", message: error!.localizedDescription ?? "")
+                        AlertController.showAlert(self, title: "Error", message: err?.localizedDescription ?? "")
                         return
                     }
                 }
@@ -499,6 +516,7 @@ class AuthVC: UIViewController {
                                                                  "username" : username,
                                                                  "email" : email]
                                 Firestore.firestore().collection("Users").document(uid).setData(userData)
+                                loadBlockedUsers()
                             }
                             
                         })
@@ -576,7 +594,11 @@ class AuthVC: UIViewController {
     
     func applyResetAnchors() {
         
-        resetEmailTF.anchors(top: view.topAnchor, topPad: 150, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
+        if #available(iOS 11.0, *) {
+            resetEmailTF.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 100, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
+        } else {
+            resetEmailTF.anchors(top: view.topAnchor, topPad: 150, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 40, width: 222)
+        }
         
         resetEmailUnderline.anchors(top: resetEmailTF.bottomAnchor, topPad: -7, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 222)
         
@@ -584,6 +606,41 @@ class AuthVC: UIViewController {
         
         switchToSignInBtn.anchors(top: resetBtn.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 222)
         
+    }
+    
+    
+    
+    
+    func addDoneButtonOnKeyboard() {
+        
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        doneToolbar.barStyle = .default
+
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.doneButtonAction))
+
+        let items = [flexSpace, done]
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+
+        resetEmailTF.inputAccessoryView = doneToolbar
+        signInEmailTF.inputAccessoryView = doneToolbar
+        signUpEmailTF.inputAccessoryView = doneToolbar
+        signInPasswordTF.inputAccessoryView = doneToolbar
+        signUpPasswordTF.inputAccessoryView = doneToolbar
+        signUpConfirmPasswordTF.inputAccessoryView = doneToolbar
+        signUpUsernameTF.inputAccessoryView = doneToolbar
+
+    }
+
+    @objc func doneButtonAction(){
+        resetEmailTF.resignFirstResponder()
+        signInEmailTF.resignFirstResponder()
+        signUpEmailTF.resignFirstResponder()
+        signInPasswordTF.resignFirstResponder()
+        signUpPasswordTF.resignFirstResponder()
+        signUpConfirmPasswordTF.resignFirstResponder()
+        signUpUsernameTF.resignFirstResponder()
     }
     
     

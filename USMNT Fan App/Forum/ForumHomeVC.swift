@@ -77,6 +77,11 @@ class ForumHomeVC: UIViewController {
         
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        tableView.reloadData()
+    }
+    
     func setupLayout() {
         
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
@@ -96,7 +101,11 @@ class ForumHomeVC: UIViewController {
     
     func applyAnchors() {
         
-        userTopicsBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 25, width: 25)
+        if #available(iOS 11.0, *) {
+            userTopicsBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 25, width: 25)
+        } else {
+            userTopicsBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 25, width: 25)
+        }
         
         createTopicBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: userTopicsBtn.leftAnchor, rightPad: -10, centerX: nil, centerXPad: 0, centerY: userTopicsBtn.centerYAnchor, centerYPad: 0, height: 25, width: 25)
         
@@ -133,7 +142,8 @@ class ForumHomeVC: UIViewController {
                     let id = document.documentID
                     let dbref = Firestore.firestore().collection("Topics").document(id)
                     let commentCount = data["commentCount"] as! Int
-                    self.naturalTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount))
+                    let isSensitive = data["isSensitive"] as! Bool
+                    self.naturalTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount, isSensitive: isSensitive))
                 }
                 
             }
@@ -175,7 +185,8 @@ class ForumHomeVC: UIViewController {
                     let id = document.documentID
                     let dbref = Firestore.firestore().collection("Topics").document(id)
                     let commentCount = data["commentCount"] as! Int
-                    self.allTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount))
+                    let isSensitive = data["isSensitive"] as! Bool
+                    self.allTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount, isSensitive: isSensitive))
                 }
                 
             }
@@ -244,10 +255,10 @@ extension ForumHomeVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "topicCell") as! TopicCell
-        
         cell.topicLbl.text = topicsDisplayed[indexPath.row].topic
         cell.authorLbl.text = topicsDisplayed[indexPath.row].author
-        
+        cell.delegate = self
+        cell.topic = topicsDisplayed[indexPath.row]
         cell.setUserProfileImage(uid: topicsDisplayed[indexPath.row].authorUID)
         
         let lastActiveDate = Date(timeIntervalSince1970: topicsDisplayed[indexPath.row].timestamp)
@@ -263,6 +274,107 @@ extension ForumHomeVC: UITableViewDelegate, UITableViewDataSource {
             cell.lastActiveLbl.text = "last active \(diffInHours) hours ago"
         } else {
             cell.lastActiveLbl.text = "last active less than an hour ago"
+        }
+        
+        var blocked: Bool = false
+        cell.unblockBtn.setTitle("unblock \(topicsDisplayed[indexPath.row].author)?", for: .normal)
+        
+        for uid in blockedUIDs {
+            
+            if topicsDisplayed[indexPath.row].authorUID == uid {
+                blocked = true
+                break
+            }
+            
+        }
+        
+        if let user = Auth.auth().currentUser {
+            
+            if user.uid != topicsDisplayed[indexPath.row].authorUID {
+                // not users post
+                
+                if blocked == true {
+                    for view in cell.subviews {
+                        view.isHidden = true
+                    }
+                    cell.blockedLbl.isHidden = false
+                    cell.unblockBtn.isHidden = false
+                } else {
+                    
+                    if topicsDisplayed[indexPath.row].isSensitive == true {
+                        
+                        let ignore = (UserDefaults.standard.bool(forKey: topicsDisplayed[indexPath.row].id + "ignoreSensitiveContent"))
+                        if ignore == true {
+                            
+                            for view in cell.subviews {
+                                view.isHidden = false
+                            }
+                            cell.sensitiveContentWarningBtn.isHidden = true
+                            cell.blockedLbl.isHidden = true
+                            cell.unblockBtn.isHidden = true
+                            
+                        } else {
+                            for view in cell.subviews {
+                                view.isHidden = true
+                            }
+                            cell.sensitiveContentWarningBtn.isHidden = false
+                        }
+                        
+                    } else {
+                        for view in cell.subviews {
+                            view.isHidden = false
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                    }
+                    
+                }
+                
+            }
+            
+        } else {
+            // definately not users post
+            
+            if blocked == true {
+                for view in cell.subviews {
+                    view.isHidden = true
+                }
+                cell.blockedLbl.isHidden = false
+                cell.unblockBtn.isHidden = false
+            } else {
+                
+                if topicsDisplayed[indexPath.row].isSensitive == true {
+                    
+                    let ignore = (UserDefaults.standard.bool(forKey: topicsDisplayed[indexPath.row].id + "ignoreSensitiveContent"))
+                    
+                    if ignore == true {
+                        
+                        for view in cell.subviews {
+                            view.isHidden = false
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                        
+                    } else {
+                        for view in cell.subviews {
+                            view.isHidden = true
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = false
+                    }
+                    
+                } else {
+                    for view in cell.subviews {
+                        view.isHidden = false
+                    }
+                    cell.sensitiveContentWarningBtn.isHidden = true
+                    cell.blockedLbl.isHidden = true
+                    cell.unblockBtn.isHidden = true
+                }
+                
+            }
+            
         }
         
         return cell
@@ -310,6 +422,40 @@ extension ForumHomeVC: UITableViewDelegate, UITableViewDataSource {
         
     }
 
+}
+
+extension ForumHomeVC: TopicCellDelegate {
+    
+    func ignoreSensitiveContent(topic: Topic) {
+        UserDefaults.standard.set(true, forKey: topic.id + "ignoreSensitiveContent")
+        tableView.reloadData()
+    }
+    
+    func unblockTopic(topic: Topic) {
+        
+        guard let user = Auth.auth().currentUser else {
+            return
+        }
+        
+        Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(topic.authorUID).getDocument { (snap, err) in
+            
+            guard err == nil else {
+                print(err?.localizedDescription ?? "")
+                return
+            }
+            
+            guard let snap = snap else {
+                return
+            }
+            
+            snap.reference.delete()
+            blockedUIDs = blockedUIDs.filter { $0 != topic.authorUID }
+            self.tableView.reloadData()
+            
+        }
+        
+    }
+    
 }
 
 extension ForumHomeVC: UISearchBarDelegate {

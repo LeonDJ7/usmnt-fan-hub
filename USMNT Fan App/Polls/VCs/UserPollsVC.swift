@@ -60,7 +60,11 @@ class UserPollsVC: UIViewController {
     
     func applyAnchors() {
         
-        descriptionLbl.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            descriptionLbl.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            descriptionLbl.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         tableView.anchors(top: descriptionLbl.bottomAnchor, topPad: 30, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 50, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -89,7 +93,7 @@ class UserPollsVC: UIViewController {
                             if let snap = snap2 {
                                 
                                 let data = snap.data()!
-                                let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: docID, userVote: 0)
+                                let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: docID, userVote: 0, isSensitive: data["isSensitive"] as! Bool)
                                 self.polls.append(poll)
                                 
                                 self.polls.sort { $0.timestamp > $1.timestamp }
@@ -121,6 +125,16 @@ class UserPollsVC: UIViewController {
     }
     
     func deletePollAlert(row: Int) {
+        
+        guard let user = Auth.auth().currentUser else {
+            tableView.reloadData()
+            return
+        }
+        
+        guard user.uid == polls[row].authorUID else {
+            tableView.reloadData()
+            return
+        }
         
         let alert = UIAlertController(title: "just checking", message: "are you sure you want to delete this poll?", preferredStyle: .alert)
         
@@ -281,6 +295,12 @@ extension UserPollsVC: UITableViewDelegate, UITableViewDataSource {
             cell.timeRemainingLbl.text = "0 hr 0 min"
         }
         
+        if Auth.auth().currentUser != nil {
+            cell.reportBtn.isHidden = false
+        } else {
+            cell.reportBtn.isHidden = true
+        }
+        
         return cell
         
     }
@@ -307,6 +327,18 @@ extension UserPollsVC: UITableViewDelegate, UITableViewDataSource {
 
 extension UserPollsVC: PollsCellDelegate {
     
+    func ignoreSensitiveContent(row: Int) {
+        // do nothing
+    }
+    
+    func unblock(row: Int) {
+        // do nothing
+    }
+    
+    func reportBtnPressed(row: Int) {
+        // do nothing
+    }
+    
     func didSelectAnswer1(row: Int) {
         // do nothing
     }
@@ -322,7 +354,6 @@ extension UserPollsVC: PollsCellDelegate {
     func didSelectAnswer4(row: Int) {
         // do nothing
     }
-    
     
     func deleteBtnPressed(row: Int) {
         

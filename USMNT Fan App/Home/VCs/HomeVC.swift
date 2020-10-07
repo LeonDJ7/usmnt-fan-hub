@@ -19,7 +19,7 @@ class HomeVC: UIViewController {
     var interstitial: GADInterstitial!
     
     var webContent = """
-        <a class="twitter-timeline" href="https://twitter.com/usmnt_daily_/lists/usmnt-fan-app?ref_src=twsrc%5Etfw">A Twitter List by usmnt_daily_</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <a class="twitter-timeline" href="https://twitter.com/usmnt_fan_hub/lists/app?ref_src=twsrc%5Etfw">A Twitter List by usmnt_fan_hub</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         """
     
     let welcomeView: UIView = {
@@ -125,7 +125,11 @@ class HomeVC: UIViewController {
     
     func applyAnchors() {
         
-        welcomeView.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            welcomeView.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            welcomeView.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         welcomeLbl.anchors(top: welcomeView.topAnchor, topPad: 10, bottom: welcomeView.bottomAnchor, bottomPad: -5, left: welcomeView.leftAnchor, leftPad: 10, right: welcomeView.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -133,7 +137,7 @@ class HomeVC: UIViewController {
         
         newsLbl.anchors(top: welcomeView.bottomAnchor, topPad: 30, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        newsTableView.anchors(top: newsLbl.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 159, width: 0)
+        newsTableView.anchors(top: newsLbl.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 100, width: 0)
         
         moreNewsBtn.anchors(top: newsTableView.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -145,7 +149,7 @@ class HomeVC: UIViewController {
     
     func loadArticles() {
         
-        Firestore.firestore().collection("News").order(by: "timestamp", descending: true).limit(to: 3).getDocuments { (snap, err) in
+        Firestore.firestore().collection("News").order(by: "timestamp", descending: true).limit(to: 2).getDocuments { (snap, err) in
             
             guard err == nil else {
                 print(err?.localizedDescription as Any)

@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import MessageUI
 
 class TopicVC: UIViewController {
     
@@ -110,6 +111,14 @@ class TopicVC: UIViewController {
         indicator.style = .whiteLarge
         return indicator
     }()
+    
+    let reportBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setImage(UIImage(named: "ReportBtnImage"), for: .normal)
+        btn.addTarget(self, action: #selector(reportAlert), for: .touchUpInside)
+        return btn
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -126,15 +135,19 @@ class TopicVC: UIViewController {
         setupLayout()
         randomizeColor()
         
-        // if this is the users post show deleteBtn
+        // if this is the users post show some btns
         
         if let user = Auth.auth().currentUser {
             
             if user.uid == topic.authorUID {
                 deleteBtn.isHidden = false
                 saveBtn.isHidden = true
+            } else {
+                reportBtn.isHidden = false
             }
             
+        } else {
+            reportBtn.isHidden = false
         }
         
     }
@@ -143,30 +156,17 @@ class TopicVC: UIViewController {
         super.viewDidAppear(true)
         
         if userHasChanged == true {
-            
-            if let user = Auth.auth().currentUser {
-                
-                if user.uid != topic.authorUID {
-                    deleteBtn.isHidden = true
-                    saveBtn.isHidden = false
-                } else {
-                    deleteBtn.isHidden = false
-                    saveBtn.isHidden = true
-                }
-                
-            } else {
-                
-                deleteBtn.isHidden = true
-                saveBtn.isHidden = false
-                
-            }
-            
             userHasChanged = false
-            
+            if Auth.auth().currentUser?.uid == topic.authorUID {
+                deleteBtn.isHidden = false
+                reportBtn.isHidden = true
+            } else {
+                deleteBtn.isHidden = true
+                reportBtn.isHidden = false
+            }
         }
         
         tableView.reloadData()
-        
         
         activityIndicatorView.isHidden = true
         self.activityIndicator.stopAnimating()
@@ -177,7 +177,6 @@ class TopicVC: UIViewController {
     func setupLayout() {
         
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        
         addSubviews()
         applyAnchors()
         
@@ -195,6 +194,7 @@ class TopicVC: UIViewController {
         view.addSubview(seperatorView)
         view.addSubview(tableView)
         view.addSubview(deleteBtn)
+        view.addSubview(reportBtn)
         view.addSubview(activityIndicatorView)
         activityIndicatorView.addSubview(activityIndicator)
         
@@ -202,7 +202,11 @@ class TopicVC: UIViewController {
     
     func applyAnchors() {
         
-        backBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            backBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            backBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         authorImageView.anchors(top: backBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
         
@@ -221,6 +225,8 @@ class TopicVC: UIViewController {
         tableView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 10, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         deleteBtn.anchors(top: nil, topPad: 5, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 20, width: 20)
+        
+        reportBtn.anchors(top: nil, topPad: 5, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 20, width: 20)
 
         activityIndicatorView.anchors(top: seperatorView.bottomAnchor, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -243,7 +249,8 @@ class TopicVC: UIViewController {
                 let id = snap.documentID
                 let dbref = Firestore.firestore().collection("Topics").document(id)
                 let commentCount = data["commentCount"] as! Int
-                self.topic = (Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount))
+                let isSensitive = data["isSensitive"] as! Bool
+                self.topic = Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount, isSensitive: isSensitive)
                 
             }
             
@@ -428,7 +435,114 @@ class TopicVC: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
+    @objc func reportAlert() {
+        
+        let alert = UIAlertController(title: "hmmm", message: "what would you like to do", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "block user", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            // add blocked user to user's blocked list in firestore
+            
+            guard let user = Auth.auth().currentUser else {
+                AlertController.showAlert(self, title: "Error", message: "must be logged in to block users")
+                return
+            }
+            
+            guard user.uid != self.topic.authorUID else {
+                return
+            }
+            
+            Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(self.topic.authorUID).setData(["blocked":true])
+            
+            Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(self.topic.authorUID).getDocument { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                blockedUIDs.append(self.topic.authorUID)
+                
+            }
+            
+            // send user back to forum home
+            
+            self.parentVC.tableView.reloadData()
+            self.navigationController?.popViewController(animated: true)
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "report sensitive content", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            UserDefaults.standard.set(false, forKey: self.topic.id + "ignoreSensitiveContent")
+            
+            // check to make sure this device hasnt already reported
+            
+            let deviceHasReported = UserDefaults.standard.bool(forKey: self.topic.id + "has reported")
+            
+            if deviceHasReported == true {
+                AlertController.showAlert(self, title: "Error", message: "you have already reported this post")
+                return
+            }
+            
+            // report to firebase and send email to myself
+            
+            let data: [String : Any] = [
+                "docID" : self.topic.id,
+                "authorUID" : self.topic.authorUID,
+                "topic" : self.topic.text
+            ]
+            
+            Firestore.firestore().collection("Sensitive Content Reports").document("\(Date().timeIntervalSince1970)").setData(data)
+            
+            self.sendEmail(text: self.topic.text)
+            UserDefaults.standard.set(true, forKey: self.topic.id + "has reported")
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "report harassment", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            // report to firebase and send an email to myself
+            
+            let data: [String : Any] = [
+                "topic" : self.topic.topic,
+                "docID" : self.topic.id,
+                "authorUID" : self.topic.authorUID,
+                "text" : self.topic.text
+            ]
+            
+            Firestore.firestore().collection("Harrasment Reports").addDocument(data: data)
+            
+            self.sendEmail(text: self.topic.text)
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+        
+    }
+    
     @objc func deleteAlert() {
+        
+        guard let user = Auth.auth().currentUser else {
+            tableView.reloadData()
+            return
+        }
+        
+        guard user.uid == topic.authorUID else {
+            tableView.reloadData()
+            return
+        }
+        
+        guard user.uid == topic.authorUID else {
+            return
+        }
         
         let alert = UIAlertController(title: "just checking", message: "are you sure you want to delete this topic?", preferredStyle: .alert)
         
@@ -516,13 +630,23 @@ class TopicVC: UIViewController {
     
     func deleteSubCommentAlert(comment: Comment, parentCell: CommentCell, commentRow: Int, cell: CommentCell) {
         
+        guard let user = Auth.auth().currentUser else {
+            tableView.reloadData()
+            return
+        }
+        
+        guard user.uid == comment.authorUID else {
+            tableView.reloadData()
+            return
+        }
+        
         let alert = UIAlertController(title: "just checking", message: "are you sure you want to delete this comment?", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "No", style: .destructive, handler: { (action) in
+        alert.addAction(UIAlertAction(title: "no", style: .destructive, handler: { (action) in
             alert.dismiss(animated: true, completion: nil)
         }))
         
-        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction(title: "yes", style: .default, handler: { (action) in
             alert.dismiss(animated: true, completion: nil)
             
             // if comment has any subcomments, create a single view that indicates that this post is deleted, but dont remove from firestore
@@ -584,13 +708,23 @@ class TopicVC: UIViewController {
     
     func deleteCommentAlert(comment: Comment, commentRow: Int, cell: CommentCell) {
         
+        guard let user = Auth.auth().currentUser else {
+            tableView.reloadData()
+            return
+        }
+        
+        guard user.uid == comment.authorUID else {
+            tableView.reloadData()
+            return
+        }
+        
         let alert = UIAlertController(title: "just checking", message: "are you sure you want to delete this comment?", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "No", style: .destructive, handler: { (action) in
+        alert.addAction(UIAlertAction(title: "no", style: .destructive, handler: { (action) in
             alert.dismiss(animated: true, completion: nil)
         }))
         
-        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction(title: "yes", style: .default, handler: { (action) in
             alert.dismiss(animated: true, completion: nil)
             
             // if comment has any subcomments, create a single view that indicates that this post is deleted, but dont remove from firestore
@@ -628,6 +762,105 @@ class TopicVC: UIViewController {
         
         self.present(alert, animated: true, completion: nil)
     }
+    
+    func reportCommentAlert(comment: Comment, cell: CommentCell) {
+        
+        let alert = UIAlertController(title: "hmmm", message: "what would you like to do", preferredStyle: .alert)
+            
+        alert.addAction(UIAlertAction(title: "block user", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            // add blocked user to user's blocked list in firestore
+            
+            guard let user = Auth.auth().currentUser else {
+                AlertController.showAlert(self, title: "Error", message: "must be logged in to block users")
+                return
+            }
+            
+            guard user.uid != comment.authorUID else {
+                return
+            }
+            
+            Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(comment.authorUID).setData(["blocked":true])
+            
+            Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(comment.authorUID).getDocument { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                blockedUIDs.append(comment.authorUID)
+                
+                if comment.authorUID == self.topic.authorUID {
+                    // author of comment is same as topic author, so pop back to forumHome
+                    self.navigationController?.popViewController(animated: true)
+                } else {
+                    // just normally reload tableview
+                    self.tableView.reloadData()
+                }
+                
+            }
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "report sensitive content", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            UserDefaults.standard.set(false, forKey: comment.id + "ignoreSensitiveContent")
+            
+            // check to make sure this device hasnt already reported
+            
+            let deviceHasReported = UserDefaults.standard.bool(forKey: comment.id + "has reported")
+            
+            if deviceHasReported == true {
+                AlertController.showAlert(self, title: "Error", message: "you have already reported this post")
+                return
+            }
+            
+            // report to firebase and send email to myself
+            
+            let data: [String : Any] = [
+                "topic" : comment.topic,
+                "depth" : comment.depth,
+                "docID" : comment.id,
+                "authorUID" : comment.authorUID,
+                "text" : comment.text
+            ]
+            
+            Firestore.firestore().collection("Sensitive Content Reports").document("\(Date().timeIntervalSince1970)").setData(data)
+            
+            self.sendEmail(text: comment.text)
+            UserDefaults.standard.set(true, forKey: comment.id + "has reported")
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "report harassment", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            // report to firebase and send an email to myself
+            
+            let data: [String : Any] = [
+                "topic" : comment.topic,
+                "depth" : comment.depth,
+                "docID" : comment.id,
+                "authorUID" : comment.authorUID,
+                "text" : comment.text
+            ]
+            
+            Firestore.firestore().collection("Harrasment Reports").document("\(Date().timeIntervalSince1970)").setData(data)
+            
+            self.sendEmail(text: comment.text)
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+        
+    }
 
 }
 
@@ -640,18 +873,6 @@ extension TopicVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell") as! CommentCell
-        
-        if let user = Auth.auth().currentUser {
-            
-            if topic.comments[indexPath.row].authorUID == user.uid && topic.comments[indexPath.row].isDeleted == false {
-                cell.deleteBtn.isHidden = false
-            } else {
-                cell.deleteBtn.isHidden = true
-            }
-            
-        } else {
-            cell.deleteBtn.isHidden = true
-        }
         
         // set all data
         
@@ -666,6 +887,19 @@ extension TopicVC: UITableViewDelegate, UITableViewDataSource {
         cell.likesLbl.text = "\(topic.comments[indexPath.row].likes)"
         cell.setAuthorProfileImage(uid: topic.comments[indexPath.row].authorUID)
         cell.commentsOutOfRangeBtn.tag = indexPath.row
+        cell.blockedUIDs = blockedUIDs
+        
+        var blocked: Bool = false
+        cell.unblockBtn.setTitle("unblock \(cell.comment.author)?", for: .normal)
+        
+        for uid in blockedUIDs {
+            
+            if cell.comment.authorUID == uid{
+                blocked = true
+                break
+            }
+            
+        }
         
         if topic.comments[indexPath.row].isDeleted == true {
             
@@ -682,6 +916,145 @@ extension TopicVC: UITableViewDelegate, UITableViewDataSource {
             
         } else {
             
+            if let user = Auth.auth().currentUser {
+                
+                if topic.comments[indexPath.row].authorUID == user.uid {
+                    // users post
+                    
+                    if blocked == true {
+                        for view in cell.subviews {
+                            view.isHidden = true
+                        }
+                        cell.blockedLbl.isHidden = false
+                        cell.unblockBtn.isHidden = false
+                    } else {
+                        for view in cell.subviews {
+                            view.isHidden = false
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                        cell.deletedLbl.isHidden = true
+                        cell.reportBtn.isHidden = true
+                        cell.commentsOutOfRangeBtn.isHidden = true
+                        cell.deleteBtn.isHidden = false
+                    }
+                    
+                } else {
+                    
+                    // not the users post
+                    
+                    cell.reportBtn.isHidden = false
+                    
+                    if blocked == true {
+                        for view in cell.subviews {
+                            view.isHidden = true
+                        }
+                        cell.blockedLbl.isHidden = false
+                        cell.unblockBtn.isHidden = false
+                    } else {
+                        
+                        if cell.comment.isSensitive == true {
+                            
+                            let ignore = (UserDefaults.standard.bool(forKey: cell.comment.id + "ignoreSensitiveContent"))
+                            
+                            if ignore == true {
+                                
+                                for view in cell.subviews {
+                                    view.isHidden = false
+                                }
+                                
+                                cell.sensitiveContentWarningBtn.isHidden = true
+                                cell.commentsOutOfRangeBtn.isHidden = true
+                                cell.blockedLbl.isHidden = true
+                                cell.unblockBtn.isHidden = true
+                                cell.deletedLbl.isHidden = true
+                                
+                            } else {
+                                
+                                for view in cell.subviews {
+                                    view.isHidden = true
+                                }
+                                
+                                cell.sensitiveContentWarningBtn.isHidden = false
+                                cell.horizontalSeperatorView.isHidden = false
+                                cell.subTableView.isHidden = false
+                                
+                            }
+                            
+                        } else {
+                            for view in cell.subviews {
+                                view.isHidden = false
+                            }
+                            cell.sensitiveContentWarningBtn.isHidden = true
+                            cell.blockedLbl.isHidden = true
+                            cell.unblockBtn.isHidden = true
+                            cell.deletedLbl.isHidden = true
+                            cell.deleteBtn.isHidden = true
+                            cell.commentsOutOfRangeBtn.isHidden = true
+                        }
+                        
+                    }
+                    
+                }
+                
+            } else {
+                
+                // no user signed in
+                
+                
+                if blocked == true {
+                    for view in cell.subviews {
+                        view.isHidden = true
+                    }
+                    cell.blockedLbl.isHidden = false
+                    cell.unblockBtn.isHidden = false
+                } else {
+                    
+                    if cell.comment.isSensitive == true {
+                        
+                        let ignore = (UserDefaults.standard.bool(forKey: cell.comment.id + "ignoreSensitiveContent"))
+                        
+                        if ignore == true {
+                            
+                            for view in cell.subviews {
+                                view.isHidden = false
+                            }
+                            
+                            cell.sensitiveContentWarningBtn.isHidden = true
+                            cell.commentsOutOfRangeBtn.isHidden = true
+                            cell.blockedLbl.isHidden = true
+                            cell.unblockBtn.isHidden = true
+                            cell.deletedLbl.isHidden = true
+                            
+                        } else {
+                            
+                            for view in cell.subviews {
+                                view.isHidden = true
+                            }
+                            
+                            cell.sensitiveContentWarningBtn.isHidden = false
+                            cell.horizontalSeperatorView.isHidden = false
+                            cell.subTableView.isHidden = false
+                            
+                        }
+                        
+                    } else {
+                        for view in cell.subviews {
+                            view.isHidden = false
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                        cell.deletedLbl.isHidden = true
+                        cell.deleteBtn.isHidden = true
+                        cell.commentsOutOfRangeBtn.isHidden = true
+                    }
+                    
+                }
+                
+            }
+            
         }
         
         if cell.comment.commentCount == 0 {
@@ -692,7 +1065,7 @@ extension TopicVC: UITableViewDelegate, UITableViewDataSource {
         } else {
             
         }
-        
+
         cell.comment.comments.sort { $0.likes > $1.likes }
         cell.subTableView.reloadData()
         
@@ -711,6 +1084,43 @@ extension TopicVC: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension TopicVC: CommentCellDelegate {
+    
+    func ignoreCommentSensitiveContent(comment: Comment, cell: CommentCell) {
+        UserDefaults.standard.set(true, forKey: comment.id + "ignoreSensitiveContent")
+        tableView.reloadData()
+    }
+    
+    func unblockComment(comment: Comment, cell: CommentCell) {
+        
+        guard let user = Auth.auth().currentUser else {
+            return
+        }
+        
+        Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(comment.authorUID).getDocument { (snap, err) in
+            
+            guard err == nil else {
+                print(err?.localizedDescription ?? "")
+                return
+            }
+            
+            guard let snap = snap else {
+                return
+            }
+            
+            snap.reference.delete()
+            blockedUIDs = blockedUIDs.filter { $0 != comment.authorUID }
+            self.tableView.reloadData()
+            
+        }
+        
+    }
+    
+    
+    func reportCommentBtnTapped(comment: Comment, cell: CommentCell) {
+        
+        reportCommentAlert(comment: comment, cell: cell)
+        
+    }
     
     func commentsOutOfRangeBtnTapped(comment: Comment, parentCell: CommentCell, commentRow: Int) {
         
@@ -785,6 +1195,27 @@ extension TopicVC: CommentCellDelegate {
             
         }
         
+    }
+    
+}
+
+extension TopicVC: MFMailComposeViewControllerDelegate {
+    
+    func sendEmail(text: String) {
+        if MFMailComposeViewController.canSendMail() {
+            let mail = MFMailComposeViewController()
+            mail.mailComposeDelegate = self
+            mail.setToRecipients(["leondjust@me.com"])
+            mail.setMessageBody("new harrasment report \ntext: \(text)", isHTML: true)
+
+            present(mail, animated: true)
+        } else {
+            // show failure alert
+        }
+    }
+
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true)
     }
     
 }

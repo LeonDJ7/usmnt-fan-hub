@@ -16,6 +16,7 @@ class CommentCell: UITableViewCell {
     var parentTopicVC: TopicVC?
     var parentSubCommentVC: SubCommentVC?
     var parentCell: CommentCell?
+    var blockedUIDs: [String] = []
     
     let subTableView: SubTableView = {
         let tv = SubTableView()
@@ -125,6 +126,41 @@ class CommentCell: UITableViewCell {
         btn.setTitle("continue thread...", for: .normal)
         return btn
     }()
+    
+    let reportBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setImage(UIImage(named: "ReportBtnImage"), for: .normal)
+        return btn
+    }()
+    
+    let sensitiveContentWarningBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setTitle("view sensitive content?", for: .normal)
+        btn.titleLabel!.textColor = .white
+        btn.titleLabel!.font = UIFont(name: "Avenir-Book", size: 16)
+        return btn
+    }()
+    
+    let blockedLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.text = "this user is blocked"
+        lbl.font = UIFont(name: "Avenir-Medium", size: 18)
+        lbl.textColor = .white
+        lbl.isHidden = true
+        lbl.textAlignment = .center
+        return lbl
+    }()
+    
+    let unblockBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setTitle("unblock?", for: .normal)
+        btn.titleLabel!.textColor = .white
+        btn.titleLabel!.font = UIFont(name: "Avenir-Book", size: 14)
+        return btn
+    }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -161,12 +197,16 @@ class CommentCell: UITableViewCell {
         addSubview(subCommentBtn)
         addSubview(subTableView)
         addSubview(deleteBtn)
+        addSubview(reportBtn)
         addSubview(deletedLbl)
         addSubview(commentsOutOfRangeBtn)
         addSubview(horizontalSeperatorView)
         addSubview(verticalSeperatorView)
         addSubview(topVertSeperatorCoverView)
         addSubview(bottomVertSeperatorCoverView)
+        addSubview(sensitiveContentWarningBtn)
+        addSubview(blockedLbl)
+        addSubview(unblockBtn)
         
     }
     
@@ -177,6 +217,8 @@ class CommentCell: UITableViewCell {
         authorAndTimePostedLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: authorImageView.rightAnchor, leftPad: 10, right: rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
         deleteBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorAndTimePostedLbl.centerYAnchor, centerYPad: 0, height: 20, width: 20)
+        
+        reportBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorAndTimePostedLbl.centerYAnchor, centerYPad: 0, height: 20, width: 20)
         
         textLbl.anchors(top: authorAndTimePostedLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: leftAnchor, leftPad: 25, right: rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -201,6 +243,12 @@ class CommentCell: UITableViewCell {
         deletedLbl.anchors(top: textLbl.topAnchor, topPad: 0, bottom: textLbl.bottomAnchor, bottomPad: 0, left: textLbl.leftAnchor, leftPad: 0, right: textLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         commentsOutOfRangeBtn.anchors(top: likeBtn.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: leftAnchor, leftPad: 0, right: rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 0)
+        
+        sensitiveContentWarningBtn.anchors(top: textLbl.topAnchor, topPad: 0, bottom: textLbl.bottomAnchor, bottomPad: 0, left: textLbl.leftAnchor, leftPad: 0, right: textLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        blockedLbl.anchors(top: textLbl.topAnchor, topPad: 0, bottom: textLbl.bottomAnchor, bottomPad: 0, left: textLbl.leftAnchor, leftPad: 0, right: textLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        unblockBtn.anchors(top: blockedLbl.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: blockedLbl.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
     }
     
@@ -237,6 +285,9 @@ class CommentCell: UITableViewCell {
         subCommentBtn.addTarget(self, action: #selector(subCommentBtnTapped(sender:)), for: .touchUpInside)
         deleteBtn.addTarget(self, action: #selector(deleteBtnTapped(sender:)), for: .touchUpInside)
         commentsOutOfRangeBtn.addTarget(self, action: #selector(commentsOutOfRangeBtnTapped), for: .touchUpInside)
+        reportBtn.addTarget(self, action: #selector(reportCommentBtnTapped), for: .touchUpInside)
+        unblockBtn.addTarget(self, action: #selector(unblockComment), for: .touchUpInside)
+        sensitiveContentWarningBtn.addTarget(self, action: #selector(ignoreCommentSensitiveContent), for: .touchUpInside)
         
     }
     
@@ -308,6 +359,18 @@ class CommentCell: UITableViewCell {
         
     }
 
+    @objc func reportCommentBtnTapped() {
+        delegate?.reportCommentBtnTapped(comment: comment, cell: self)
+    }
+    
+    @objc func ignoreCommentSensitiveContent() {
+        delegate?.ignoreCommentSensitiveContent(comment: comment, cell: self)
+    }
+    
+    @objc func unblockComment() {
+        delegate?.unblockComment(comment: comment, cell: self)
+    }
+    
 }
 
 extension CommentCell: UITableViewDelegate, UITableViewDataSource {
@@ -353,6 +416,19 @@ extension CommentCell: UITableViewDelegate, UITableViewDataSource {
         cell.likesLbl.text = "\(comment.comments[indexPath.row].likes)"
         cell.setAuthorProfileImage(uid: comment.comments[indexPath.row].authorUID)
         cell.commentsOutOfRangeBtn.tag = indexPath.row
+        cell.blockedUIDs = blockedUIDs
+        
+        var blocked: Bool = false
+        cell.unblockBtn.setTitle("unblock \(cell.comment.author)?", for: .normal)
+        
+        for uid in blockedUIDs {
+            
+            if cell.comment.authorUID == uid{
+                blocked = true
+                break
+            }
+            
+        }
         
         if comment.comments[indexPath.row].isDeleted == true {
             
@@ -366,6 +442,144 @@ extension CommentCell: UITableViewDelegate, UITableViewDataSource {
             cell.horizontalSeperatorView.isHidden = false
             cell.topVertSeperatorCoverView.isHidden = false
             cell.bottomVertSeperatorCoverView.isHidden = false
+            
+        } else {
+            
+            if let user = Auth.auth().currentUser {
+                
+                if comment.comments[indexPath.row].authorUID == user.uid {
+                    // users post
+                    
+                    if blocked == true {
+                        for view in cell.subviews {
+                            view.isHidden = true
+                        }
+                        cell.blockedLbl.isHidden = false
+                        cell.unblockBtn.isHidden = false
+                    } else {
+                        for view in cell.subviews {
+                            view.isHidden = false
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                        cell.deletedLbl.isHidden = true
+                        cell.reportBtn.isHidden = true
+                        cell.commentsOutOfRangeBtn.isHidden = true
+                        cell.deleteBtn.isHidden = false
+                    }
+                    
+                } else {
+                    
+                    // not the users post
+                    
+                    if blocked == true {
+                        for view in cell.subviews {
+                            view.isHidden = true
+                        }
+                        cell.blockedLbl.isHidden = false
+                        cell.unblockBtn.isHidden = false
+                    } else {
+                        
+                        if cell.comment.isSensitive == true {
+                            
+                            let ignore = (UserDefaults.standard.bool(forKey: cell.comment.id + "ignoreSensitiveContent"))
+                            
+                            if ignore == true {
+                                
+                                for view in cell.subviews {
+                                    view.isHidden = false
+                                }
+                                
+                                cell.sensitiveContentWarningBtn.isHidden = true
+                                cell.commentsOutOfRangeBtn.isHidden = true
+                                cell.blockedLbl.isHidden = true
+                                cell.unblockBtn.isHidden = true
+                                cell.deletedLbl.isHidden = true
+                                
+                            } else {
+                                
+                                for view in cell.subviews {
+                                    view.isHidden = true
+                                }
+                                
+                                cell.sensitiveContentWarningBtn.isHidden = false
+                                cell.horizontalSeperatorView.isHidden = false
+                                cell.subTableView.isHidden = false
+                                
+                            }
+                            
+                        } else {
+                            for view in cell.subviews {
+                                view.isHidden = false
+                            }
+                            cell.sensitiveContentWarningBtn.isHidden = true
+                            cell.blockedLbl.isHidden = true
+                            cell.unblockBtn.isHidden = true
+                            cell.deletedLbl.isHidden = true
+                            cell.deleteBtn.isHidden = true
+                            cell.commentsOutOfRangeBtn.isHidden = true
+                        }
+                        
+                    }
+                    
+                }
+                
+            } else {
+                
+                // no user logged in
+                
+                if blocked == true {
+                    for view in cell.subviews {
+                        view.isHidden = true
+                    }
+                    cell.blockedLbl.isHidden = false
+                    cell.unblockBtn.isHidden = false
+                } else {
+                    
+                    if cell.comment.isSensitive == true {
+                        
+                        let ignore = (UserDefaults.standard.bool(forKey: cell.comment.id + "ignoreSensitiveContent"))
+                        
+                        if ignore == true {
+                            
+                            for view in cell.subviews {
+                                view.isHidden = false
+                            }
+                            
+                            cell.sensitiveContentWarningBtn.isHidden = true
+                            cell.commentsOutOfRangeBtn.isHidden = true
+                            cell.blockedLbl.isHidden = true
+                            cell.unblockBtn.isHidden = true
+                            cell.deletedLbl.isHidden = true
+                            
+                        } else {
+                            
+                            for view in cell.subviews {
+                                view.isHidden = true
+                            }
+                            
+                            cell.sensitiveContentWarningBtn.isHidden = false
+                            cell.horizontalSeperatorView.isHidden = false
+                            cell.subTableView.isHidden = false
+                            
+                        }
+                        
+                    } else {
+                        for view in cell.subviews {
+                            view.isHidden = false
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                        cell.deletedLbl.isHidden = true
+                        cell.deleteBtn.isHidden = true
+                        cell.commentsOutOfRangeBtn.isHidden = true
+                    }
+                    
+                }
+                
+            }
             
         }
         
@@ -393,7 +607,7 @@ extension CommentCell: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 113
+        return 300
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -415,6 +629,12 @@ protocol CommentCellDelegate : class {
     func deleteCommentBtnTapped(comment: Comment, commentRow: Int, cell: CommentCell) // for direct comments of main topic or comment
     
     func commentsOutOfRangeBtnTapped(comment: Comment, parentCell: CommentCell, commentRow: Int)
+    
+    func reportCommentBtnTapped(comment: Comment, cell: CommentCell)
+    
+    func ignoreCommentSensitiveContent(comment: Comment, cell: CommentCell)
+    
+    func unblockComment(comment: Comment, cell: CommentCell)
     
 }
 

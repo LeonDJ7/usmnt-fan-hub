@@ -18,13 +18,6 @@ class AddCommentVC: UIViewController {
     var parentCell = CommentCell()
     var parentIsComment = false
     
-    let backBtn: UIButton = {
-        let btn = UIButton()
-        btn.addTarget(self, action: #selector(goBack), for: .touchUpInside)
-        btn.setImage(UIImage(named: "Cancel"), for: .normal)
-        return btn
-    }()
-    
     let postBtn: UIButton = {
         let btn = UIButton()
         btn.setImage(UIImage(named: "Check"), for: .normal)
@@ -62,7 +55,7 @@ class AddCommentVC: UIViewController {
         replyTextView.delegate = self
         replyTextView.becomeFirstResponder()
         replyTextView.selectedTextRange = replyTextView.textRange(from: replyTextView.beginningOfDocument, to: replyTextView.beginningOfDocument)
-        
+        addDoneButtonOnKeyboard()
         setupLayout()
     }
     
@@ -78,7 +71,6 @@ class AddCommentVC: UIViewController {
     
     func addSubviews() {
         
-        view.addSubview(backBtn)
         view.addSubview(postBtn)
         view.addSubview(parentTextLbl)
         view.addSubview(seperatorView)
@@ -88,16 +80,37 @@ class AddCommentVC: UIViewController {
     
     func applyAnchors() {
         
-        backBtn.anchors(top: view.topAnchor, topPad: 30, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            postBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 20, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            postBtn.anchors(top: view.topAnchor, topPad: 30, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
-        postBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: backBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
-        
-        parentTextLbl.anchors(top: backBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        parentTextLbl.anchors(top: postBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         seperatorView.anchors(top: parentTextLbl.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
         
         replyTextView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -30, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
+    }
+    
+    func addDoneButtonOnKeyboard() {
+        
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        doneToolbar.barStyle = .default
+
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.doneButtonAction))
+
+        let items = [flexSpace, done]
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+
+        replyTextView.inputAccessoryView = doneToolbar
+    }
+
+    @objc func doneButtonAction(){
+        replyTextView.resignFirstResponder()
     }
     
     func setPostInfo() {
@@ -114,13 +127,15 @@ class AddCommentVC: UIViewController {
         
     }
     
-    @objc func goBack() {
-        dismiss(animated: true, completion: nil)
-    }
-    
     @objc func post() {
         
-        if replyTextView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        guard let user = Auth.auth().currentUser else {
+            let vc = AuthVC()
+            present(vc, animated: true, completion: nil)
+            return
+        }
+        
+        if replyTextView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || replyTextView.text == "..." {
             // string doesn't contain non-whitespace characters
             AlertController.showAlert(self, title: "Error", message: "comment must contain non-whitespace characters")
             return
@@ -128,7 +143,7 @@ class AddCommentVC: UIViewController {
         
         if parentIsComment == true {
             
-            parentComment.addComment(timestamp: Date().timeIntervalSince1970, author: (Auth.auth().currentUser?.displayName)!, authorUID: Auth.auth().currentUser!.uid, text: replyTextView.text)
+            parentComment.addComment(timestamp: Date().timeIntervalSince1970, author: user.displayName!, authorUID: user.uid, text: replyTextView.text)
             
             parentCell.subTableView.isHidden = false
             
@@ -136,18 +151,24 @@ class AddCommentVC: UIViewController {
                 // refresh tableView with new comment, should automatically include new comment
                 
                 if let parentVC = self.parentTopicVC {
-                    parentVC.tableView.reloadData()
+                    let deadline = DispatchTime.now() + .milliseconds(100)
+                    DispatchQueue.main.asyncAfter(deadline: deadline) {
+                        parentVC.tableView.reloadData()
+                    }
                 }
                 
                 if let parentVC = self.parentSubCommentVC {
-                    parentVC.tableView.reloadData()
+                    let deadline = DispatchTime.now() + .milliseconds(100)
+                    DispatchQueue.main.asyncAfter(deadline: deadline) {
+                        parentVC.tableView.reloadData()
+                    }
                 }
                 
             }
             
         } else {
             
-            parentTopic.addComment(timestamp: Date().timeIntervalSince1970, author: (Auth.auth().currentUser?.displayName)!, authorUID: Auth.auth().currentUser!.uid, text: replyTextView.text)
+            parentTopic.addComment(timestamp: Date().timeIntervalSince1970, author: user.displayName!, authorUID: user.uid, text: replyTextView.text)
             
             dismiss(animated: true) {
                 // refresh tableView with new comment, should automatically include new comment

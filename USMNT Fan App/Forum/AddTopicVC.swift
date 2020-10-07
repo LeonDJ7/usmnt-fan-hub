@@ -39,7 +39,7 @@ class AddTopicVC: UIViewController {
     
     let topicTV: UITextView = {
         let tv = UITextView()
-        tv.font = UIFont(name: "Avenir-Book", size: 18)
+        tv.font = UIFont(name: "Avenir-Book", size: 17)
         tv.layer.cornerRadius = 5
         tv.autocorrectionType = .default
         tv.textColor = .white
@@ -57,7 +57,7 @@ class AddTopicVC: UIViewController {
     
     let descriptionTV: UITextView = {
         let tv = UITextView()
-        tv.font = UIFont(name: "Avenir-Book", size: 18)
+        tv.font = UIFont(name: "Avenir-Book", size: 15)
         tv.layer.cornerRadius = 5
         tv.autocorrectionType = .default
         tv.textColor = .white
@@ -72,6 +72,7 @@ class AddTopicVC: UIViewController {
 
         topicTV.delegate = self
         descriptionTV.delegate = self
+        addDoneButtonOnKeyboard()
         setupLayout()
         
     }
@@ -98,7 +99,11 @@ class AddTopicVC: UIViewController {
         
         cancelBtn.anchors(top: view.topAnchor, topPad: 0, bottom: view.bottomAnchor, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        popUpView.anchors(top: view.topAnchor, topPad: 200, bottom: nil, bottomPad: 0, left: view.leftAnchor , leftPad: 50, right: view.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            popUpView.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 30, bottom: nil, bottomPad: 0, left: view.leftAnchor , leftPad: 50, right: view.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            popUpView.anchors(top: view.topAnchor, topPad: 70, bottom: nil, bottomPad: 0, left: view.leftAnchor , leftPad: 50, right: view.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         topicTV.anchors(top: popUpView.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: popUpView.leftAnchor, leftPad: 10, right: popUpView.rightAnchor, rightPad: -10, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 60, width: 0)
         
@@ -110,60 +115,81 @@ class AddTopicVC: UIViewController {
         
     }
     
+    func addDoneButtonOnKeyboard() {
+        
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        doneToolbar.barStyle = .default
+
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.doneButtonAction))
+
+        let items = [flexSpace, done]
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+
+        topicTV.inputAccessoryView = doneToolbar
+        descriptionTV.inputAccessoryView = doneToolbar
+    }
+
+    @objc func doneButtonAction(){
+        topicTV.resignFirstResponder()
+        descriptionTV.resignFirstResponder()
+    }
+    
     @objc func confirm() {
         
-        if topicTV.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        guard let user = Auth.auth().currentUser else {
+            let vc = AuthVC()
+            present(vc, animated: true, completion: nil)
+            return
+        }
+        
+        if topicTV.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || topicTV.text! == "topic" {
             AlertController.showAlert(self, title: "Error", message: "must provide topic")
             return
         }
         
-        if descriptionTV.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if descriptionTV.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || descriptionTV.text == "description" {
             AlertController.showAlert(self, title: "Error", message: "must provide description")
             return
         }
         
         let timestamp = Double(NSDate().timeIntervalSince1970)
         
-        if let user = Auth.auth().currentUser {
-            
-            let questionData : [String : Any] = [
-                "timestamp" : timestamp,
-                "author" : user.displayName!,
-                "authorUID" : user.uid,
-                "text" : descriptionTV.text!,
-                "topic" : topicTV.text!,
-                "commentCount" : 0
-            ]
+        let questionData : [String : Any] = [
+            "timestamp" : timestamp,
+            "author" : user.displayName!,
+            "authorUID" : user.uid,
+            "text" : descriptionTV.text!,
+            "topic" : topicTV.text!,
+            "commentCount" : 0,
+            "isSensitive":false
+        ]
 
-            var ref: DocumentReference? = nil
-            ref = Firestore.firestore().collection("Topics").addDocument(data: questionData) { err in
-                if let err = err {
-                    print("Error adding document: \(err)")
-                } else {
-                    Firestore.firestore().collection("Users").document(user.uid).collection("UserTopics").addDocument(data: ["docID":ref!.documentID])
-                }
+        var ref: DocumentReference? = nil
+        ref = Firestore.firestore().collection("Topics").addDocument(data: questionData) { err in
+            if let err = err {
+                print("Error adding document: \(err)")
+            } else {
+                Firestore.firestore().collection("Users").document(user.uid).collection("UserTopics").addDocument(data: ["docID":ref!.documentID])
             }
+        }
+        
+        
+        dismiss(animated: true) {
             
-            
-            dismiss(animated: true) {
-                
-                // refresh parentVC tableview
-                let newTopic = Topic(topic: self.topicTV.text!, timestamp: timestamp, author: user.displayName!, authorUID: user.uid, text: self.descriptionTV.text!, id: ref!.documentID, dbref: Firestore.firestore().collection("Topics").document(ref!.documentID), commentCount: 0)
-                self.parentVC.allTopics.append(newTopic)
-                self.parentVC.naturalTopics.append(newTopic)
-                self.parentVC.topicsDisplayed.append(newTopic)
-                self.parentVC.maxTopicsLoaded += 1
-                self.parentVC.topicsDisplayed.sort { $0.timestamp > $1.timestamp }
-                self.parentVC.tableView.reloadData()
-                
-            }
-            
-        } else {
-            
-            let vc = AuthVC()
-            present(vc, animated: true, completion: nil)
+            // refresh parentVC tableview
+            let newTopic = Topic(topic: self.topicTV.text!, timestamp: timestamp, author: user.displayName!, authorUID: user.uid, text: self.descriptionTV.text!, id: ref!.documentID, dbref: Firestore.firestore().collection("Topics").document(ref!.documentID), commentCount: 0, isSensitive: false)
+            self.parentVC.allTopics.append(newTopic)
+            self.parentVC.naturalTopics.append(newTopic)
+            self.parentVC.topicsDisplayed.append(newTopic)
+            self.parentVC.maxTopicsLoaded += 1
+            self.parentVC.topicsDisplayed.sort { $0.timestamp > $1.timestamp }
+            self.parentVC.tableView.reloadData()
             
         }
+            
+        
         
     }
     

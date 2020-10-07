@@ -9,13 +9,9 @@
 import UIKit
 import Firebase
 
-
-
 class RosterVC: UIViewController {
     
     var showAgeGroupDropDown = false
-    
-    var bannerView: GADBannerView!
     
     var ageGroupSelected = "USMNT"
     var ageGroups: [String] = ["USMNT", "U-23", "U-20", "U-17"]
@@ -100,11 +96,6 @@ class RosterVC: UIViewController {
         ageGroupSelectorTV.delegate = self
         ageGroupSelectorTV.dataSource = self
         
-        bannerView = GADBannerView(adSize: kGADAdSizeBanner)
-        bannerView.adUnitID = "ca-app-pub-2790005755690511/7934596736"
-        bannerView.rootViewController = self
-        bannerView.load(GADRequest())
-        
         setupLayout()
         
         activityIndicator.startAnimating()
@@ -132,7 +123,6 @@ class RosterVC: UIViewController {
     func setupLayout() {
         
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        
         addSubviews()
         applyAnchors()
         
@@ -142,7 +132,6 @@ class RosterVC: UIViewController {
         
         view.addSubview(ageGroupSelectorBtn)
         view.addSubview(listIndicator)
-        view.addSubview(bannerView)
         view.addSubview(rosterTV)
         view.addSubview(leftBorder)
         view.addSubview(centerLeftBorder)
@@ -155,25 +144,28 @@ class RosterVC: UIViewController {
     
     func applyAnchors() {
         
-        ageGroupSelectorBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            ageGroupSelectorBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            ageGroupSelectorBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         listIndicator.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: ageGroupSelectorBtn.rightAnchor, leftPad: 3, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: ageGroupSelectorBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
-        leftBorder.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
-        
-        centerLeftBorder.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: leftBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
-        
-        centerRightBorder.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: centerLeftBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
-        
-        rightBorder.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: centerRightBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
-        
-        bannerView.anchors(top: nil, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
-        
-        rosterTV.anchors(top: centerLeftBorder.bottomAnchor, topPad: 0, bottom: bannerView.topAnchor, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        rosterTV.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 15, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         ageGroupSelectorTV.anchors(top: ageGroupSelectorBtn.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 160, width: 150)
         
         activityIndicator.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: view.centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        
+        leftBorder.anchors(top: rosterTV.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
+        
+        centerLeftBorder.anchors(top: rosterTV.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: leftBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
+        
+        centerRightBorder.anchors(top: rosterTV.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: centerLeftBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
+        
+        rightBorder.anchors(top: rosterTV.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: centerRightBorder.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 15, width: view.frame.width/4)
+        
     }
     
     @objc func handleAgeGroupDropDown() {

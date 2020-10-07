@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SwiftSoup
+import Firebase
 
 func scrapeUSMNTRosterFromWikipedia() {
     
@@ -697,4 +698,30 @@ func scrapeU17RosterFromWikipedia() {
     
 }
 
+func loadBlockedUsers() {
+    
+    if let user = Auth.auth().currentUser {
+        
+        // gather uids of user's blocked list
+        
+        Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").getDocuments { (snap, err) in
+            
+            guard err == nil else {
+                print(err?.localizedDescription ?? "")
+                return
+            }
+            
+            guard let snap = snap else {
+                return
+            }
+            
+            for document in snap.documents {
+                blockedUIDs.append(document.documentID)
+            }
+            
+        }
+        
+    }
+    
+}
 

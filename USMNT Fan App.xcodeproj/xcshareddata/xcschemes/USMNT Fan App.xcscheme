@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "75D0077521E7F36800EBFB8D"
-               BuildableName = "USMNT Live.app"
+               BuildableName = "USMNT Fan Hub.app"
                BlueprintName = "USMNT Fan App"
                ReferencedContainer = "container:USMNT Fan App.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "75D0077521E7F36800EBFB8D"
-            BuildableName = "USMNT Live.app"
+            BuildableName = "USMNT Fan Hub.app"
             BlueprintName = "USMNT Fan App"
             ReferencedContainer = "container:USMNT Fan App.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "75D0077521E7F36800EBFB8D"
-            BuildableName = "USMNT Live.app"
+            BuildableName = "USMNT Fan Hub.app"
             BlueprintName = "USMNT Fan App"
             ReferencedContainer = "container:USMNT Fan App.xcodeproj">
          </BuildableReference>

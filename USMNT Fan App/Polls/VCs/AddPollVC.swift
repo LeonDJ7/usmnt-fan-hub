@@ -15,7 +15,7 @@ class AddPollVC: UIViewController {
     
     let popUpView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(displayP3Red: 239/255, green: 141/255, blue: 137/255, alpha: 1)
+        view.backgroundColor = #colorLiteral(red: 0.937254902, green: 0.5529411765, blue: 0.537254902, alpha: 1)
         view.layer.cornerRadius = 5
         return view
     }()
@@ -98,7 +98,7 @@ class AddPollVC: UIViewController {
     
     let questionTV: UITextView = {
         let tv = UITextView()
-        tv.font = UIFont(name: "Avenir-Book", size: 18)
+        tv.font = UIFont(name: "Avenir-Book", size: 17)
         tv.layer.cornerRadius = 5
         tv.autocorrectionType = .default
         tv.textColor = .darkGray
@@ -129,6 +129,7 @@ class AddPollVC: UIViewController {
         answer2TF.delegate = self
         answer3TF.delegate = self
         answer4TF.delegate = self
+        addDoneButtonOnKeyboard()
         setupLayout()
         
     }
@@ -161,7 +162,11 @@ class AddPollVC: UIViewController {
         
         cancelBtn.anchors(top: view.topAnchor, topPad: 0, bottom: view.bottomAnchor, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        popUpView.anchors(top: view.topAnchor, topPad: 200, bottom: nil, bottomPad: 0, left: view.leftAnchor , leftPad: 50, right: view.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            popUpView.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 30, bottom: nil, bottomPad: 0, left: view.leftAnchor , leftPad: 50, right: view.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            popUpView.anchors(top: view.topAnchor, topPad: 70, bottom: nil, bottomPad: 0, left: view.leftAnchor , leftPad: 50, right: view.rightAnchor, rightPad: -50, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         questionTV.anchors(top: popUpView.topAnchor, topPad: 15, bottom: nil, bottomPad: 0, left: popUpView.leftAnchor, leftPad: 15, right: popUpView.rightAnchor, rightPad: -15, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 70, width: 0)
         
@@ -185,7 +190,40 @@ class AddPollVC: UIViewController {
         
     }
     
+    func addDoneButtonOnKeyboard() {
+        
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        doneToolbar.barStyle = .default
+
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.doneButtonAction))
+
+        let items = [flexSpace, done]
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+
+        questionTV.inputAccessoryView = doneToolbar
+        answer1TF.inputAccessoryView = doneToolbar
+        answer2TF.inputAccessoryView = doneToolbar
+        answer3TF.inputAccessoryView = doneToolbar
+        answer4TF.inputAccessoryView = doneToolbar
+    }
+
+    @objc func doneButtonAction(){
+        questionTV.resignFirstResponder()
+        answer1TF.resignFirstResponder()
+        answer2TF.resignFirstResponder()
+        answer3TF.resignFirstResponder()
+        answer4TF.resignFirstResponder()
+    }
+    
     @objc func confirm() {
+        
+        guard let user = Auth.auth().currentUser else {
+            let vc = AuthVC()
+            present(vc, animated: true, completion: nil)
+            return
+        }
         
         if questionTV.text == "" {
             AlertController.showAlert(self, title: "Error", message: "must provide question")
@@ -218,82 +256,41 @@ class AddPollVC: UIViewController {
             totalAnswerOptions -= 1
         }
         
-        if let user = Auth.auth().currentUser {
-            
-            Firestore.firestore().collection("Polls").order(by: "timestamp", descending: true).limit(to: 1).getDocuments { (snap, err) in
-                
-                guard err == nil else {
-                    print(err?.localizedDescription ?? "")
-                    return
-                }
-                
-                var largestTimestamp = 0.0
-            
-                for document in snap!.documents {
-                    
-                    // get largest timestamp to tell whether or not to immediately add newc poll to users tableview, or wait for it to be loaded naturally
-                    
-                    largestTimestamp = document.data()["timestamp"] as! Double
-                    
-                }
-                
-                let timestamp = Double(Date().timeIntervalSince1970)
-                
-                let questionData : [String : Any] = [
-                    "question" : self.questionTV.text!,
-                    "answer1" : self.answer1TF.text!,
-                    "answer2" : self.answer2TF.text!,
-                    "answer3" : self.answer3TF.text!,
-                    "answer4" : self.answer4TF.text!,
-                    "answer1Score" : 0,
-                    "answer2Score" : 0,
-                    "answer3Score" : 0,
-                    "answer4Score" : 0,
-                    "timestamp" : timestamp,
-                    "totalAnswerOptions" : totalAnswerOptions,
-                    "totalVotes" : 0,
-                    "author" : user.displayName!,
-                    "authorUID" : user.uid
-                ]
-                
-                var ref: DocumentReference? = nil
-                var docID = ""
-                ref = Firestore.firestore().collection("Polls").addDocument(data: questionData) { err in
-                    if let err = err {
-                        print("Error adding document: \(err)")
-                    } else {
-                        docID = ref!.documentID
-                        Firestore.firestore().collection("Users").document(user.uid).collection("UserPolls").addDocument(data: ["docID":docID,
-                                                                        "timestamp":timestamp])
-                    }
-                }
-                
-                let poll = Poll(question: self.questionTV.text!, author: user.displayName!, authorUID: user.uid, answer1: self.answer1TF.text!, answer2: self.answer2TF.text!, answer3: self.answer3TF.text!, answer4: self.answer4TF.text!, answer1Score: 0, answer2Score: 0, answer3Score: 0, answer4Score: 0, timestamp: Double(NSDate().timeIntervalSince1970), totalAnswerOptions: Double(totalAnswerOptions), docID: docID, userVote: 0)
-                
-                self.dismiss(animated: true) {
-                    
-                    // if all active polls are in tableview already, then add this one to it
-                    
-                    if self.parentVC.polls.count > 0 {
-                        if largestTimestamp == self.parentVC.polls[self.parentVC.polls.count-1].timestamp {
-                            self.parentVC.polls.append(poll)
-                            self.parentVC.maxPollsLoaded += 1
-                            self.parentVC.tableView.reloadData()
-                        }
-                    } else {
-                        self.parentVC.polls.append(poll)
-                        self.parentVC.maxPollsLoaded += 1
-                        self.parentVC.tableView.reloadData()
-                    }
-                    
-                }
-                
+        let timestamp = Double(Date().timeIntervalSince1970)
+        
+        let questionData : [String : Any] = [
+            "question" : self.questionTV.text!,
+            "answer1" : self.answer1TF.text!,
+            "answer2" : self.answer2TF.text!,
+            "answer3" : self.answer3TF.text!,
+            "answer4" : self.answer4TF.text!,
+            "answer1Score" : 0,
+            "answer2Score" : 0,
+            "answer3Score" : 0,
+            "answer4Score" : 0,
+            "timestamp" : timestamp,
+            "totalAnswerOptions" : totalAnswerOptions,
+            "totalVotes" : 0,
+            "author" : user.displayName!,
+            "authorUID" : user.uid,
+            "isSensitive" : false
+        ]
+        
+        var ref: DocumentReference? = nil
+        var docID = ""
+        ref = Firestore.firestore().collection("Polls").addDocument(data: questionData) { err in
+            if let err = err {
+                print("Error adding document: \(err)")
+            } else {
+                docID = ref!.documentID
+                Firestore.firestore().collection("Users").document(user.uid).collection("UserPolls").addDocument(data: ["docID":docID,
+                                                                "timestamp":timestamp])
             }
+        }
+        
+        self.dismiss(animated: true) {
             
-        } else {
-            
-            let vc = AuthVC()
-            present(vc, animated: true, completion: nil)
+            self.parentVC.loadPolls(resetPolls: true)
             
         }
         

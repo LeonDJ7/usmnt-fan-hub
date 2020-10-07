@@ -26,8 +26,9 @@ class Poll {
     let totalAnswerOptions: Double
     var docID: String
     let userVote: Int
+    var isSensitive: Bool
     
-    init(question: String, author: String, authorUID: String, answer1: String, answer2: String, answer3: String, answer4: String, answer1Score: Double, answer2Score: Double, answer3Score: Double, answer4Score: Double, timestamp: Double, totalAnswerOptions: Double, docID: String, userVote: Int) {
+    init(question: String, author: String, authorUID: String, answer1: String, answer2: String, answer3: String, answer4: String, answer1Score: Double, answer2Score: Double, answer3Score: Double, answer4Score: Double, timestamp: Double, totalAnswerOptions: Double, docID: String, userVote: Int, isSensitive: Bool) {
         self.question = question
         self.author = author
         self.authorUID = authorUID
@@ -44,5 +45,6 @@ class Poll {
         self.totalAnswerOptions = totalAnswerOptions
         self.docID = docID
         self.userVote = userVote
+        self.isSensitive = isSensitive
     }
 }

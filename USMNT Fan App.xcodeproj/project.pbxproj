@@ -84,7 +84,7 @@
 		75AB270924E99D3100389DC2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		75CF82FB2425690F00C11CCB /* TopicVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TopicVC.swift; path = ../TopicVC.swift; sourceTree = "<group>"; };
 		75CFF95021ED543200C3F8E1 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
-		75D0077621E7F36800EBFB8D /* USMNT Live.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "USMNT Live.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		75D0077621E7F36800EBFB8D /* USMNT Fan Hub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "USMNT Fan Hub.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		75D0077921E7F36800EBFB8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		75D0077B21E7F36800EBFB8D /* CalendarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarVC.swift; sourceTree = "<group>"; };
 		75D0078021E7F36A00EBFB8D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -265,7 +265,7 @@
 		75D0077721E7F36800EBFB8D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				75D0077621E7F36800EBFB8D /* USMNT Live.app */,
+				75D0077621E7F36800EBFB8D /* USMNT Fan Hub.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -353,8 +353,8 @@
 				75D0077221E7F36800EBFB8D /* Sources */,
 				75D0077321E7F36800EBFB8D /* Frameworks */,
 				75D0077421E7F36800EBFB8D /* Resources */,
-				B3704C7E4BA115286C8FF8A3 /* [CP] Embed Pods Frameworks */,
-				7F923E3C18407D187A9AFE51 /* [CP] Copy Pods Resources */,
+				0B45596DE9628F4E68DE0E80 /* [CP] Embed Pods Frameworks */,
+				9CA6449F89066CD69CAB792C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -362,7 +362,7 @@
 			);
 			name = "USMNT Fan App";
 			productName = "USA Soccer Calendar";
-			productReference = 75D0077621E7F36800EBFB8D /* USMNT Live.app */;
+			productReference = 75D0077621E7F36800EBFB8D /* USMNT Fan Hub.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -413,6 +413,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0B45596DE9628F4E68DE0E80 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		157EE75A13DD82B47ACF5717 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -435,7 +452,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7F923E3C18407D187A9AFE51 /* [CP] Copy Pods Resources */ = {
+		9CA6449F89066CD69CAB792C /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -450,23 +467,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B3704C7E4BA115286C8FF8A3 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -654,7 +654,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "USMNT Fan App/USMNT Live.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USMNT Fan App/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -662,8 +662,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
-				PRODUCT_NAME = "USMNT Live";
+				PRODUCT_NAME = "USMNT Fan Hub";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -676,7 +677,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "USMNT Fan App/USMNT Live.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USMNT Fan App/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -684,8 +685,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
-				PRODUCT_NAME = "USMNT Live";
+				PRODUCT_NAME = "USMNT Fan Hub";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

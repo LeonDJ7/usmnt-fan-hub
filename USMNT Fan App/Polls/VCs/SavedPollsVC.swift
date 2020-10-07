@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import MessageUI
 
 class SavedPollsVC: UIViewController {
 
@@ -61,7 +62,11 @@ class SavedPollsVC: UIViewController {
     
     func applyAnchors() {
         
-        descriptionLbl.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            descriptionLbl.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            descriptionLbl.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         tableView.anchors(top: descriptionLbl.bottomAnchor, topPad: 30, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 50, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -88,7 +93,7 @@ class SavedPollsVC: UIViewController {
                     Firestore.firestore().collection("Polls").document(docID).getDocument { (snap2, err) in
                         
                         let data = snap2!.data()!
-                        let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: vote)
+                        let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: vote, isSensitive: data["isSensitive"] as! Bool)
                         
                         self.polls.append(poll)
                         
@@ -113,6 +118,84 @@ class SavedPollsVC: UIViewController {
             }
             
         }
+        
+    }
+    
+    func reportPollAlert(row: Int) {
+        
+        let alert = UIAlertController(title: "hmmm", message: "what would you like to do", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "block user", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            // add blocked user to user's blocked list in firestore
+            
+            guard let user = Auth.auth().currentUser else {
+                AlertController.showAlert(self, title: "Error", message: "must be logged in to block users")
+                return
+            }
+            
+            guard user.uid != self.polls[row].authorUID else {
+                return
+            }
+            
+            Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(self.polls[row].authorUID).setData(["blocked":true])
+            
+            Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(self.polls[row].authorUID).getDocument { (snap, err) in
+                
+                guard err == nil else {
+                    print(err?.localizedDescription ?? "")
+                    return
+                }
+                
+                blockedUIDs.append(self.polls[row].authorUID)
+                
+            }
+            
+            // do blocked stuff to cell
+            
+            let cell = self.tableView.cellForRow(at: IndexPath(row: row, section: 0)) as! PollsCell
+            for view in cell.subviews {
+                view.isHidden = true
+            }
+            
+            cell.blockedLbl.isHidden = false
+            cell.unblockBtn.isHidden = false
+        }))
+        
+        alert.addAction(UIAlertAction(title: "report sensitive content", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            UserDefaults.standard.set(false, forKey: self.polls[row].docID + "ignoreSensitiveContent")
+            // check to make sure this device hasnt already reported
+            
+            let deviceHasReported = UserDefaults.standard.bool(forKey: self.polls[row].docID + "has reported")
+            
+            if deviceHasReported == true {
+                AlertController.showAlert(self, title: "Error", message: "you have already reported this post")
+                return
+            }
+            
+            // report to firebase and send email to myself
+            
+            let data: [String : Any] = [
+                "docID" : self.polls[row].docID,
+                "authorUID" : self.polls[row].authorUID,
+                "question" : self.polls[row].question
+            ]
+            
+            Firestore.firestore().collection("Sensitive Content Reports").document("\(Date().timeIntervalSince1970)").setData(data)
+            
+            self.sendEmail(text: self.polls[row].question)
+            UserDefaults.standard.set(true, forKey: self.polls[row].docID + "has reported")
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
         
     }
     
@@ -233,6 +316,58 @@ extension SavedPollsVC: UITableViewDelegate, UITableViewDataSource {
         cell.answer3Btn.isEnabled = false
         cell.answer4Btn.isEnabled = false
         
+        cell.reportBtn.isHidden = false
+        
+        if polls[indexPath.row].isSensitive == true {
+            
+            let ignore = (UserDefaults.standard.bool(forKey: polls[indexPath.row].docID + "ignoreSensitiveContent"))
+            
+            if ignore == true {
+                
+                for view in cell.subviews {
+                    view.isHidden = true
+                }
+                
+                cell.sensitiveContentWarningBtn.isHidden = true
+                cell.unblockBtn.isHidden = true
+                cell.blockedLbl.isHidden = true
+                
+            } else {
+                
+                for view in cell.subviews {
+                    view.isHidden = true
+                }
+                
+                cell.sensitiveContentWarningBtn.isHidden = false
+                
+            }
+            
+        }
+        
+        var blocked: Bool = false
+        cell.unblockBtn.setTitle("unblock \(polls[indexPath.row].author)?", for: .normal)
+        
+        for uid in blockedUIDs {
+            
+            if polls[indexPath.row].authorUID == uid{
+                blocked = true
+                break
+            }
+            
+        }
+        
+        if blocked == true {
+            cell.cellView.isHidden = true
+            cell.sensitiveContentWarningBtn.isHidden = true
+            cell.blockedLbl.isHidden = false
+            cell.unblockBtn.isHidden = false
+        } else {
+            cell.cellView.isHidden = false
+            cell.sensitiveContentWarningBtn.isHidden = true
+            cell.blockedLbl.isHidden = true
+            cell.unblockBtn.isHidden = true
+        }
+        
         return cell
         
     }
@@ -253,6 +388,92 @@ extension SavedPollsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
+    }
+    
+}
+
+extension SavedPollsVC: PollsCellDelegate {
+    
+    func unblock(row: Int) {
+        
+        guard let user = Auth.auth().currentUser else {
+            return
+        }
+        
+        Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(polls[row].authorUID).getDocument { (snap, err) in
+            
+            guard err == nil else {
+                print(err?.localizedDescription ?? "")
+                return
+            }
+            
+            guard let snap = snap else {
+                return
+            }
+            
+            snap.reference.delete()
+            blockedUIDs = blockedUIDs.filter { $0 != self.polls[row].authorUID }
+            self.tableView.reloadData()
+            
+        }
+        
+    }
+    
+    func ignoreSensitiveContent(row: Int) {
+        
+        UserDefaults.standard.set(true, forKey: polls[row].docID + "ignoreSensitiveContent")
+        tableView.reloadData()
+        
+    }
+    
+    
+    func reportBtnPressed(row: Int) {
+        
+        reportPollAlert(row: row)
+        
+    }
+    
+    func didSelectAnswer1(row: Int) {
+        // do nothing
+    }
+    
+    func didSelectAnswer2(row: Int) {
+        // do nothing
+    }
+    
+    func didSelectAnswer3(row: Int) {
+        // do nothing
+    }
+    
+    func didSelectAnswer4(row: Int) {
+        // do nothing
+    }
+    
+    func deleteBtnPressed(row: Int) {
+        
+        // do nothing
+        
+    }
+    
+}
+
+extension SavedPollsVC: MFMailComposeViewControllerDelegate {
+    
+    func sendEmail(text: String) {
+        if MFMailComposeViewController.canSendMail() {
+            let mail = MFMailComposeViewController()
+            mail.mailComposeDelegate = self
+            mail.setToRecipients(["leondjust@me.com"])
+            mail.setMessageBody("new harrasment report \ntext: \(text)", isHTML: true)
+
+            present(mail, animated: true)
+        } else {
+            // show failure alert
+        }
+    }
+
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true)
     }
     
 }

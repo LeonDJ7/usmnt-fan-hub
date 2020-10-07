@@ -21,6 +21,7 @@ class Topic {
     var comments: [Comment] = []
     var commentCount: Int
     var dbref: DocumentReference
+    var isSensitive: Bool
     
     init() {
         self.topic = ""
@@ -31,9 +32,10 @@ class Topic {
         self.id = ""
         self.commentCount = 0
         self.dbref = Firestore.firestore().collection("Inits").document()
+        self.isSensitive = false
     }
     
-    init(topic: String, timestamp: Double, author: String, authorUID: String, text: String, id: String, dbref: DocumentReference, commentCount: Int) {
+    init(topic: String, timestamp: Double, author: String, authorUID: String, text: String, id: String, dbref: DocumentReference, commentCount: Int, isSensitive: Bool) {
         
         self.topic = topic
         self.timestamp = timestamp
@@ -43,6 +45,7 @@ class Topic {
         self.id = id
         self.dbref = dbref
         self.commentCount = commentCount
+        self.isSensitive = isSensitive
         
         dbref.collection("Comments").order(by: "likes").getDocuments { (snap, error) in
             
@@ -60,7 +63,8 @@ class Topic {
                 let topicID =  self.id
                 let commentCount = data["commentCount"] as! Int
                 let isDeleted = data["isDeleted"] as! Bool
-                let comment = Comment(topic: topic, topicID: topicID, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, likes: likes, depth: 0, dbref: dbref, commentCount: commentCount, isDeleted: isDeleted)
+                let isSensitive = data["isSensitive"] as! Bool
+                let comment = Comment(topic: topic, topicID: topicID, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, likes: likes, depth: 0, dbref: dbref, commentCount: commentCount, isDeleted: isDeleted, isSensitive: isSensitive)
                 self.comments.append(comment)
                 
             }
@@ -78,7 +82,8 @@ class Topic {
                     "timestamp":timestamp,
                     "likes":0,
                     "commentCount":0,
-                    "isDeleted":false
+                    "isDeleted":false,
+                    "isSensitive":false
                     ]
         
         var ref: DocumentReference? = nil
@@ -86,7 +91,7 @@ class Topic {
             if let err = err {
                 print("Error adding document: \(err)")
             } else {
-                let comment = Comment(topic: self.topic, topicID: self.id, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: ref!.documentID, likes: 0, depth: 0, dbref: self.dbref.collection("Comments").document(ref!.documentID), commentCount: 0, isDeleted: false)
+                let comment = Comment(topic: self.topic, topicID: self.id, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: ref!.documentID, likes: 0, depth: 0, dbref: self.dbref.collection("Comments").document(ref!.documentID), commentCount: 0, isDeleted: false, isSensitive: false)
                 self.comments.append(comment)
             }
         }
@@ -133,6 +138,7 @@ class Comment {
     var userHasVoted = false
     var voteWasLike = true
     var isDeleted: Bool
+    var isSensitive: Bool
     
     init() {
         self.likes = 0
@@ -147,9 +153,10 @@ class Comment {
         self.commentCount = 0
         self.dbref = Firestore.firestore().collection("Inits").document()
         self.isDeleted = false
+        self.isSensitive = false
     }
     
-    init(topic: String, topicID: String, timestamp: Double, author: String, authorUID: String, text: String, id: String, likes: Int, depth: Int, dbref: DocumentReference, commentCount: Int, isDeleted: Bool) {
+    init(topic: String, topicID: String, timestamp: Double, author: String, authorUID: String, text: String, id: String, likes: Int, depth: Int, dbref: DocumentReference, commentCount: Int, isDeleted: Bool, isSensitive: Bool) {
         
         self.likes = likes
         self.topicID = topicID
@@ -163,7 +170,7 @@ class Comment {
         self.dbref = dbref
         self.commentCount = commentCount
         self.isDeleted = isDeleted
-        
+        self.isSensitive = isSensitive
         
         // load comments
         
@@ -183,7 +190,8 @@ class Comment {
                 let topicID = self.topicID
                 let commentCount = data["commentCount"] as! Int
                 let isDeleted = data["isDeleted"] as! Bool
-                let comment = Comment(topic: topic, topicID: topicID, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, likes: likes, depth: self.depth+1, dbref: dbref, commentCount: commentCount, isDeleted: isDeleted)
+                let isSensitive = data["isSensitive"] as! Bool
+                let comment = Comment(topic: topic, topicID: topicID, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, likes: likes, depth: self.depth+1, dbref: dbref, commentCount: commentCount, isDeleted: isDeleted, isSensitive: isSensitive)
                 self.comments.append(comment)
                 
             }
@@ -231,7 +239,8 @@ class Comment {
                     "timestamp":timestamp,
                     "likes":0,
                     "commentCount":0,
-                    "isDeleted":false
+                    "isDeleted":false,
+                    "isSensitive":false
                     ]
         
         var ref: DocumentReference? = nil
@@ -239,7 +248,7 @@ class Comment {
             if let err = err {
                 print("Error adding document: \(err)")
             } else {
-                let comment = Comment(topic: self.topic, topicID: self.topicID, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: ref!.documentID, likes: 0, depth: self.depth+1, dbref: self.dbref.collection("Comments").document(ref!.documentID), commentCount: 0, isDeleted: false)
+                let comment = Comment(topic: self.topic, topicID: self.topicID, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: ref!.documentID, likes: 0, depth: self.depth+1, dbref: self.dbref.collection("Comments").document(ref!.documentID), commentCount: 0, isDeleted: false, isSensitive: false)
                 self.comments.append(comment)
             }
         }
@@ -490,9 +499,6 @@ class Comment {
             
         }
         
-        
-        
     }
-
     
 }

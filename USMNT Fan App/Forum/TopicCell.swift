@@ -11,6 +11,9 @@ import Firebase
 
 class TopicCell: UITableViewCell {
     
+    var delegate: TopicCellDelegate?
+    var topic = Topic()
+    
     let cellView: UIView = {
         let view = UIView()
         view.clipsToBounds = true
@@ -57,6 +60,34 @@ class TopicCell: UITableViewCell {
         return lbl
     }()
     
+    let sensitiveContentWarningBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setTitle("view sensitive content?", for: .normal)
+        btn.titleLabel!.textColor = .white
+        btn.titleLabel!.font = UIFont(name: "Avenir-Book", size: 16)
+        return btn
+    }()
+    
+    let blockedLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.text = "this user is blocked"
+        lbl.font = UIFont(name: "Avenir-Book", size: 16)
+        lbl.textColor = .white
+        lbl.isHidden = true
+        lbl.textAlignment = .center
+        return lbl
+    }()
+    
+    @objc let unblockBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setTitle("unblock?", for: .normal)
+        btn.titleLabel!.textColor = .white
+        btn.titleLabel!.font = UIFont(name: "Avenir-Book", size: 14)
+        return btn
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
@@ -73,6 +104,7 @@ class TopicCell: UITableViewCell {
         backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
         addSubviews()
         applyAnchors()
+        addTargets()
         
     }
     
@@ -84,6 +116,9 @@ class TopicCell: UITableViewCell {
         cellView.addSubview(authorLbl)
         cellView.addSubview(lastActiveView)
         lastActiveView.addSubview(lastActiveLbl)
+        addSubview(sensitiveContentWarningBtn)
+        addSubview(blockedLbl)
+        addSubview(unblockBtn)
         
     }
     
@@ -100,6 +135,12 @@ class TopicCell: UITableViewCell {
         lastActiveView.anchors(top: cellView.topAnchor, topPad: 0, bottom: cellView.bottomAnchor, bottomPad: 0, left: cellView.rightAnchor, leftPad: -80, right: cellView.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         lastActiveLbl.anchors(top: lastActiveView.topAnchor, topPad: 5, bottom: lastActiveView.bottomAnchor, bottomPad: -5, left: lastActiveView.leftAnchor, leftPad: 5, right: lastActiveView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        sensitiveContentWarningBtn.anchors(top: topicLbl.topAnchor, topPad: 0, bottom: topicLbl.bottomAnchor, bottomPad: 0, left: topicLbl.leftAnchor, leftPad: 0, right: topicLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        blockedLbl.anchors(top: topicLbl.topAnchor, topPad: 0, bottom: topicLbl.bottomAnchor, bottomPad: 0, left: topicLbl.leftAnchor, leftPad: 0, right: topicLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        unblockBtn.anchors(top: blockedLbl.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: blockedLbl.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
     }
     
@@ -148,5 +189,27 @@ class TopicCell: UITableViewCell {
         authorImageView.backgroundColor = backgroundColor
         
     }
+    
+    func addTargets() {
+        sensitiveContentWarningBtn.addTarget(self, action: #selector(ignoreSensitiveContent), for: .touchUpInside)
+        unblockBtn.addTarget(self, action: #selector(unblockTopic), for: .touchUpInside)
+        
+    }
+    
+    @objc func ignoreSensitiveContent() {
+        delegate?.ignoreSensitiveContent(topic: topic)
+    }
+    
+    @objc func unblockTopic() {
+        delegate?.unblockTopic(topic: topic)
+    }
 
+}
+
+protocol TopicCellDelegate : class {
+    
+    func ignoreSensitiveContent(topic: Topic)
+    
+    func unblockTopic(topic: Topic)
+    
 }

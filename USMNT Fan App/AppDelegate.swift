@@ -30,6 +30,8 @@ var U17defenders: [Player] = []
 var U17midfielders: [Player] = []
 var U17forwards: [Player] = []
 
+var blockedUIDs: [String] = []
+
 let gcmMessageIDKey = "gcm.message_id"
 
 @UIApplicationMain
@@ -94,6 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             scrapeU23RosterFromWikipedia()
             scrapeU20RosterFromWikipedia()
             scrapeU17RosterFromWikipedia()
+            loadBlockedUsers()
             
         }
         

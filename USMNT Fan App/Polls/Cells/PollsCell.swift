@@ -177,6 +177,42 @@ class PollsCell: UITableViewCell {
         return btn
     }()
     
+    let reportBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setImage(UIImage(named: "ReportBtnImage"), for: .normal)
+        return btn
+    }()
+    
+    let sensitiveContentWarningBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setTitle("view sensitive content", for: .normal)
+        btn.titleLabel!.textColor = .white
+        btn.titleLabel!.font = UIFont(name: "Avenir-Book", size: 16)
+        return btn
+    }()
+    
+    let blockedLbl: UILabel = {
+        let lbl = UILabel()
+        lbl.text = "this user is blocked"
+        lbl.font = UIFont(name: "Avenir-Medium", size: 18)
+        lbl.textColor = .white
+        lbl.isHidden = true
+        lbl.textAlignment = .center
+        return lbl
+    }()
+    
+    let unblockBtn: UIButton = {
+        let btn = UIButton()
+        btn.isHidden = true
+        btn.setTitle("unblock?", for: .normal)
+        btn.titleLabel!.textColor = .white
+        btn.titleLabel!.font = UIFont(name: "Avenir-Book", size: 14)
+        return btn
+    }()
+    
+    
     var answer1Score = 0.0
     var answer2Score = 0.0
     var answer3Score = 0.0
@@ -186,7 +222,6 @@ class PollsCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupLayout()
         addTargets() // connect each btn with its method
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -220,11 +255,15 @@ class PollsCell: UITableViewCell {
         cellView.addSubview(answer3Btn)
         cellView.addSubview(answer4Btn)
         cellView.addSubview(deleteBtn)
+        cellView.addSubview(reportBtn)
         answer1Btn.addSubview(answer1PercentLbl)
         answer2Btn.addSubview(answer2PercentLbl)
         answer3Btn.addSubview(answer3PercentLbl)
         answer4Btn.addSubview(answer4PercentLbl)
-        
+        addSubview(sensitiveContentWarningBtn)
+        addSubview(blockedLbl)
+        addSubview(unblockBtn)
+                
     }
     
     func applyAnchors() {
@@ -232,6 +271,8 @@ class PollsCell: UITableViewCell {
         cellView.anchors(top: topAnchor, topPad: 5, bottom: bottomAnchor, bottomPad: -5, left: leftAnchor, leftPad: 5, right: rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         deleteBtn.anchors(top: cellView.topAnchor, topPad: 13, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
+        
+        reportBtn.anchors(top: cellView.topAnchor, topPad: 13, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
         
         questionLbl.anchors(top: cellView.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -267,6 +308,12 @@ class PollsCell: UITableViewCell {
         
         answer4PercentLbl.anchors(top: answer4Btn.topAnchor, topPad: 0, bottom: answer4Btn.bottomAnchor, bottomPad: 0, left: answer4Btn.leftAnchor, leftPad: 0, right: answer4Btn.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
+        sensitiveContentWarningBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: centerXAnchor, centerXPad: 0, centerY: centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        
+        blockedLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: centerXAnchor, centerXPad: 0, centerY: centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        
+        unblockBtn.anchors(top: blockedLbl.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: leftAnchor, leftPad: 0, right: rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
     }
     
     func addTargets() {
@@ -276,10 +323,13 @@ class PollsCell: UITableViewCell {
         answer3Btn.addTarget(self, action: #selector(selectAnswer3(sender:)), for: .touchUpInside)
         answer4Btn.addTarget(self, action: #selector(selectAnswer4(sender:)), for: .touchUpInside)
         deleteBtn.addTarget(self, action: #selector(deleteBtnPressed(sender:)), for: .touchUpInside)
+        reportBtn.addTarget(self, action: #selector(reportBtnPressed(sender:)), for: .touchUpInside)
+        sensitiveContentWarningBtn.addTarget(self, action: #selector(ignoreSensitiveContent(sender:)), for: .touchUpInside)
+        unblockBtn.addTarget(self, action: #selector(unblock(sender:)), for: .touchUpInside)
         
     }
     
-    func scheduleTimeRemainingTimer(){
+    func scheduleTimeRemainingTimer() {
         // Scheduling timer to Call the function "updateCounting" with the interval of 1 seconds
         
         refreshTimeRemaining()
@@ -433,6 +483,18 @@ class PollsCell: UITableViewCell {
         delegate?.deleteBtnPressed(row: sender.tag)
     }
     
+    @objc func reportBtnPressed(sender: UIButton) {
+        delegate?.reportBtnPressed(row: sender.tag)
+    }
+    
+    @objc func ignoreSensitiveContent(sender: UIButton) {
+        delegate?.ignoreSensitiveContent(row: sender.tag)
+    }
+    
+    @objc func unblock(sender: UIButton) {
+        delegate?.unblock(row: sender.tag)
+    }
+    
 }
 
 protocol PollsCellDelegate : class {
@@ -446,5 +508,11 @@ protocol PollsCellDelegate : class {
     func didSelectAnswer4(row: Int)
     
     func deleteBtnPressed(row: Int)
+    
+    func reportBtnPressed(row: Int)
+    
+    func ignoreSensitiveContent(row: Int)
+    
+    func unblock(row: Int)
     
 }

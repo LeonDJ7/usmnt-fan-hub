@@ -37,14 +37,6 @@ class SavedTopicsVC: UIViewController {
         getTopics()
         setupLayout()
         
-        if tableView.numberOfRows(inSection: 0) == 0 {
-            let deadline = DispatchTime.now() + .milliseconds(500)
-            DispatchQueue.main.asyncAfter(deadline: deadline) {
-                self.forumTopics.sort { $0.timestamp > $1.timestamp }
-                self.tableView.reloadData()
-            }
-        }
-        
     }
     
     func setupLayout() {
@@ -64,7 +56,11 @@ class SavedTopicsVC: UIViewController {
     
     func applyAnchors() {
         
-        descriptionLbl.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        if #available(iOS 11.0, *) {
+            descriptionLbl.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            descriptionLbl.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         tableView.anchors(top: descriptionLbl.bottomAnchor, topPad: 30, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 40, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -99,21 +95,18 @@ class SavedTopicsVC: UIViewController {
                             let author = data["author"] as! String
                             let authorUID = data["authorUID"] as! String
                             let text = data["text"] as! String
-                            let id = document.documentID
+                            let id = snap.documentID
                             let commentCount = data["commentCount"] as! Int
                             let dbref = Firestore.firestore().collection("Topics").document(id)
-                            self.forumTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount))
+                            let isSensitive = data["isSensitive"] as! Bool
+                            self.forumTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount, isSensitive: isSensitive))
+                            self.forumTopics.sort { $0.timestamp > $1.timestamp }
+                            self.tableView.reloadData()
                             
                         }
                         
                     }
                     
-                }
-                
-                let deadline = DispatchTime.now() + .milliseconds(250)
-                DispatchQueue.main.asyncAfter(deadline: deadline) {
-                    self.forumTopics.sort { $0.timestamp > $1.timestamp }
-                    self.tableView.reloadData()
                 }
                 
             }
@@ -140,12 +133,119 @@ extension SavedTopicsVC: UITableViewDelegate, UITableViewDataSource {
         cell.setUserProfileImage(uid: forumTopics[indexPath.row].authorUID)
         
         let lastActiveDate = Date(timeIntervalSince1970: forumTopics[indexPath.row].timestamp)
-        let diffInHours = Calendar.current.dateComponents([.hour], from: lastActiveDate, to: Date()).hour
+        let diffInHours = Calendar.current.dateComponents([.hour], from: lastActiveDate, to: Date()).hour ?? 0
         
-        if diffInHours != 0 {
-            cell.lastActiveLbl.text = "last active \(diffInHours!) hours ago"
+        if diffInHours >= 8760 {
+            let diffInYears = diffInHours / 8760
+            cell.lastActiveLbl.text = "last active \(diffInYears) years ago"
+        } else if diffInHours >= 24 {
+            let diffInDays = diffInHours / 24
+            cell.lastActiveLbl.text = "last active \(diffInDays) days ago"
+        } else if diffInHours != 0 {
+            cell.lastActiveLbl.text = "last active \(diffInHours) hours ago"
         } else {
             cell.lastActiveLbl.text = "last active less than an hour ago"
+        }
+        
+        var blocked: Bool = false
+        cell.unblockBtn.setTitle("unblock \(forumTopics[indexPath.row].author)?", for: .normal)
+        
+        for uid in blockedUIDs {
+            
+            if forumTopics[indexPath.row].authorUID == uid {
+                blocked = true
+                break
+            }
+            
+        }
+        
+        if let user = Auth.auth().currentUser {
+            
+            if user.uid != forumTopics[indexPath.row].authorUID {
+                // not users post
+                
+                if blocked == true {
+                    for view in cell.subviews {
+                        view.isHidden = true
+                    }
+                    cell.blockedLbl.isHidden = false
+                    cell.unblockBtn.isHidden = false
+                } else {
+                    
+                    if forumTopics[indexPath.row].isSensitive == true {
+                        
+                        let ignore = (UserDefaults.standard.bool(forKey: forumTopics[indexPath.row].id + "ignoreSensitiveContent"))
+                        if ignore == true {
+                            
+                            for view in cell.subviews {
+                                view.isHidden = false
+                            }
+                            cell.sensitiveContentWarningBtn.isHidden = true
+                            cell.blockedLbl.isHidden = true
+                            cell.unblockBtn.isHidden = true
+                            
+                        } else {
+                            for view in cell.subviews {
+                                view.isHidden = true
+                            }
+                            cell.sensitiveContentWarningBtn.isHidden = false
+                        }
+                        
+                    } else {
+                        for view in cell.subviews {
+                            view.isHidden = false
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                    }
+                    
+                }
+                
+            }
+            
+        } else {
+            // definately not users post
+            
+            if blocked == true {
+                for view in cell.subviews {
+                    view.isHidden = true
+                }
+                cell.blockedLbl.isHidden = false
+                cell.unblockBtn.isHidden = false
+            } else {
+                
+                if forumTopics[indexPath.row].isSensitive == true {
+                    
+                    let ignore = (UserDefaults.standard.bool(forKey: forumTopics[indexPath.row].id + "ignoreSensitiveContent"))
+                    
+                    if ignore == true {
+                        
+                        for view in cell.subviews {
+                            view.isHidden = false
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                        
+                    } else {
+                        for view in cell.subviews {
+                            view.isHidden = true
+                        }
+                        cell.sensitiveContentWarningBtn.isHidden = false
+                    }
+                    
+                } else {
+                    for view in cell.subviews {
+                        view.isHidden = false
+                    }
+                    cell.sensitiveContentWarningBtn.isHidden = true
+                    cell.blockedLbl.isHidden = true
+                    cell.unblockBtn.isHidden = true
+                }
+                
+            }
+            
         }
         
         return cell

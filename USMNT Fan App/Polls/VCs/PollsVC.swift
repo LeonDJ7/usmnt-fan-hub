@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import MessageUI
 
 class PollsVC: UIViewController {
     
@@ -97,7 +98,11 @@ class PollsVC: UIViewController {
     
     func applyAnchors() {
         
-        userPollsBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 25, width: 25)
+        if #available(iOS 11.0, *) {
+            userPollsBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 25, width: 25)
+        } else {
+            userPollsBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 25, width: 25)
+        }
         
         createPollBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: userPollsBtn.leftAnchor, rightPad: -10, centerX: nil, centerXPad: 0, centerY: userPollsBtn.centerYAnchor, centerYPad: 0, height: 25, width: 25)
         
@@ -207,7 +212,7 @@ class PollsVC: UIViewController {
                                 
                                 let data = document.data()
                                 
-                                let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: userVotes[document.documentID] ?? 0)
+                                let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: userVotes[document.documentID] ?? 0, isSensitive: data["isSensitive"] as! Bool)
                                 
                                 self.polls.append(poll)
                                 
@@ -237,9 +242,9 @@ class PollsVC: UIViewController {
                     for document in snap.documents {
                         
                         let data = document.data()
-                        let userVote = UserDefaults.standard.object(forKey: document.documentID) ?? 0
+                        let userVote = UserDefaults.standard.object(forKey: document.documentID + "vote") ?? 0
                         
-                        let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: userVote as! Int)
+                        let poll = Poll(question: data["question"] as! String, author: data["author"] as! String, authorUID: data["authorUID"] as! String, answer1: data["answer1"] as! String, answer2: data["answer2"] as! String, answer3: data["answer3"] as! String, answer4: data["answer4"] as! String, answer1Score: data["answer1Score"] as! Double, answer2Score: data["answer2Score"] as! Double, answer3Score: data["answer3Score"] as! Double, answer4Score: data["answer4Score"] as! Double, timestamp: data["timestamp"] as! Double, totalAnswerOptions: data["totalAnswerOptions"] as! Double, docID: document.documentID, userVote: userVote as! Int, isSensitive: data["isSensitive"] as! Bool)
                         
                         self.polls.append(poll)
                         
@@ -266,13 +271,23 @@ class PollsVC: UIViewController {
     
     func deletePollAlert(row: Int) {
         
+        guard let user = Auth.auth().currentUser else {
+            tableView.reloadData()
+            return
+        }
+        
+        guard user.uid == polls[row].authorUID else {
+            tableView.reloadData()
+            return
+        }
+        
         let alert = UIAlertController(title: "just checking", message: "are you sure you want to delete this poll?", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "No", style: .destructive, handler: { (action) in
+        alert.addAction(UIAlertAction(title: "no", style: .destructive, handler: { (action) in
             alert.dismiss(animated: true, completion: nil)
         }))
         
-        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction(title: "yes", style: .default, handler: { (action) in
             alert.dismiss(animated: true, completion: nil)
             
             let docID = self.polls[row].docID
@@ -336,6 +351,67 @@ class PollsVC: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+    func reportPollAlert(row: Int) {
+        
+        let alert = UIAlertController(title: "hmmm", message: "what would you like to do", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "block user", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            // add blocked user to user's blocked list in firestore
+            
+            guard let user = Auth.auth().currentUser else {
+                AlertController.showAlert(self, title: "Error", message: "must be logged in to block users")
+                return
+            }
+            
+            guard user.uid != self.polls[row].authorUID else {
+                return
+            }
+            
+            Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(self.polls[row].authorUID).setData(["blocked":true])
+            
+            blockedUIDs.append(self.polls[row].authorUID)
+            self.tableView.reloadData()
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "report sensitive content", style: .destructive, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+            
+            UserDefaults.standard.set(false, forKey: self.polls[row].docID + "ignoreSensitiveContent")
+            // check to make sure this device hasnt already reported
+            
+            let deviceHasReported = UserDefaults.standard.bool(forKey: self.polls[row].docID + "has reported")
+            
+            if deviceHasReported == true {
+                AlertController.showAlert(self, title: "Error", message: "you have already reported this post")
+                return
+            }
+            
+            // report to firebase and send email to myself
+            
+            let data: [String : Any] = [
+                "docID" : self.polls[row].docID,
+                "authorUID" : self.polls[row].authorUID,
+                "question" : self.polls[row].question
+            ]
+            
+            Firestore.firestore().collection("Sensitive Content Reports").document("\(Date().timeIntervalSince1970)").setData(data)
+            
+            self.sendEmail(text: self.polls[row].question)
+            UserDefaults.standard.set(true, forKey: self.polls[row].docID + "has reported")
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+        
+    }
+    
 }
 
 extension PollsVC: UITableViewDelegate, UITableViewDataSource {
@@ -385,6 +461,9 @@ extension PollsVC: UITableViewDelegate, UITableViewDataSource {
         cell.answer3Btn.tag = indexPath.row
         cell.answer4Btn.tag = indexPath.row
         cell.deleteBtn.tag = indexPath.row
+        cell.reportBtn.tag = indexPath.row
+        cell.sensitiveContentWarningBtn.tag = indexPath.row
+        cell.unblockBtn.tag = indexPath.row
         
         cell.questionLbl.text = polls[indexPath.row].question
         cell.authorLbl.text = polls[indexPath.row].author
@@ -431,6 +510,7 @@ extension PollsVC: UITableViewDelegate, UITableViewDataSource {
                 cell.backgroundColor = #colorLiteral(red: 1, green: 0.944347918, blue: 0.9286107421, alpha: 1)
                 cell.questionLbl.textColor = .darkGray
                 cell.deleteBtn.isHidden = false
+                cell.reportBtn.isHidden = true
                 
                 cell.answer1PercentLbl.isHidden = false
                 cell.answer2PercentLbl.isHidden = false
@@ -444,9 +524,12 @@ extension PollsVC: UITableViewDelegate, UITableViewDataSource {
                 
             } else {
                 
+                // not users poll
+                
                 cell.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
                 cell.questionLbl.textColor = .white
                 cell.deleteBtn.isHidden = true
+                cell.reportBtn.isHidden = false
                 
                 if polls[indexPath.row].userVote != 0 {
                     
@@ -487,13 +570,42 @@ extension PollsVC: UITableViewDelegate, UITableViewDataSource {
                     
                 }
                 
+                if polls[indexPath.row].isSensitive == true {
+                    
+                    let ignore = (UserDefaults.standard.bool(forKey: polls[indexPath.row].docID + "ignoreSensitiveContent"))
+                    
+                    if ignore == true {
+                        
+                        for view in cell.subviews {
+                            view.isHidden = true
+                        }
+                        
+                        cell.sensitiveContentWarningBtn.isHidden = true
+                        cell.unblockBtn.isHidden = true
+                        cell.blockedLbl.isHidden = true
+                        
+                    } else {
+                        
+                        for view in cell.subviews {
+                            view.isHidden = true
+                        }
+                        
+                        cell.sensitiveContentWarningBtn.isHidden = false
+                        
+                    }
+                    
+                }
+                
             }
             
         } else {
             
+            // no user signed in
+            
             cell.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
             cell.questionLbl.textColor = .white
             cell.deleteBtn.isHidden = true
+            cell.reportBtn.isHidden = false
             
             if polls[indexPath.row].userVote != 0 {
                 
@@ -539,6 +651,57 @@ extension PollsVC: UITableViewDelegate, UITableViewDataSource {
                 
             }
             
+            if polls[indexPath.row].isSensitive == true {
+                
+                let ignore = (UserDefaults.standard.bool(forKey: polls[indexPath.row].docID + "ignoreSensitiveContent"))
+                
+                if ignore == true {
+                    
+                    for view in cell.subviews {
+                        view.isHidden = false
+                    }
+                    
+                    cell.sensitiveContentWarningBtn.isHidden = true
+                    cell.blockedLbl.isHidden = true
+                    cell.unblockBtn.isHidden = true
+                    
+                    
+                } else {
+                    
+                    for view in cell.subviews {
+                        view.isHidden = true
+                    }
+                    
+                    cell.sensitiveContentWarningBtn.isHidden = false
+                    
+                }
+                
+            }
+            
+        }
+        
+        var blocked: Bool = false
+        cell.unblockBtn.setTitle("unblock \(polls[indexPath.row].author)?", for: .normal)
+        
+        for uid in blockedUIDs {
+            
+            if polls[indexPath.row].authorUID == uid {
+                blocked = true
+                break
+            }
+            
+        }
+        
+        if blocked == true {
+            cell.cellView.isHidden = true
+            cell.sensitiveContentWarningBtn.isHidden = true
+            cell.blockedLbl.isHidden = false
+            cell.unblockBtn.isHidden = false
+        } else {
+            cell.cellView.isHidden = false
+            cell.sensitiveContentWarningBtn.isHidden = true
+            cell.blockedLbl.isHidden = true
+            cell.unblockBtn.isHidden = true
         }
         
         cell.questionLbl.sizeToFit()
@@ -566,6 +729,49 @@ extension PollsVC: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension PollsVC: PollsCellDelegate {
+    
+    func unblock(row: Int) {
+        
+        guard let user = Auth.auth().currentUser else {
+            return
+        }
+        
+        Firestore.firestore().collection("Users").document(user.uid).collection("Blocked").document(polls[row].authorUID).getDocument { (snap, err) in
+            
+            guard err == nil else {
+                print(err?.localizedDescription ?? "")
+                return
+            }
+            
+            guard let snap = snap else {
+                return
+            }
+            
+            snap.reference.delete()
+            blockedUIDs = blockedUIDs.filter { $0 != self.polls[row].authorUID }
+            self.tableView.reloadData()
+            
+        }
+        
+    }
+    
+    func ignoreSensitiveContent(row: Int) {
+        tableView.reloadData()
+        UserDefaults.standard.set(true, forKey: polls[row].docID + "ignoreSensitiveContent")
+    }
+    
+    
+    func reportBtnPressed(row: Int) {
+        
+        reportPollAlert(row: row)
+        
+    }
+    
+    func deleteBtnPressed(row: Int) {
+        
+        deletePollAlert(row: row)
+        
+    }
     
     func didSelectAnswer1(row: Int) {
         
@@ -671,7 +877,7 @@ extension PollsVC: PollsCellDelegate {
                     let totalVotes = data?["totalVotes"] as? Int
                     snap.reference.updateData(["answer1Score":answer1Score! + 1,
                                                 "totalVotes":totalVotes! + 1])
-                    UserDefaults.standard.set(1, forKey: self.polls[row].docID)
+                    UserDefaults.standard.set(1, forKey: self.polls[row].docID + "vote")
                 }
                 
             }
@@ -778,7 +984,7 @@ extension PollsVC: PollsCellDelegate {
                     let totalVotes = data?["totalVotes"] as? Int
                     snap.reference.updateData(["answer2Score":answer2Score! + 1,
                                                 "totalVotes":totalVotes! + 1])
-                    UserDefaults.standard.set(2, forKey: self.polls[row].docID)
+                    UserDefaults.standard.set(2, forKey: self.polls[row].docID + "vote")
                 }
                 
             }
@@ -884,7 +1090,7 @@ extension PollsVC: PollsCellDelegate {
                     let totalVotes = data?["totalVotes"] as? Int
                     snap.reference.updateData(["answer3Score":answer3Score! + 1,
                                                 "totalVotes":totalVotes! + 1])
-                    UserDefaults.standard.set(3, forKey: self.polls[row].docID)
+                    UserDefaults.standard.set(3, forKey: self.polls[row].docID + "vote")
                 }
                 
             }
@@ -991,7 +1197,7 @@ extension PollsVC: PollsCellDelegate {
                     let totalVotes = data?["totalVotes"] as? Int
                     snap.reference.updateData(["answer4Score":answer4Score! + 1,
                                                 "totalVotes":totalVotes! + 1])
-                    UserDefaults.standard.set(4, forKey: self.polls[row].docID)
+                    UserDefaults.standard.set(4, forKey: self.polls[row].docID + "vote")
                 }
                 
             }
@@ -1000,10 +1206,25 @@ extension PollsVC: PollsCellDelegate {
         
     }
     
-    func deleteBtnPressed(row: Int) {
-        
-        deletePollAlert(row: row)
-        
+}
+
+extension PollsVC: MFMailComposeViewControllerDelegate {
+    
+    func sendEmail(text: String) {
+        if MFMailComposeViewController.canSendMail() {
+            let mail = MFMailComposeViewController()
+            mail.mailComposeDelegate = self
+            mail.setToRecipients(["leondjust@me.com"])
+            mail.setMessageBody("new harrasment report \ntext: \(text)", isHTML: true)
+
+            present(mail, animated: true)
+        } else {
+            // show failure alert
+        }
+    }
+
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true)
     }
     
 }

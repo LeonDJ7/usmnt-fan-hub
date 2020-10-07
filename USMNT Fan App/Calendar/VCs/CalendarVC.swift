@@ -107,13 +107,17 @@ class CalendarVC: UIViewController {
     
     func applyAnchors() {
         
-        yearLbl.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
+        if #available(iOS 11.0, *) {
+            yearLbl.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
+        } else {
+            yearLbl.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: view.centerXAnchor, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
+        }
         
         tableView.anchors(top: yearLbl.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        increaseYearBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: yearLbl.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
+        increaseYearBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: yearLbl.rightAnchor, leftPad: 0, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: yearLbl.centerYAnchor, centerYPad: 0, height: 30, width: 60)
         
-        decreaseYearBtn.anchors(top: view.topAnchor, topPad: 60, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: yearLbl.leftAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 60)
+        decreaseYearBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: yearLbl.leftAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: yearLbl.centerYAnchor, centerYPad: 0, height: 30, width: 60)
         
     }
     

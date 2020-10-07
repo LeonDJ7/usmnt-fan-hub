@@ -38,6 +38,8 @@ class SettingsVC: UIViewController {
         tf.borderStyle = .roundedRect
         tf.font = UIFont(name: "Avenir-Book", size: 15)
         tf.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        tf.textColor = .darkGray
+        tf.backgroundColor = .white
         return tf
     }()
     
@@ -77,10 +79,11 @@ class SettingsVC: UIViewController {
         return btn
     }()
     
-    let privacyBtn: UIButton = {
+    let rateAppBtn: UIButton = {
         let btn = UIButton()
         btn.titleLabel?.font = UIFont(name: "Avenir-Book", size: 15)
         btn.setTitle("rate app", for: .normal)
+        btn.addTarget(self, action: #selector(rateApp), for: .touchUpInside)
         btn.layer.borderWidth = 1
         btn.layer.borderColor = UIColor.white.cgColor
         btn.layer.cornerRadius = 5
@@ -117,7 +120,7 @@ class SettingsVC: UIViewController {
         view.addSubview(usernameLbl)
         view.addSubview(usernameTF)
         view.addSubview(logOutBtn)
-        view.addSubview(privacyBtn)
+        view.addSubview(rateAppBtn)
         view.addSubview(confirmImageBtn)
         view.addSubview(confirmUsernameBtn)
         
@@ -135,7 +138,7 @@ class SettingsVC: UIViewController {
         
         logOutBtn.anchors(top: usernameTF.bottomAnchor, topPad: 15, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        privacyBtn.anchors(top: logOutBtn.bottomAnchor, topPad: 15, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        rateAppBtn.anchors(top: logOutBtn.bottomAnchor, topPad: 15, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 70, right: view.rightAnchor, rightPad: -70, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         confirmImageBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: profileImageView.rightAnchor, leftPad: 10, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: profileImageView.centerYAnchor, centerYPad: 0, height: 30, width: 30)
         
@@ -206,12 +209,12 @@ class SettingsVC: UIViewController {
         
     }
     
-    func rateApp() {
+    @objc func rateApp() {
         
         if #available(iOS 10.3, *) {
             SKStoreReviewController.requestReview()
 
-        } else if let url = URL(string: "itms-apps://itunes.apple.com/app/" + "appId") {
+        } else if let url = URL(string: "itms-apps://itunes.apple.com/app/" + "\(1527654710)") {
             if #available(iOS 10, *) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
 
@@ -300,8 +303,9 @@ class SettingsVC: UIViewController {
                     
                     try firebaseAuth.signOut()
                     userHasChanged = true
-                    self.dismiss(animated: true, completion: nil)
-                    userHasChanged = true
+                    self.dismiss(animated: true) {
+                        loadBlockedUsers()
+                    }
                     
                 } catch let signOutError as NSError {
                     print ("Error signing out: %@", signOutError)

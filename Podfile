@@ -11,9 +11,9 @@ target 'USMNT Fan App' do
 	pod 'Firebase/Firestore'
 	pod 'FirebaseUI/Auth'
     	pod 'Firebase/Storage'
+	pod 'Firebase/Messaging'
     	pod 'Firebase/Analytics'
 	pod 'Google-Mobile-Ads-SDK'
 	pod 'SwiftSoup'
-	pod 'Firebase/Messaging'
 	
 end
