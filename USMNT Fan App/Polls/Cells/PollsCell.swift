@@ -274,7 +274,7 @@ class PollsCell: UITableViewCell {
         
         reportBtn.anchors(top: cellView.topAnchor, topPad: 13, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
         
-        questionLbl.anchors(top: cellView.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        questionLbl.anchors(top: cellView.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: reportBtn.leftAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         timeRemainingLbl.anchors(top: questionLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: cellView.leftAnchor, leftPad: 5, right: cellView.rightAnchor, rightPad: -5, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 22, width: 0)
         

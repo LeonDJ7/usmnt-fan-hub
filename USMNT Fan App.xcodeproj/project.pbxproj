@@ -14,6 +14,7 @@
 		7518B81824396DDB00265EE4 /* ForumHomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81724396DDB00265EE4 /* ForumHomeVC.swift */; };
 		7518B81A24396E1E00265EE4 /* AddTopicVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81924396E1E00265EE4 /* AddTopicVC.swift */; };
 		7518B81C24396E3B00265EE4 /* TopicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518B81B24396E3B00265EE4 /* TopicCell.swift */; };
+		7525712525B3A48E0061EB57 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7525712425B3A48E0061EB57 /* Utils.swift */; };
 		752A3A4621F0727A00566127 /* ArticlesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A3A4521F0727A00566127 /* ArticlesVC.swift */; };
 		752A7B962319D24F00C41CF1 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752A7B952319D24F00C41CF1 /* AlertController.swift */; };
 		7538A4A3243C017D0037B172 /* UserTopicsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7538A4A2243C017D0037B172 /* UserTopicsVC.swift */; };
@@ -61,6 +62,7 @@
 		7518B81724396DDB00265EE4 /* ForumHomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ForumHomeVC.swift; path = ../ForumHomeVC.swift; sourceTree = "<group>"; };
 		7518B81924396E1E00265EE4 /* AddTopicVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AddTopicVC.swift; path = ../AddTopicVC.swift; sourceTree = "<group>"; };
 		7518B81B24396E3B00265EE4 /* TopicCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TopicCell.swift; path = ../TopicCell.swift; sourceTree = "<group>"; };
+		7525712425B3A48E0061EB57 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		752A3A4521F0727A00566127 /* ArticlesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesVC.swift; sourceTree = "<group>"; };
 		752A7B952319D24F00C41CF1 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
 		7538A4A2243C017D0037B172 /* UserTopicsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserTopicsVC.swift; path = ../UserTopicsVC.swift; sourceTree = "<group>"; };
@@ -311,6 +313,7 @@
 				750F89C422E25687006EA794 /* Player.swift */,
 				754164F622F74CCE00EB230D /* Poll.swift */,
 				75EE814124242CD700DC0F79 /* PaddingLabel.swift */,
+				7525712425B3A48E0061EB57 /* Utils.swift */,
 			);
 			path = "Custom Classes";
 			sourceTree = "<group>";
@@ -353,8 +356,8 @@
 				75D0077221E7F36800EBFB8D /* Sources */,
 				75D0077321E7F36800EBFB8D /* Frameworks */,
 				75D0077421E7F36800EBFB8D /* Resources */,
-				0B45596DE9628F4E68DE0E80 /* [CP] Embed Pods Frameworks */,
-				9CA6449F89066CD69CAB792C /* [CP] Copy Pods Resources */,
+				865F20C2C0544A46DE15D496 /* [CP] Embed Pods Frameworks */,
+				3631F9AF955F758181BEA481 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -372,7 +375,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1010;
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = "Leon Djusberg";
 				TargetAttributes = {
 					75D0077521E7F36800EBFB8D = {
@@ -413,23 +416,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0B45596DE9628F4E68DE0E80 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		157EE75A13DD82B47ACF5717 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,7 +438,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9CA6449F89066CD69CAB792C /* [CP] Copy Pods Resources */ = {
+		3631F9AF955F758181BEA481 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -469,6 +455,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		865F20C2C0544A46DE15D496 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-USMNT Fan App/Pods-USMNT Fan App-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -481,6 +484,7 @@
 				7518B81824396DDB00265EE4 /* ForumHomeVC.swift in Sources */,
 				752A7B962319D24F00C41CF1 /* AlertController.swift in Sources */,
 				75D0079021E8010900EBFB8D /* Extensions.swift in Sources */,
+				7525712525B3A48E0061EB57 /* Utils.swift in Sources */,
 				75D7E88922C42FBB009EBF75 /* RosterVC.swift in Sources */,
 				75AB04FC24ABF844005C892C /* Article.swift in Sources */,
 				7560441522DD163000A73201 /* HomeVC.swift in Sources */,
@@ -557,6 +561,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -618,6 +623,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -657,12 +663,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USMNT Fan App/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
 				PRODUCT_NAME = "USMNT Fan Hub";
 				SWIFT_VERSION = 5.0;
@@ -680,12 +686,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5PSSV7624A;
 				INFOPLIST_FILE = "USMNT Fan App/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
 				PRODUCT_NAME = "USMNT Fan Hub";
 				SWIFT_VERSION = 5.0;

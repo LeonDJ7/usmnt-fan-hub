@@ -277,6 +277,11 @@ extension UserPollsVC: UITableViewDelegate, UITableViewDataSource {
         cell.answer3PercentLbl.text = String(format: "%.0f", a3perc) + "%"
         cell.answer4PercentLbl.text = String(format: "%.0f", a4perc) + "%"
         
+        cell.answer1PercentLbl.isHidden = false
+        cell.answer2PercentLbl.isHidden = false
+        cell.answer3PercentLbl.isHidden = false
+        cell.answer4PercentLbl.isHidden = false
+        
         cell.answer1Btn.isEnabled = false
         cell.answer2Btn.isEnabled = false
         cell.answer3Btn.isEnabled = false

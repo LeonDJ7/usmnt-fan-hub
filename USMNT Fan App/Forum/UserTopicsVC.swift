@@ -90,6 +90,7 @@ class UserTopicsVC: UIViewController {
                         if let snap = snap2 {
                             
                             let data = snap.data()!
+                            let lastActiveTimestamp = data["lastActiveTimestamp"] as! Double
                             let timestamp = data["timestamp"] as! Double
                             let topic = data["topic"] as! String
                             let author = data["author"] as! String
@@ -99,7 +100,7 @@ class UserTopicsVC: UIViewController {
                             let commentCount = data["commentCount"] as! Int
                             let dbref = Firestore.firestore().collection("Topics").document(id)
                             let isSensitive = data["isSensitive"] as! Bool
-                            self.forumTopics.append(Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount, isSensitive: isSensitive))
+                            self.forumTopics.append(Topic(topic: topic, lastActiveTimestamp: lastActiveTimestamp, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount, isSensitive: isSensitive))
                             self.forumTopics.sort { $0.timestamp > $1.timestamp }
                             self.tableView.reloadData()
                         }
@@ -131,7 +132,7 @@ extension UserTopicsVC: UITableViewDelegate, UITableViewDataSource {
         
         cell.setUserProfileImage(uid: forumTopics[indexPath.row].authorUID)
         
-        let lastActiveDate = Date(timeIntervalSince1970: forumTopics[indexPath.row].timestamp)
+        let lastActiveDate = Date(timeIntervalSince1970: forumTopics[indexPath.row].lastActiveTimestamp)
         let diffInHours = Calendar.current.dateComponents([.hour], from: lastActiveDate, to: Date()).hour ?? 0
         
         if diffInHours >= 8760 {

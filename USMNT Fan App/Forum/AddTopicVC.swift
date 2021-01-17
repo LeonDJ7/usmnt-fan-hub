@@ -41,7 +41,8 @@ class AddTopicVC: UIViewController {
         let tv = UITextView()
         tv.font = UIFont(name: "Avenir-Book", size: 17)
         tv.layer.cornerRadius = 5
-        tv.autocorrectionType = .default
+        tv.autocapitalizationType = .none
+        tv.autocorrectionType = .no
         tv.textColor = .white
         tv.tag = 0
         tv.backgroundColor = #colorLiteral(red: 0.937254902, green: 0.5529411765, blue: 0.537254902, alpha: 1)
@@ -59,7 +60,8 @@ class AddTopicVC: UIViewController {
         let tv = UITextView()
         tv.font = UIFont(name: "Avenir-Book", size: 15)
         tv.layer.cornerRadius = 5
-        tv.autocorrectionType = .default
+        tv.autocapitalizationType = .none
+        tv.autocorrectionType = .no
         tv.textColor = .white
         tv.tag = 1
         tv.backgroundColor = #colorLiteral(red: 0.937254902, green: 0.5529411765, blue: 0.537254902, alpha: 1)
@@ -157,6 +159,7 @@ class AddTopicVC: UIViewController {
         let timestamp = Double(NSDate().timeIntervalSince1970)
         
         let questionData : [String : Any] = [
+            "lastActiveTimestamp" : timestamp,
             "timestamp" : timestamp,
             "author" : user.displayName!,
             "authorUID" : user.uid,
@@ -179,7 +182,7 @@ class AddTopicVC: UIViewController {
         dismiss(animated: true) {
             
             // refresh parentVC tableview
-            let newTopic = Topic(topic: self.topicTV.text!, timestamp: timestamp, author: user.displayName!, authorUID: user.uid, text: self.descriptionTV.text!, id: ref!.documentID, dbref: Firestore.firestore().collection("Topics").document(ref!.documentID), commentCount: 0, isSensitive: false)
+            let newTopic = Topic(topic: self.topicTV.text!, lastActiveTimestamp: timestamp, timestamp: timestamp, author: user.displayName!, authorUID: user.uid, text: self.descriptionTV.text!, id: ref!.documentID, dbref: Firestore.firestore().collection("Topics").document(ref!.documentID), commentCount: 0, isSensitive: false)
             self.parentVC.allTopics.append(newTopic)
             self.parentVC.naturalTopics.append(newTopic)
             self.parentVC.topicsDisplayed.append(newTopic)

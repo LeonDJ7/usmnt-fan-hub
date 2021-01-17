@@ -18,8 +18,8 @@ class CommentCell: UITableViewCell {
     var parentCell: CommentCell?
     var blockedUIDs: [String] = []
     
-    let subTableView: SubTableView = {
-        let tv = SubTableView()
+    let subTableView: CustomTableView = {
+        let tv = CustomTableView()
         tv.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
         tv.separatorStyle = .none
         tv.allowsSelection = false
@@ -242,8 +242,6 @@ class CommentCell: UITableViewCell {
         
         deletedLbl.anchors(top: textLbl.topAnchor, topPad: 0, bottom: textLbl.bottomAnchor, bottomPad: 0, left: textLbl.leftAnchor, leftPad: 0, right: textLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        commentsOutOfRangeBtn.anchors(top: likeBtn.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: leftAnchor, leftPad: 0, right: rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 0)
-        
         sensitiveContentWarningBtn.anchors(top: textLbl.topAnchor, topPad: 0, bottom: textLbl.bottomAnchor, bottomPad: 0, left: textLbl.leftAnchor, leftPad: 0, right: textLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         blockedLbl.anchors(top: textLbl.topAnchor, topPad: 0, bottom: textLbl.bottomAnchor, bottomPad: 0, left: textLbl.leftAnchor, leftPad: 0, right: textLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
@@ -271,7 +269,7 @@ class CommentCell: UITableViewCell {
         let date = Date(timeIntervalSince1970: timestamp)
         let formatter = DateFormatter()
         formatter.timeZone = TimeZone.current
-        formatter.dateFormat = "dd-MM-yyyy HH:mm"
+        formatter.dateFormat = "MM-dd-yyyy HH:mm"
         let dateString = formatter.string(from: date)
         
         return dateString
@@ -382,6 +380,8 @@ extension CommentCell: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "subCommentCell") as! CommentCell
+        
+        cell.contentView.isUserInteractionEnabled = false
         
         if let user = Auth.auth().currentUser {
             
@@ -583,11 +583,15 @@ extension CommentCell: UITableViewDelegate, UITableViewDataSource {
             
         }
         
-        if comment.comments[indexPath.row].depth == 5 {
-            cell.commentsOutOfRangeBtn.isHidden = false
-            cell.subCommentBtn.isHidden = true
+        if comment.comments[indexPath.row].depth % 6 == 0 {
+            cell.likeBtn.removeFromSuperview()
+            cell.dislikeBtn.removeFromSuperview()
+            cell.likesLbl.removeFromSuperview()
+            cell.subCommentBtn.removeFromSuperview()
             cell.subTableView.removeFromSuperview()
-            cell.horizontalSeperatorView.isHidden = true
+            cell.horizontalSeperatorView.removeFromSuperview()
+            cell.commentsOutOfRangeBtn.isHidden = false
+            cell.commentsOutOfRangeBtn.anchors(top: cell.textLbl.bottomAnchor, topPad: 0, bottom: cell.bottomAnchor, bottomPad: -10, left: cell.leftAnchor, leftPad: 0, right: cell.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 0)
         }
         
         if cell.comment.commentCount == 0 {
@@ -635,25 +639,5 @@ protocol CommentCellDelegate : class {
     func ignoreCommentSensitiveContent(comment: Comment, cell: CommentCell)
     
     func unblockComment(comment: Comment, cell: CommentCell)
-    
-}
-
-class SubTableView: UITableView {
-    
-    override var intrinsicContentSize: CGSize {
-        self.layoutIfNeeded()
-        return self.contentSize
-    }
-
-    override var contentSize: CGSize {
-        didSet {
-            self.invalidateIntrinsicContentSize()
-        }
-    }
-
-    override func reloadData() {
-        super.reloadData()
-        self.invalidateIntrinsicContentSize()
-    }
     
 }

@@ -695,7 +695,6 @@ func scrapeU17RosterFromWikipedia() {
 
     task.resume()
     
-    
 }
 
 func loadBlockedUsers() {

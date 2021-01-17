@@ -13,6 +13,7 @@ import Firebase
 class Topic {
     
     let topic: String
+    let lastActiveTimestamp: Double
     let timestamp: Double
     let author: String
     let authorUID: String
@@ -25,6 +26,7 @@ class Topic {
     
     init() {
         self.topic = ""
+        self.lastActiveTimestamp = 0.0
         self.timestamp = 0.0
         self.author = ""
         self.authorUID = ""
@@ -35,9 +37,10 @@ class Topic {
         self.isSensitive = false
     }
     
-    init(topic: String, timestamp: Double, author: String, authorUID: String, text: String, id: String, dbref: DocumentReference, commentCount: Int, isSensitive: Bool) {
+    init(topic: String, lastActiveTimestamp: Double, timestamp: Double, author: String, authorUID: String, text: String, id: String, dbref: DocumentReference, commentCount: Int, isSensitive: Bool) {
         
         self.topic = topic
+        self.lastActiveTimestamp = lastActiveTimestamp
         self.timestamp = timestamp
         self.author = author
         self.authorUID = authorUID
@@ -110,7 +113,7 @@ class Topic {
             if let snap = snap {
                 
                 let FIRCommentCount = snap.data()!["commentCount"] as! Int
-                snap.reference.updateData(["commentCount" : FIRCommentCount + 1, "timestamp" : Date().timeIntervalSince1970])
+                snap.reference.updateData(["commentCount" : FIRCommentCount + 1, "lastActiveTimestamp" : Date().timeIntervalSince1970])
                 
             }
             
@@ -257,7 +260,7 @@ class Comment {
         
         // update topic timestamp as well, to inform lastActiveLbl
         
-        Firestore.firestore().collection("Topics").document(self.topicID).updateData(["timestamp" : Date().timeIntervalSince1970])
+        Firestore.firestore().collection("Topics").document(self.topicID).updateData(["lastActiveTimestamp" : Date().timeIntervalSince1970])
         
         self.dbref.getDocument { (snap, err) in
             

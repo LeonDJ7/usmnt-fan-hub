@@ -25,6 +25,16 @@ class AddCommentVC: UIViewController {
         return btn
     }()
     
+    let backBtn: UIButton = {
+        let btn = UIButton()
+        btn.addTarget(self, action: #selector(goBack), for: .touchUpInside)
+        btn.setImage(UIImage(named: "BackArrow"), for: .normal)
+        return btn
+    }()
+    
+    let scrollView = UIScrollView()
+    let scrollViewContainer = UIView()
+    
     let parentTextLbl: UILabel = {
         let lbl = UILabel()
         lbl.numberOfLines = 0
@@ -45,18 +55,27 @@ class AddCommentVC: UIViewController {
         tv.textColor = .lightGray
         tv.text = "..."
         tv.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
-        tv.autocorrectionType = .default
+        tv.autocapitalizationType = .none
+        tv.autocorrectionType = .no
         return tv
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        scrollView.delegate = self
+        scrollView.contentSize.height = self.view.frame.size.height * 3
+        scrollView.contentSize.width = self.view.frame.size.width
         replyTextView.delegate = self
         replyTextView.becomeFirstResponder()
         replyTextView.selectedTextRange = replyTextView.textRange(from: replyTextView.beginningOfDocument, to: replyTextView.beginningOfDocument)
         addDoneButtonOnKeyboard()
         setupLayout()
+        
+        let contentRect: CGRect = scrollView.subviews.reduce(into: .zero) { rect, view in
+            rect = rect.union(view.frame)
+        }
+        scrollView.contentSize = CGSize(width: contentRect.size.width, height: contentRect.size.height + 3000)
+        
     }
     
     func setupLayout() {
@@ -71,14 +90,23 @@ class AddCommentVC: UIViewController {
     
     func addSubviews() {
         
+        view.addSubview(backBtn)
         view.addSubview(postBtn)
-        view.addSubview(parentTextLbl)
-        view.addSubview(seperatorView)
-        view.addSubview(replyTextView)
+        view.addSubview(scrollView)
+        scrollView.addSubview(scrollViewContainer)
+        scrollViewContainer.addSubview(parentTextLbl)
+        scrollViewContainer.addSubview(seperatorView)
+        scrollViewContainer.addSubview(replyTextView)
         
     }
     
     func applyAnchors() {
+        
+        if #available(iOS 11.0, *) {
+            backBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        } else {
+            backBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        }
         
         if #available(iOS 11.0, *) {
             postBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 20, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
@@ -86,11 +114,25 @@ class AddCommentVC: UIViewController {
             postBtn.anchors(top: view.topAnchor, topPad: 30, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         }
         
-        parentTextLbl.anchors(top: postBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollViewContainer.translatesAutoresizingMaskIntoConstraints = false
         
-        seperatorView.anchors(top: parentTextLbl.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
+        scrollView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        scrollView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: backBtn.bottomAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(self.tabBarController?.tabBar.frame.size.height)!).isActive = true
         
-        replyTextView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -30, left: view.leftAnchor, leftPad: 30, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        scrollViewContainer.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
+        scrollViewContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        scrollViewContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        scrollViewContainer.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        scrollViewContainer.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        
+        parentTextLbl.anchors(top: scrollViewContainer.topAnchor, topPad: 20, bottom: nil, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 30, right: scrollViewContainer.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        seperatorView.anchors(top: parentTextLbl.bottomAnchor, topPad: 20, bottom: nil, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 30, right: scrollViewContainer.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
+        
+        replyTextView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: scrollViewContainer.bottomAnchor, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 30, right: scrollViewContainer.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1500, width: 0)
         
     }
     
@@ -109,7 +151,7 @@ class AddCommentVC: UIViewController {
         replyTextView.inputAccessoryView = doneToolbar
     }
 
-    @objc func doneButtonAction(){
+    @objc func doneButtonAction() {
         replyTextView.resignFirstResponder()
     }
     
@@ -147,44 +189,46 @@ class AddCommentVC: UIViewController {
             
             parentCell.subTableView.isHidden = false
             
-            dismiss(animated: true) {
-                // refresh tableView with new comment, should automatically include new comment
-                
-                if let parentVC = self.parentTopicVC {
-                    let deadline = DispatchTime.now() + .milliseconds(100)
-                    DispatchQueue.main.asyncAfter(deadline: deadline) {
-                        parentVC.tableView.reloadData()
-                    }
+            // refresh tableView with new comment, should automatically include new comment
+            
+            if let parentVC = self.parentTopicVC {
+                let deadline = DispatchTime.now() + .milliseconds(100)
+                DispatchQueue.main.asyncAfter(deadline: deadline) {
+                    parentVC.tableView.reloadData()
                 }
-                
-                if let parentVC = self.parentSubCommentVC {
-                    let deadline = DispatchTime.now() + .milliseconds(100)
-                    DispatchQueue.main.asyncAfter(deadline: deadline) {
-                        parentVC.tableView.reloadData()
-                    }
-                }
-                
             }
+            
+            if let parentVC = self.parentSubCommentVC {
+                let deadline = DispatchTime.now() + .milliseconds(100)
+                DispatchQueue.main.asyncAfter(deadline: deadline) {
+                    parentVC.tableView.reloadData()
+                }
+            }
+            
+            navigationController?.popViewController(animated: true)
             
         } else {
             
             parentTopic.addComment(timestamp: Date().timeIntervalSince1970, author: user.displayName!, authorUID: user.uid, text: replyTextView.text)
             
-            dismiss(animated: true) {
-                // refresh tableView with new comment, should automatically include new comment
-                
-                if let parentVC = self.parentTopicVC {
-                    parentVC.tableView.reloadData()
-                }
-                
-                if let parentVC = self.parentSubCommentVC {
-                    parentVC.tableView.reloadData()
-                }
-                
+            // refresh tableView with new comment, should automatically include new comment
+            
+            if let parentVC = self.parentTopicVC {
+                parentVC.tableView.reloadData()
             }
+            
+            if let parentVC = self.parentSubCommentVC {
+                parentVC.tableView.reloadData()
+            }
+            
+            navigationController?.popViewController(animated: true)
             
         }
         
+    }
+    
+    @objc func goBack() {
+        navigationController?.popViewController(animated: true)
     }
 
 }

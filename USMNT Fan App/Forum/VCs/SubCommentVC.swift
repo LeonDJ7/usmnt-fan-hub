@@ -17,8 +17,11 @@ class SubCommentVC: UIViewController {
     var topic: Topic = Topic()
     var commentRow: Int?
     
-    let tableView: UITableView = {
-        let tv = UITableView()
+    let scrollView = UIScrollView()
+    let scrollViewContainer = UIView()
+    
+    let tableView: CustomTableView = {
+        let tv = CustomTableView()
         tv.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
         tv.separatorStyle = .none
         tv.allowsSelection = false
@@ -99,13 +102,6 @@ class SubCommentVC: UIViewController {
         return lbl
     }()
     
-    lazy var refresher: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.tintColor = .darkGray
-        refreshControl.addTarget(self, action: #selector(requestData), for: .valueChanged)
-        return refreshControl
-    }()
-    
     let activityIndicatorView: UIView = {
         let view = UIView()
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
@@ -163,9 +159,12 @@ class SubCommentVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        scrollView.delegate = self
+        scrollView.contentSize.height = self.view.frame.size.height * 3
+        scrollView.contentSize.width = self.view.frame.size.width
+        
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.refreshControl = refresher
         
         comment.comments.sort { $0.likes > $1.likes }
         
@@ -174,6 +173,11 @@ class SubCommentVC: UIViewController {
         
         tableView.reloadData()
         activityIndicator.startAnimating()
+        
+        let contentRect: CGRect = scrollView.subviews.reduce(into: .zero) { rect, view in
+            rect = rect.union(view.frame)
+        }
+        scrollView.contentSize = contentRect.size
 
     }
     
@@ -199,23 +203,25 @@ class SubCommentVC: UIViewController {
     func addSubviews() {
         
         view.addSubview(backBtn)
-        view.addSubview(authorImageView)
-        view.addSubview(authorAndTimePostedLbl)
-        view.addSubview(textLbl)
-        view.addSubview(likeBtn)
-        view.addSubview(likesLbl)
-        view.addSubview(dislikeBtn)
-        view.addSubview(commentBtn)
-        view.addSubview(seperatorView)
-        view.addSubview(tableView)
-        view.addSubview(deletedLbl)
+        view.addSubview(scrollView)
+        scrollView.addSubview(scrollViewContainer)
+        scrollViewContainer.addSubview(authorImageView)
+        scrollViewContainer.addSubview(authorAndTimePostedLbl)
+        scrollViewContainer.addSubview(textLbl)
+        scrollViewContainer.addSubview(likeBtn)
+        scrollViewContainer.addSubview(likesLbl)
+        scrollViewContainer.addSubview(dislikeBtn)
+        scrollViewContainer.addSubview(commentBtn)
+        scrollViewContainer.addSubview(seperatorView)
+        scrollViewContainer.addSubview(tableView)
+        scrollViewContainer.addSubview(deletedLbl)
         view.addSubview(activityIndicatorView)
         activityIndicatorView.addSubview(activityIndicator)
-        view.addSubview(sensitiveContentWarningBtn)
-        view.addSubview(sensitiveContentUnderline)
-        view.addSubview(blockedLbl)
-        view.addSubview(unblockBtn)
-        view.addSubview(unblockUnderline)
+        scrollViewContainer.addSubview(sensitiveContentWarningBtn)
+        scrollViewContainer.addSubview(sensitiveContentUnderline)
+        scrollViewContainer.addSubview(blockedLbl)
+        scrollViewContainer.addSubview(unblockBtn)
+        scrollViewContainer.addSubview(unblockUnderline)
         
     }
     
@@ -227,13 +233,27 @@ class SubCommentVC: UIViewController {
             backBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         }
         
-        authorImageView.anchors(top: backBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollViewContainer.translatesAutoresizingMaskIntoConstraints = false
         
-        authorAndTimePostedLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: authorImageView.rightAnchor, leftPad: 5, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        scrollView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        scrollView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: backBtn.bottomAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(self.tabBarController?.tabBar.frame.size.height)!).isActive = true
         
-        textLbl.anchors(top: authorImageView.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        scrollViewContainer.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
+        scrollViewContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        scrollViewContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        scrollViewContainer.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        scrollViewContainer.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         
-        likeBtn.anchors(top: textLbl.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 30)
+        authorImageView.anchors(top: scrollViewContainer.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: scrollView.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
+        
+        authorAndTimePostedLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: authorImageView.rightAnchor, leftPad: 5, right: scrollView.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        
+        textLbl.anchors(top: authorImageView.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: scrollView.leftAnchor, leftPad: 20, right: scrollView.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        likeBtn.anchors(top: textLbl.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: scrollView.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 30, width: 30)
         
         likesLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: likeBtn.rightAnchor, leftPad: 3, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: likeBtn.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
@@ -241,9 +261,9 @@ class SubCommentVC: UIViewController {
         
         commentBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: dislikeBtn.rightAnchor, leftPad: 6, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: likeBtn.centerYAnchor, centerYPad: 0, height: 30, width: 30)
         
-        seperatorView.anchors(top: commentBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
+        seperatorView.anchors(top: commentBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: scrollView.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
         
-        tableView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 10, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        tableView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: scrollView.bottomAnchor, bottomPad: 0, left: scrollView.leftAnchor, leftPad: 0, right: scrollView.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
 
         deletedLbl.anchors(top: textLbl.topAnchor, topPad: 0, bottom: textLbl.bottomAnchor, bottomPad: 0, left: textLbl.leftAnchor, leftPad: 0, right: textLbl.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
@@ -257,7 +277,7 @@ class SubCommentVC: UIViewController {
         
         blockedLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: textLbl.centerXAnchor, centerXPad: 0, centerY: textLbl.centerYAnchor, centerYPad: 0, height: 0, width: 0)
         
-        unblockBtn.anchors(top: blockedLbl.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        unblockBtn.anchors(top: blockedLbl.bottomAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: scrollView.leftAnchor, leftPad: 0, right: scrollView.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         unblockUnderline.anchors(top: unblockBtn.bottomAnchor, topPad: -3, bottom: nil, bottomPad: 0, left: unblockBtn.leftAnchor, leftPad: 0, right: unblockBtn.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
         
@@ -288,37 +308,6 @@ class SubCommentVC: UIViewController {
         }
         
         likesLbl.text = "\(comment.likes)"
-        
-    }
-    
-    @objc func requestData() {
-        
-        topic.dbref.getDocument { (snap, err) in
-            
-            if let snap = snap {
-                
-                let data = snap.data()!
-                let timestamp = data["timestamp"] as! Double
-                let topic = data["topic"] as! String
-                let author = data["author"] as! String
-                let authorUID = data["authorUID"] as! String
-                let text = data["text"] as! String
-                let id = snap.documentID
-                let dbref = Firestore.firestore().collection("Topics").document(id)
-                let commentCount = data["commentCount"] as! Int
-                let isSensitive = data["isSensitive"] as! Bool
-                self.topic = (Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount, isSensitive: isSensitive))
-                
-            }
-            
-        }
-        
-        let deadline = DispatchTime.now() + .seconds(1)
-        DispatchQueue.main.asyncAfter(deadline: deadline) {
-            self.comment.comments.sort { $0.likes > $1.likes }
-            self.tableView.reloadData()
-            self.refresher.endRefreshing()
-        }
         
     }
     
@@ -393,7 +382,7 @@ class SubCommentVC: UIViewController {
         let date = Date(timeIntervalSince1970: timestamp)
         let formatter = DateFormatter()
         formatter.timeZone = TimeZone.current
-        formatter.dateFormat = "dd-MM-yyyy HH:mm"
+        formatter.dateFormat = "MM-dd-yyyy HH:mm"
         let dateString = formatter.string(from: date)
         
         return dateString
@@ -408,7 +397,7 @@ class SubCommentVC: UIViewController {
             vc.parentIsComment = true
             vc.parentComment = self.comment
             vc.parentSubCommentVC = self
-            present(vc, animated: true, completion: nil)
+            navigationController?.pushViewController(vc, animated: true)
             
         } else {
             
@@ -670,6 +659,7 @@ extension SubCommentVC: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell") as! CommentCell
         
         // set all data
+        cell.contentView.isUserInteractionEnabled = false
         
         cell.delegate = self
         cell.parentSubCommentVC = self
@@ -713,7 +703,7 @@ extension SubCommentVC: UITableViewDelegate, UITableViewDataSource {
             
             if let user = Auth.auth().currentUser {
                 
-                if topic.comments[indexPath.row].authorUID == user.uid {
+                if comment.comments[indexPath.row].authorUID == user.uid {
                     // users post
                     
                     if blocked == true {
@@ -974,7 +964,7 @@ extension SubCommentVC: CommentCellDelegate {
             vc.parentComment = comment
             vc.parentCell = cell
             vc.parentSubCommentVC = self
-            present(vc, animated: true, completion: nil)
+            navigationController?.pushViewController(vc, animated: true)
             
         } else {
             

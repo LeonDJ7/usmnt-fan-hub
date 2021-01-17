@@ -17,11 +17,15 @@ class TopicVC: UIViewController {
     var topicRow: Int?
     var topicIsSaved = false
     
-    let tableView: UITableView = {
-        let tv = UITableView()
+    let scrollView = UIScrollView()
+    let scrollViewContainer = UIView()
+    
+    let tableView: CustomTableView = {
+        let tv = CustomTableView()
         tv.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
         tv.separatorStyle = .none
         tv.allowsSelection = false
+        tv.isScrollEnabled = false
         tv.register(CommentCell.self, forCellReuseIdentifier: "commentCell")
         return tv
     }()
@@ -92,13 +96,6 @@ class TopicVC: UIViewController {
         return btn
     }()
     
-    lazy var refresher: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.tintColor = .darkGray
-        refreshControl.addTarget(self, action: #selector(requestData), for: .valueChanged)
-        return refreshControl
-    }()
-    
     let activityIndicatorView: UIView = {
         let view = UIView()
         view.backgroundColor = #colorLiteral(red: 0.2513133883, green: 0.2730262578, blue: 0.302120626, alpha: 1)
@@ -125,7 +122,6 @@ class TopicVC: UIViewController {
         
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.refreshControl = refresher
         
         activityIndicator.startAnimating()
         
@@ -149,6 +145,11 @@ class TopicVC: UIViewController {
         } else {
             reportBtn.isHidden = false
         }
+        
+        let contentRect: CGRect = scrollView.subviews.reduce(into: .zero) { rect, view in
+            rect = rect.union(view.frame)
+        }
+        scrollView.contentSize = contentRect.size
         
     }
     
@@ -185,16 +186,18 @@ class TopicVC: UIViewController {
     func addSubviews() {
         
         view.addSubview(backBtn)
-        view.addSubview(authorImageView)
-        view.addSubview(authorAndTimePostedLbl)
-        view.addSubview(topicLbl)
-        view.addSubview(descriptionLbl)
-        view.addSubview(commentBtn)
-        view.addSubview(saveBtn)
-        view.addSubview(seperatorView)
-        view.addSubview(tableView)
-        view.addSubview(deleteBtn)
-        view.addSubview(reportBtn)
+        view.addSubview(scrollView)
+        scrollView.addSubview(scrollViewContainer)
+        scrollViewContainer.addSubview(authorImageView)
+        scrollViewContainer.addSubview(authorAndTimePostedLbl)
+        scrollViewContainer.addSubview(topicLbl)
+        scrollViewContainer.addSubview(descriptionLbl)
+        scrollViewContainer.addSubview(commentBtn)
+        scrollViewContainer.addSubview(saveBtn)
+        scrollViewContainer.addSubview(seperatorView)
+        scrollViewContainer.addSubview(tableView)
+        scrollViewContainer.addSubview(deleteBtn)
+        scrollViewContainer.addSubview(reportBtn)
         view.addSubview(activityIndicatorView)
         activityIndicatorView.addSubview(activityIndicator)
         
@@ -203,65 +206,48 @@ class TopicVC: UIViewController {
     func applyAnchors() {
         
         if #available(iOS 11.0, *) {
-            backBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 0, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+            backBtn.anchors(top: view.safeAreaLayoutGuide.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         } else {
             backBtn.anchors(top: view.topAnchor, topPad: 50, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         }
         
-        authorImageView.anchors(top: backBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollViewContainer.translatesAutoresizingMaskIntoConstraints = false
         
-        authorAndTimePostedLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: authorImageView.rightAnchor, leftPad: 5, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        scrollView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        scrollView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: backBtn.bottomAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(self.tabBarController?.tabBar.frame.size.height)!).isActive = true
         
-        topicLbl.anchors(top: authorImageView.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        scrollViewContainer.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
+        scrollViewContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        scrollViewContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        scrollViewContainer.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        scrollViewContainer.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         
-        descriptionLbl.anchors(top: topicLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        authorImageView.anchors(top: scrollViewContainer.topAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 20, width: 20)
         
-        commentBtn.anchors(top: descriptionLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 20)
+        authorAndTimePostedLbl.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: authorImageView.rightAnchor, leftPad: 5, right: scrollViewContainer.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
+        
+        topicLbl.anchors(top: authorImageView.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 20, right: scrollViewContainer.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        descriptionLbl.anchors(top: topicLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 20, right: scrollViewContainer.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        
+        commentBtn.anchors(top: descriptionLbl.bottomAnchor, topPad: 5, bottom: nil, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 20, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 20)
         
         saveBtn.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: commentBtn.rightAnchor, leftPad: 5, right: nil, rightPad: 0, centerX: nil, centerXPad: 0, centerY: commentBtn.centerYAnchor, centerYPad: 0, height: 0, width: 20)
         
-        seperatorView.anchors(top: commentBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: view.leftAnchor, leftPad: 20, right: view.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
+        seperatorView.anchors(top: commentBtn.bottomAnchor, topPad: 10, bottom: nil, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 20, right: scrollViewContainer.rightAnchor, rightPad: -20, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 1, width: 0)
         
-        tableView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)! - 10, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
+        tableView.anchors(top: seperatorView.bottomAnchor, topPad: 10, bottom: scrollViewContainer.bottomAnchor, bottomPad: 0, left: scrollViewContainer.leftAnchor, leftPad: 0, right: scrollViewContainer.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
-        deleteBtn.anchors(top: nil, topPad: 5, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 20, width: 20)
+        deleteBtn.anchors(top: nil, topPad: 5, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: scrollViewContainer.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 20, width: 20)
         
-        reportBtn.anchors(top: nil, topPad: 5, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: view.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 20, width: 20)
+        reportBtn.anchors(top: nil, topPad: 5, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: scrollViewContainer.rightAnchor, rightPad: -30, centerX: nil, centerXPad: 0, centerY: authorImageView.centerYAnchor, centerYPad: 0, height: 20, width: 20)
 
         activityIndicatorView.anchors(top: seperatorView.bottomAnchor, topPad: 0, bottom: view.bottomAnchor, bottomPad: -(self.tabBarController?.tabBar.frame.size.height)!, left: view.leftAnchor, leftPad: 0, right: view.rightAnchor, rightPad: 0, centerX: nil, centerXPad: 0, centerY: nil, centerYPad: 0, height: 0, width: 0)
         
         activityIndicator.anchors(top: nil, topPad: 0, bottom: nil, bottomPad: 0, left: nil, leftPad: 0, right: nil, rightPad: 0, centerX: activityIndicatorView.centerXAnchor, centerXPad: 0, centerY: activityIndicatorView.centerYAnchor, centerYPad: 0, height: 0, width: 0)
-        
-    }
-    
-    @objc func requestData() {
-        
-        topic.dbref.getDocument { (snap, err) in
-            
-            if let snap = snap {
-                
-                let data = snap.data()!
-                let timestamp = data["timestamp"] as! Double
-                let topic = data["topic"] as! String
-                let author = data["author"] as! String
-                let authorUID = data["authorUID"] as! String
-                let text = data["text"] as! String
-                let id = snap.documentID
-                let dbref = Firestore.firestore().collection("Topics").document(id)
-                let commentCount = data["commentCount"] as! Int
-                let isSensitive = data["isSensitive"] as! Bool
-                self.topic = Topic(topic: topic, timestamp: timestamp, author: author, authorUID: authorUID, text: text, id: id, dbref: dbref, commentCount: commentCount, isSensitive: isSensitive)
-                
-            }
-            
-        }
-        
-        let deadline = DispatchTime.now() + .seconds(1)
-        DispatchQueue.main.asyncAfter(deadline: deadline) {
-            self.topic.comments.sort { $0.likes > $1.likes }
-            self.tableView.reloadData()
-            self.refresher.endRefreshing()
-        }
         
     }
     
@@ -351,7 +337,7 @@ class TopicVC: UIViewController {
         let date = Date(timeIntervalSince1970: timestamp)
         let formatter = DateFormatter()
         formatter.timeZone = TimeZone.current
-        formatter.dateFormat = "dd-MM-yyyy HH:mm"
+        formatter.dateFormat = "MM-dd-yyyy HH:mm"
         let dateString = formatter.string(from: date)
         
         return dateString
@@ -366,7 +352,7 @@ class TopicVC: UIViewController {
             vc.parentIsComment = false
             vc.parentTopic = self.topic
             vc.parentTopicVC = self
-            present(vc, animated: true, completion: nil)
+            navigationController?.pushViewController(vc, animated: true)
             
         } else {
             
@@ -874,6 +860,8 @@ extension TopicVC: UITableViewDelegate, UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell") as! CommentCell
         
+        cell.contentView.isUserInteractionEnabled = false
+        
         // set all data
         
         cell.delegate = self
@@ -1142,7 +1130,7 @@ extension TopicVC: CommentCellDelegate {
             vc.parentComment = comment
             vc.parentCell = cell
             vc.parentTopicVC = self
-            present(vc, animated: true, completion: nil)
+            navigationController?.pushViewController(vc, animated: true)
             
         } else {
             

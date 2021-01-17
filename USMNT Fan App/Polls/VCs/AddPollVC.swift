@@ -29,7 +29,8 @@ class AddPollVC: UIViewController {
         tf.attributedPlaceholder = NSAttributedString(string: "answer 1", attributes: attributes)
         tf.font = UIFont(name: "Avenir-Book", size: 15)
         tf.textColor = .darkGray
-        tf.autocorrectionType = .default
+        tf.autocapitalizationType = .none
+        tf.autocorrectionType = .no
         return tf
     }()
     
@@ -42,7 +43,8 @@ class AddPollVC: UIViewController {
         tf.attributedPlaceholder = NSAttributedString(string: "answer 2", attributes: attributes)
         tf.font = UIFont(name: "Avenir-Book", size: 15)
         tf.textColor = .darkGray
-        tf.autocorrectionType = .default
+        tf.autocapitalizationType = .none
+        tf.autocorrectionType = .no
         return tf
     }()
     
@@ -55,7 +57,8 @@ class AddPollVC: UIViewController {
         tf.attributedPlaceholder = NSAttributedString(string: "answer 3 (optional)", attributes: attributes)
         tf.font = UIFont(name: "Avenir-Book", size: 15)
         tf.textColor = .darkGray
-        tf.autocorrectionType = .default
+        tf.autocapitalizationType = .none
+        tf.autocorrectionType = .no
         return tf
     }()
     
@@ -67,7 +70,8 @@ class AddPollVC: UIViewController {
         ]
         tf.attributedPlaceholder = NSAttributedString(string: "answer 4 (optional)", attributes: attributes)
         tf.font = UIFont(name: "Avenir-Book", size: 15)
-        tf.autocorrectionType = .default
+        tf.autocapitalizationType = .none
+        tf.autocorrectionType = .no
         tf.textColor = .darkGray
         return tf
     }()
@@ -100,7 +104,8 @@ class AddPollVC: UIViewController {
         let tv = UITextView()
         tv.font = UIFont(name: "Avenir-Book", size: 17)
         tv.layer.cornerRadius = 5
-        tv.autocorrectionType = .default
+        tv.autocapitalizationType = .none
+        tv.autocorrectionType = .no
         tv.textColor = .darkGray
         tv.backgroundColor = .white
         return tv
@@ -313,7 +318,7 @@ extension AddPollVC: UITextFieldDelegate {
         }
         let substringToReplace = textFieldText[rangeOfTextToReplace]
         let count = textFieldText.count - substringToReplace.count + string.count
-        return count <= 30
+        return count <= 40
     }
     
 }
