@@ -220,30 +220,39 @@
 			path = VCs;
 			sourceTree = "<group>";
 		};
-		7518755A22D3CC520098494F /* Polls */ = {
+		7518755A22D3CC520098494F /* polls */ = {
 			isa = PBXGroup;
 			children = (
 				75169678246A03A30056E4A6 /* VCs */,
 				75169679246A03BD0056E4A6 /* Cells */,
 			);
-			path = Polls;
+			path = polls;
 			sourceTree = "<group>";
 		};
-		752A7B972319D33E00C41CF1 /* Authentification */ = {
+		752A7B972319D33E00C41CF1 /* authentification */ = {
 			isa = PBXGroup;
 			children = (
 				7516967E246A043A0056E4A6 /* VCs */,
 			);
-			path = Authentification;
+			path = authentification;
 			sourceTree = "<group>";
 		};
-		7560441322DD160800A73201 /* Home */ = {
+		754B17E626437D1900F57EB5 /* UIkit class modifications */ = {
+			isa = PBXGroup;
+			children = (
+				7525712425B3A48E0061EB57 /* Utils.swift */,
+				75EE814124242CD700DC0F79 /* PaddingLabel.swift */,
+			);
+			path = "UIkit class modifications";
+			sourceTree = "<group>";
+		};
+		7560441322DD160800A73201 /* home */ = {
 			isa = PBXGroup;
 			children = (
 				7516967F246A044E0056E4A6 /* VCs */,
 				75AB04F524ABE098005C892C /* Cells */,
 			);
-			path = Home;
+			path = home;
 			sourceTree = "<group>";
 		};
 		75AB04F524ABE098005C892C /* Cells */ = {
@@ -275,15 +284,16 @@
 		75D0077821E7F36800EBFB8D /* USMNT Fan App */ = {
 			isa = PBXGroup;
 			children = (
-				7565238D24E47230005C28B2 /* USMNT Live.entitlements */,
-				7560441322DD160800A73201 /* Home */,
-				75E0344522AB200A00B9A193 /* Calendar */,
-				75E0344A22AEFDC400B9A193 /* Forum */,
-				75D7E88722C42F50009EBF75 /* Roster */,
-				7518755A22D3CC520098494F /* Polls */,
-				752A7B972319D33E00C41CF1 /* Authentification */,
-				75E0344422AB1F6700B9A193 /* Custom Classes */,
 				75D0078F21E8010900EBFB8D /* Extensions.swift */,
+				7565238D24E47230005C28B2 /* USMNT Live.entitlements */,
+				7560441322DD160800A73201 /* home */,
+				75E0344522AB200A00B9A193 /* calendar */,
+				75E0344A22AEFDC400B9A193 /* forum */,
+				75D7E88722C42F50009EBF75 /* roster */,
+				7518755A22D3CC520098494F /* polls */,
+				752A7B972319D33E00C41CF1 /* authentification */,
+				754B17E626437D1900F57EB5 /* UIkit class modifications */,
+				75E0344422AB1F6700B9A193 /* models */,
 				75551B9424B4D2DB00DB1225 /* Functions.swift */,
 				752A7B952319D24F00C41CF1 /* AlertController.swift */,
 				75D0077921E7F36800EBFB8D /* AppDelegate.swift */,
@@ -295,16 +305,16 @@
 			path = "USMNT Fan App";
 			sourceTree = "<group>";
 		};
-		75D7E88722C42F50009EBF75 /* Roster */ = {
+		75D7E88722C42F50009EBF75 /* roster */ = {
 			isa = PBXGroup;
 			children = (
 				7516967A246A03CC0056E4A6 /* VCs */,
 				7516967B246A03DB0056E4A6 /* Cells */,
 			);
-			path = Roster;
+			path = roster;
 			sourceTree = "<group>";
 		};
-		75E0344422AB1F6700B9A193 /* Custom Classes */ = {
+		75E0344422AB1F6700B9A193 /* models */ = {
 			isa = PBXGroup;
 			children = (
 				75CFF95021ED543200C3F8E1 /* Event.swift */,
@@ -312,28 +322,26 @@
 				75E0345722B1831C00B9A193 /* Posts.swift */,
 				750F89C422E25687006EA794 /* Player.swift */,
 				754164F622F74CCE00EB230D /* Poll.swift */,
-				75EE814124242CD700DC0F79 /* PaddingLabel.swift */,
-				7525712425B3A48E0061EB57 /* Utils.swift */,
 			);
-			path = "Custom Classes";
+			path = models;
 			sourceTree = "<group>";
 		};
-		75E0344522AB200A00B9A193 /* Calendar */ = {
+		75E0344522AB200A00B9A193 /* calendar */ = {
 			isa = PBXGroup;
 			children = (
 				7516967C246A03FB0056E4A6 /* VCs */,
 				7516967D246A042B0056E4A6 /* Cells */,
 			);
-			path = Calendar;
+			path = calendar;
 			sourceTree = "<group>";
 		};
-		75E0344A22AEFDC400B9A193 /* Forum */ = {
+		75E0344A22AEFDC400B9A193 /* forum */ = {
 			isa = PBXGroup;
 			children = (
 				751696722469E7150056E4A6 /* VCs */,
 				751696752469E7370056E4A6 /* Cells */,
 			);
-			path = Forum;
+			path = forum;
 			sourceTree = "<group>";
 		};
 		7A4135BCE83CF18BF11F15AF /* Pods */ = {
@@ -668,7 +676,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
 				PRODUCT_NAME = "USMNT Fan Hub";
 				SWIFT_VERSION = 5.0;
@@ -691,7 +699,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Leon-Djusberg.USMNT-Fan-App";
 				PRODUCT_NAME = "USMNT Fan Hub";
 				SWIFT_VERSION = 5.0;
